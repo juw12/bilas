@@ -12,3 +12,5 @@ Keep rule: gates pass AND score >= best + 0.3 AND wins swapped pairwise.
 **Stopped after r2 (plateau: 2 stalls).** Baseline 8.1 -> final 8.22 (judged). Objective gates G1-G7 pass on the shipped build (flows r16 1280x800 + m3 390x844, 0 console errors, 29 sounds; gates g4; slop_check 0 blockers).
 Neither round cleared the +0.3 absolute-score bar, but both beat v0 3/3 in swapped pairwise. Shipped r2 (no regression evidence; fixes a real next-step bug). Rule-strict best v0 is kept in `hone/v0/src/` for rollback.
 Next levers judges agree on: volumetric cloth (sag on the line, thickness), richer machine paneling/materials, denser fibrous lint felt, gesture-based pouring/loading.
+
+| r3 (ship) | 2026-11-08 | Judge-agreed fixes: drape shader, folded thickness, felt lint, machine dials, skyline, glass fog, touch ripple; PWA + signed Android APK | flow desktop+phone PASS 0 errors 29 sounds; G4/G6/G1file/G7 pass; slop 0 | council not re-run (kept 8.22) | shipped |
