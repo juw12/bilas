@@ -1,0 +1,143 @@
+{
+  "mode": "score",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "weights": {
+    "C1": 0.3,
+    "C2": 0.25,
+    "C3": 0.25,
+    "C4": 0.2
+  },
+  "judges": {
+    "Pega-Vision": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 7.0,
+        "C4": 8.0
+      },
+      "evidence": {
+        "C1": "30 one-shot sound ids; lint peel and smooth tied to drag speed, but clipped notes and flat line shirts jar",
+        "C2": "DRAG each coin into the slot; drag across lint screen to peel felt; pegs, smoothing, folding in thirds",
+        "C3": "clearcoat enamel and cutting mat are deliberate, but Clean the lint trap after u is clipped and city/cloth look flat",
+        "C4": "Tap the green slot to feed in a note. plus This load card and red underline, though phone top cards feel cramped"
+      },
+      "fixes": [
+        "Fix clipped/overlapping text and HUD collisions first: desktop notes/prices and phone top cards must be fully readable at 390 and 1280.",
+        "Raise visual craft of cloth and environment: make line shirts, tumbling clothes, basket, bottle, and city backdrop less flat with better geometry, materials, and lighting.",
+        "Deepen ASMR micro-payoff: add synchronized deformation, ripples, coin-insertion feedback, and spatial ambient life for every tap/drag without jarring."
+      ],
+      "total": 8.0,
+      "seconds": 15.9
+    },
+    "Pega-Thinking": {
+      "scores": {
+        "C1": 7.0,
+        "C2": 8.0,
+        "C3": 6.0,
+        "C4": 8.0
+      },
+      "evidence": {
+        "C1": "Calm mint palette, film grain/vignette, 30 synthesized sounds + ambient bed, drum has shader water/foam, dryer warm light, receipt printer moment. However shirts on the line read as flat planes ('cloth reads as fabric' claim not visible in screenshots) and most interactions lack strong tactile visual payoff beyond the lint peel and smoothing.",
+        "C2": "Rich, faithful flow: changer with note feed and coin cascade, detergent drawer, coin drag into slot, lint trap with canvas-erased peel, smoothing tied to drag speed, folding in thirds, pegs, receipt listing every coin. Gestures are matched to actions (drag coin, drag to smooth, drag to peel).",
+        "C3": "Coherent but generic: washers/dryers are white boxes with circles and a flat panel, mint subway tile is stock, shirts on the line look like cardboard cutouts with no visible drape curvature in the screenshot, HUD is clean but the 'clearcoat' and 'soft contact shadows' are not visually evident. Folding mat and receipt are the strongest design moments.",
+        "C4": "Pinned object labels ('Washer 2 · Open the door', 'Changer · Feed a note'), red underline on next station, one-line hint above bar, 'This load' card with per-shirt state, visible timers ('Washing · 0:26 left', 'Drying by the window · 0:39'). A first-time user has a clear next action at all times."
+      },
+      "fixes": [
+        "Make the hanging shirts actually look like fabric in the rendered frame — the line screenshot shows flat, cardboard-like planes; add visible drape curvature, sag at pegs, and translucency so the daylight-through-cotton claim is visible.",
+        "Add visual detail and material variation to the washers/dryers/changer so they stop reading as default primitives — e.g. control knobs with depth, seam lines, brand plates, slight enamel imperfections, visible drum interior texture.",
+        "Add richer in-scene visual payoff during interactions: water sloshing/splash on pour, steam wisp from dryer, foam build-up during wash, subtle cloth weight sag when wet shirts are loaded — so every touch has a tactile visual moment, not just a sound."
+      ],
+      "total": 7.2,
+      "seconds": 12.4
+    },
+    "GLM-5.3-Flash": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 8.0
+      },
+      "evidence": {
+        "C1": "Strong sensory layering claimed and partly visible: '30 one-shot sound ids... plus continuous wash loop, dry loop... rain/room-tone ambience', 'hand-on-cotton sound tied to drag speed', 'drips slow as they dry', 'Sit' station with 'background machines from other customers keep running'; screenshots show drum water/foam, darker wet shirts, peelable lint felt. Falls short of 10: the rain/ambience is audio-only in the shown day scenes (clear sky, no weather cue), and HUD/station-bar taps read as standard buttons rather than tactile moments.",
+        "C2": "Every anchor-10 element is present with matched gestures: 'DRAG each coin into the slot', 'Hold to pour' into the detergent drawer, 'pull the lint trap and drag across it to peel the felt off', 'wooden pegs', 'fold left sleeve, right sleeve, bottom up' on a mat with 'cream thirds guides', plus neighbourhood texture ('Lost: grey sock... leave it on the bench', 'Washer · 2 coins / Dryer · 1 coin' price sign). Remaining gap: washer dial/timer are decorative and the changer dispenses a fixed '1 note = 4 coins', so machine controls are slightly less real than the rest.",
+        "C3": "Coherent, deliberate look: mint tile / cream / terracotta palette, 'clearcoat material' enamel, 'soft contact shadows', 'deep green cutting mat with a light grid and cream thirds guides', thermal receipt with 'torn zigzag bottom' and monospace type, HUD (coin-smiley logo, shirt-state card) clearly belongs to the place. Not a 10: secondary props (detergent bottle, spray bottle, mug) are still simple primitives, wall-note textures are blurry at 1280x800, and the drum contents in the wash close-ups clump/clip awkwardly.",
+        "C4": "Guidance is layered and always present: 'a small label pins to the exact machine or item for the next step... with a soft ring marker', 'the red underline marks only a real next task', one-line hint in every screenshot ('Tap the green slot to feed in a note.'), and 'This load' card plus per-machine timers ('Washer 2 · 0:26 Washing') keep progress visible. Not 9-10: in the 390px fold screenshot the shirt is cropped to a strip at the mat's top edge while the hint says 'Now fold the right side in.', a real confusion risk for a first-time phone user."
+      },
+      "fixes": [
+        "Make the lingering payoff visible, not just audible: add a weather/ambience cue in the day theme (rain streaks or drips at the window) and enrich the drum water (foam, ripples) so it reads clearly through the door glass on the phone view, where it currently looks like a flat plane.",
+        "Raise craft on the secondary props and textures: detergent bottle, spray bottle and mug are bare primitives, and the pinned wall notes are low-resolution/blurry at desktop size — sharper decals or geometry would lift the whole scene toward 'designer would screenshot'.",
+        "Fix phone fold framing: at 390px the folding camera crops the shirt to a thin strip at the top of the mat during 'fold the right side in' — pull the camera back or recenter so the full shirt and the next fold target are always on screen."
+      ],
+      "total": 8.25,
+      "seconds": 47.9
+    }
+  },
+  "quorum": 3,
+  "criterion_median": {
+    "C1": 8.0,
+    "C2": 9.0,
+    "C3": 7.0,
+    "C4": 8.0
+  },
+  "criterion_spread": {
+    "C1": 1.0,
+    "C2": 1.0,
+    "C3": 2.0,
+    "C4": 0.0
+  },
+  "split_criteria": [],
+  "judge_total_range": [
+    7.2,
+    8.25
+  ],
+  "fixes": [
+    {
+      "judge": "Pega-Vision",
+      "fix": "Fix clipped/overlapping text and HUD collisions first: desktop notes/prices and phone top cards must be fully readable at 390 and 1280."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Raise visual craft of cloth and environment: make line shirts, tumbling clothes, basket, bottle, and city backdrop less flat with better geometry, materials, and lighting."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Deepen ASMR micro-payoff: add synchronized deformation, ripples, coin-insertion feedback, and spatial ambient life for every tap/drag without jarring."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Make the hanging shirts actually look like fabric in the rendered frame — the line screenshot shows flat, cardboard-like planes; add visible drape curvature, sag at pegs, and translucency so the daylight-through-cotton claim is visible."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Add visual detail and material variation to the washers/dryers/changer so they stop reading as default primitives — e.g. control knobs with depth, seam lines, brand plates, slight enamel imperfections, visible drum interior texture."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Add richer in-scene visual payoff during interactions: water sloshing/splash on pour, steam wisp from dryer, foam build-up during wash, subtle cloth weight sag when wet shirts are loaded — so every touch has a tactile visual moment, not just a sound."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Make the lingering payoff visible, not just audible: add a weather/ambience cue in the day theme (rain streaks or drips at the window) and enrich the drum water (foam, ripples) so it reads clearly through the door glass on the phone view, where it currently looks like a flat plane."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Raise craft on the secondary props and textures: detergent bottle, spray bottle and mug are bare primitives, and the pinned wall notes are low-resolution/blurry at desktop size — sharper decals or geometry would lift the whole scene toward 'designer would screenshot'."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Fix phone fold framing: at 390px the folding camera crops the shirt to a thin strip at the top of the mat during 'fold the right side in' — pull the camera back or recenter so the full shirt and the next fold target are always on screen."
+    }
+  ],
+  "label": "council-judged (3 judges), mean of 2 runs",
+  "council_score": 8.12,
+  "runs": 2,
+  "run_scores": [
+    8.25,
+    8.0
+  ],
+  "run_spread": 0.25
+}
