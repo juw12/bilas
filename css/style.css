@@ -44,6 +44,10 @@ body {
   color: var(--text);
   font-family: var(--body);
   -webkit-tap-highlight-color: transparent;
+  /* drags and long-presses play the game; they should never select text or open the iOS callout */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 #scene {
@@ -356,7 +360,8 @@ input:focus-visible {
   padding: 11px 18px 11px 30px;
   font-size: 15px;
   line-height: 1.4;
-  pointer-events: auto;
+  /* touches fall through to the 3D scene: on phones the hint sits over the basket */
+  pointer-events: none;
   overflow-wrap: anywhere;
 }
 

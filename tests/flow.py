@@ -21,6 +21,7 @@ WIDTH = int(sys.argv[2]) if len(sys.argv) > 2 else 1280
 HEIGHT = int(sys.argv[3]) if len(sys.argv) > 3 else 800
 OUT = ROOT / "hone" / "shots" / TAG
 LITE = os.environ.get("BILAS_LITE") == "1"
+ENGINE = os.environ.get("BILAS_ENGINE", "chromium")  # "webkit" = Safari engine with an iPhone user agent
 QUERY = "?lite" if LITE else ""
 OUT.mkdir(parents=True, exist_ok=True)
 
@@ -42,7 +43,10 @@ ARGS = [
 # is still recorded by BilasAudio, it just is never sent to a speaker.
 AUDIO_STUB = """
 (() => {
-  const Off = window.OfflineAudioContext;
+  const Off = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  if (!Off) {
+    return;
+  }
   function Fake() {
     const c = new Off(2, 44100 * 2, 44100);
     c.resume = () => Promise.resolve();
@@ -373,8 +377,13 @@ def main():
     errors = []
     result = {}
     with sync_playwright() as p:
-        browser = p.chromium.launch(args=ARGS)
-        page = browser.new_page(viewport={"width": WIDTH, "height": HEIGHT})
+        if ENGINE == "webkit":
+            browser = p.webkit.launch()
+            ua = p.devices["iPhone 13"]["user_agent"]
+            page = browser.new_page(viewport={"width": WIDTH, "height": HEIGHT}, user_agent=ua, device_scale_factor=2)
+        else:
+            browser = p.chromium.launch(args=ARGS)
+            page = browser.new_page(viewport={"width": WIDTH, "height": HEIGHT})
         page.add_init_script(AUDIO_STUB)
         page.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
         page.on("pageerror", lambda e: errors.append("PAGEERROR " + str(e)))

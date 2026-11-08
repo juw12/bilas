@@ -38,8 +38,13 @@ def gestures(r):
     # two shirts by hand, the rest by tap
     for i in range(2):
         r.wait_idle()
+        before = (r.pos("basketShirt:dirty"), r.pos("washerClothes"))
         carry(r, "basketShirt:dirty", "washerClothes")
         r.until(B + f"MS.washer.items.length === {i + 1}")
+        if r.js(B + "MS.washer.items.length") != i + 1:
+            print("debug carry", i, "from/to", before)
+            print("debug state", r.js("JSON.stringify({w: " + B + "MS.washer.items.length, busy: " + B + "MS.washer.busy, door: " + B + "MS.washer.doorOpen, down: " + B + "lastDown})"))
+            r.shot(f"g-debug-carry{i}")
         if i == 0:
             pg.wait_for_timeout(300)
             r.shot("g1-carried")

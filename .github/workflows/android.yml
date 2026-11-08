@@ -116,12 +116,7 @@ jobs:
             sleep 25
             adb exec-out screencap -p > dist/emulator-start.png
             adb shell pidof io.github.juw12.bilas
-            adb shell uiautomator dump /sdcard/ui.xml > /dev/null 2>&1 || true
-            adb shell cat /sdcard/ui.xml > dist/emulator-ui.xml 2>/dev/null || true
-            XY=$(grep -o 'text="Step inside"[^>]*bounds="\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]"' dist/emulator-ui.xml | grep -o '\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]' | head -n 1 | tr -d '[' | tr ']' ',' | awk -F, '{print int(($1+$3)/2)" "int(($2+$4)/2)}')
-            if [ -z "$XY" ]; then XY="540 1358"; fi
-            echo "tapping Step inside at $XY"
-            adb shell input tap $XY
+            XY=$(adb shell uiautomator dump /dev/tty 2>/dev/null | grep -o 'text="Step inside"[^>]*' | grep -o 'bounds="[^"]*"' | head -n 1 | grep -o '[0-9][0-9]*' | tr '\n' ' ' | awk '{print int(($1+$3)/2)" "int(($2+$4)/2)}'); [ -n "$XY" ] || XY="540 1358"; echo "tapping Step inside at $XY"; adb shell input tap $XY
             sleep 10
             adb exec-out screencap -p > dist/emulator-laundry.png
             adb shell pidof io.github.juw12.bilas
@@ -133,7 +128,6 @@ jobs:
           path: |
             dist/*.png
             dist/*.txt
-            dist/*.xml
           retention-days: 7
 
   publish:

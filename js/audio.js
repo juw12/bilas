@@ -45,18 +45,42 @@
     return buf;
   }
 
+  /* iOS: "suspended" after backgrounding, "interrupted" after a call or Siri.
+     Any user gesture or return to the page wakes the context again. */
+  function wake() {
+    if (ctx && ctx.state !== "running" && ctx.state !== "closed") {
+      const p = ctx.resume();
+      if (p && p.catch) {
+        p.catch(function () {});
+      }
+    }
+  }
+
   A.init = function () {
     if (ctx) {
-      if (ctx.state === "suspended") {
-        ctx.resume();
-      }
+      wake();
       return true;
     }
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) {
       return false;
     }
+    /* Safari 16.4+: play through the ring/silent switch like a music app. */
+    try {
+      if (navigator.audioSession) {
+        navigator.audioSession.type = "playback";
+      }
+    } catch (e) {
+      /* older browsers: no audio session API */
+    }
     ctx = new AC();
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) {
+        wake();
+      }
+    });
+    window.addEventListener("pointerdown", wake, true);
+    window.addEventListener("pageshow", wake);
     master = ctx.createGain();
     master.gain.value = volume;
     const comp = ctx.createDynamicsCompressor();

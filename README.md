@@ -32,7 +32,7 @@ Turn the sound on — everything you hear is synthesized live.
 - Works on phones (tested at 320-1440 px wide). Shows a friendly message if WebGL is unavailable.
 
 ## Tests
-`tests/flow.py` drives the full flow with real pointer events in headless Chromium (desktop and phone); `tests/gestures.py` checks the drag-to-load and hold-to-pour gestures; `tests/gates.py` checks layout overflow, tap sizes, translation parity, contrast, `file://` and no-WebGL. Hone history: `hone/refine_log.md`.
+`tests/flow.py` drives the full flow with real pointer events in headless Chromium (desktop and phone), or in WebKit with an iPhone profile when `BILAS_ENGINE=webkit` is set; `tests/gestures.py` checks the drag-to-load and hold-to-pour gestures; `tests/gates.py` checks layout overflow, tap sizes, translation parity, contrast, `file://` and no-WebGL. Hone history: `hone/refine_log.md`.
 
 ## License
 MIT © Juwen Lie
