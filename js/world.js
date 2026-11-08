@@ -75,7 +75,10 @@
   W.M = M;
 
   function buildMaterials() {
-    M.enamel = std(PAL.enamel, { roughness: 0.32 });
+    // porcelain enamel: a clear lacquer coat over the paint picks up the ceiling strips
+    M.enamel = /[?&]lite\b/.test(window.location.search)
+      ? std(PAL.enamel, { roughness: 0.32 })
+      : new T.MeshPhysicalMaterial({ color: PAL.enamel, roughness: 0.38, metalness: 0, clearcoat: 0.85, clearcoatRoughness: 0.1 });
     M.chrome = std("#dfe3e6", { metalness: 1, roughness: 0.16 });
     M.steelDark = std("#6d7478", { metalness: 0.8, roughness: 0.35 });
     M.panel = std("#283034", { roughness: 0.45 });
@@ -1389,6 +1392,41 @@
     puddle.scale.set(0.6, 2.1, 1);
     scene.add(puddle);
     W.puddle = puddle;
+
+    // contact shadows: soft pools where heavy things meet the floor, so nothing floats
+    const aoTex = canvasTex(128, 128, function (c, s) {
+      const g = c.createRadialGradient(s / 2, s / 2, s * 0.06, s / 2, s / 2, s / 2);
+      g.addColorStop(0, "rgba(0,0,0,0.85)");
+      g.addColorStop(0.5, "rgba(0,0,0,0.42)");
+      g.addColorStop(1, "rgba(0,0,0,0)");
+      c.fillStyle = g;
+      c.fillRect(0, 0, s, s);
+    });
+    function contactShadow(x, z, w, d, strength) {
+      const m = new T.Mesh(
+        new T.PlaneGeometry(w, d),
+        new T.MeshBasicMaterial({ map: aoTex, color: "#20170e", transparent: true, opacity: strength, depthWrite: false })
+      );
+      m.rotation.x = -Math.PI / 2;
+      m.position.set(x, 0.004, z);
+      m.renderOrder = 1;
+      m.userData.pass = true;
+      scene.add(m);
+      return m;
+    }
+    [-1.5, -0.75, 0.6].forEach(function (x) {
+      contactShadow(x, -1.3, 0.95, 0.9, 0.55);
+    });
+    contactShadow(1.85, -1.55, 0.8, 0.7, 0.5);
+    contactShadow(-1.05, 1.9, 1.6, 0.6, 0.28);
+    [-0.58, 0.58].forEach(function (x) {
+      contactShadow(-1.05 + x, 1.9, 0.18, 0.5, 0.45);
+    });
+    contactShadow(0.8, 0.85, 1.7, 1.1, 0.22);
+    [[-0.65, -0.35], [0.65, -0.35], [-0.65, 0.35], [0.65, 0.35]].forEach(function (p) {
+      contactShadow(0.8 + p[0], 0.85 + p[1], 0.16, 0.16, 0.5);
+    });
+    contactShadow(-2.6, -1.65, 0.55, 0.55, 0.5);
 
     // highlight ring for "tap here"
     const ringTex = canvasTex(128, 128, function (c, s) {

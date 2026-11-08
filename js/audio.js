@@ -296,6 +296,15 @@
     });
   };
 
+  // thermal receipt printer: a short buzzing feed, line ticks, then the tear
+  S.receipt = function (t) {
+    noise({ t: t, f: 3200, q: 1.4, attack: 0.02, decay: 0.75, peak: 0.022 });
+    for (let i = 0; i < 6; i++) {
+      click(t + 0.12 + i * 0.13, rnd(1900, 2500), 0.035);
+    }
+    noise({ t: t + 0.95, f: 2600, f2: 900, q: 0.8, attack: 0.005, decay: 0.12, peak: 0.07 });
+  };
+
   S.flap = function (t) {
     noise({ t: t, f: 900, q: 0.9, attack: 0.004, decay: 0.1, peak: 0.2 });
     noise({ t: t + 0.11, f: 1200, q: 0.9, attack: 0.004, decay: 0.07, peak: 0.1 });

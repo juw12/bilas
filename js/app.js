@@ -234,6 +234,7 @@
     S.loadId += 1;
     S.loadStart = performance.now();
     S.doneShown = false;
+    S.receipt = { washer: 0, dryer: 0, line: 0 };
     SH.randomSpecs(4).forEach(function (spec, i) {
       const obj = SH.create(spec);
       const rec = { id: S.loadId + "-" + i, load: S.loadId, spec: spec, obj: obj, state: "dirty", loc: "basket", tumble: null, hang: null };
@@ -806,6 +807,9 @@
     m.phase = "run";
     m.t = 0;
     m.dur = (m.key === "washer" ? 1 : 0.8) * S.cycle;
+    if (S.receipt) {
+      S.receipt[m.key] += m.need;
+    }
     m.coins = 0;
     m.lastPh = "";
     A.play("startBeep");
@@ -1209,6 +1213,9 @@
     S.line[free] = s;
     s.loc = "line";
     s.hang = { slot: free, pivot: pivot, pegs: 0, markers: [], pegMeshes: [], dry: 0, phase: rand(0, 6), swing: 0 };
+    if (S.receipt) {
+      S.receipt.line += 1;
+    }
     layoutBasket();
     A.play("swish");
     fly(s, pivot, new T.Vector3(0, -0.29, 0), Q_HANG, 0.85, 0.6, 0.18, function () {
@@ -1540,14 +1547,47 @@
     S.doneShown = true;
     later(1.2, function () {
       const sec = (performance.now() - S.loadStart) / 1000;
-      $("doneBody").textContent = t("done_body", { n: loadShirts().length, time: fmtTime(sec) });
+      const n = loadShirts().length;
+      const r = S.receipt || { washer: 0, dryer: 0, line: 0 };
+      $("doneBody").textContent = t("done_body", { n: n, time: fmtTime(sec) });
+      // a thermal slip from the changer: what this load cost, line by line
+      const rows = [[t("rc_shirts"), "\u00d7" + n]];
+      if (r.washer) {
+        rows.push([t("ticket_washer"), t(r.washer === 1 ? "rc_coin" : "rc_coins", { n: r.washer })]);
+      }
+      if (r.dryer) {
+        rows.push([t("ticket_dryer"), t(r.dryer === 1 ? "rc_coin" : "rc_coins", { n: r.dryer })]);
+      }
+      if (r.line) {
+        rows.push([t("rc_line"), t("rc_free", { n: r.line })]);
+      }
+      rows.push([t("rc_time"), fmtTime(sec)]);
+      const list = $("doneLines");
+      list.textContent = "";
+      rows.forEach(function (row, i) {
+        const li = document.createElement("li");
+        li.style.animationDelay = (0.25 + i * 0.16).toFixed(2) + "s";
+        const a = document.createElement("span");
+        a.textContent = row[0];
+        const b = document.createElement("span");
+        b.textContent = row[1];
+        li.appendChild(a);
+        li.appendChild(b);
+        list.appendChild(li);
+      });
+      const stamp = new Date();
+      $("doneStamp").textContent = "LOAD " + String(S.loadId).padStart(3, "0") + " \u00b7 " +
+        String(stamp.getHours()).padStart(2, "0") + ":" + String(stamp.getMinutes()).padStart(2, "0");
       $("done").hidden = false;
+      document.body.classList.add("done-open");
+      A.play("receipt");
       updateHUD();
     });
   }
 
   function anotherLoad() {
     $("done").hidden = true;
+    document.body.classList.remove("done-open");
     const folded = S.stack.slice();
     if (folded.length > 8) {
       folded.slice(0, folded.length - 8).forEach(function (s) {
@@ -2313,12 +2353,18 @@
   }
 
   /* ---------- guide ring: where to tap next (appears after a short pause) ---------- */
+  // where to look next, plus a short label for the in-world callout
   function guideTarget() {
     const st = S.station;
     const w = MS.washer;
     const d = MS.dryer;
     const bk = basketCounts();
     const v = new T.Vector3();
+    S.guide = null;
+    function at(key, who, obj) {
+      S.guide = { key: key, who: who };
+      return obj.getWorldPosition(v);
+    }
     if (cam.moving || S.station === "sit") {
       return null;
     }
@@ -2326,53 +2372,53 @@
       if (S.changerBusy) {
         return null;
       }
-      return (S.trayCoins > 0 ? C.trayHit : C.billHit).getWorldPosition(v);
+      return S.trayCoins > 0 ? at("g_scoop", "", C.trayHit) : at("g_note", "", C.billHit);
     }
     if (st === "wash") {
       if (w.phase === "run" || w.busy) {
         return null;
       }
       if (w.phase === "done") {
-        return (w.doorOpen ? w.parts.drumHit : w.parts.doorHit).getWorldPosition(v);
+        return w.doorOpen ? at("g_unload", "w", w.parts.drumHit) : at("g_open", "w", w.parts.doorHit);
       }
       if (w.doorOpen && bk.dirty > 0) {
-        return W.basket.hit.getWorldPosition(v);
+        return at("g_load", "", W.basket.hit);
       }
       if (!w.items.length) {
-        return bk.dirty > 0 ? w.parts.doorHit.getWorldPosition(v) : null;
+        return bk.dirty > 0 ? at("g_open", "w", w.parts.doorHit) : null;
       }
       if (!w.soap) {
-        return w.parts.bottle.getWorldPosition(v).add(new T.Vector3(0, 0.09, 0));
+        return at("g_pour", "", w.parts.bottle).add(new T.Vector3(0, 0.09, 0));
       }
       if (w.doorOpen) {
-        return w.parts.doorHit.getWorldPosition(v);
+        return at("g_close", "w", w.parts.doorHit);
       }
       if (w.coins < w.need) {
-        return S.purse > 0 ? w.parts.slotHit.getWorldPosition(v) : null;
+        return S.purse > 0 ? at("g_coin", "w", w.parts.slotHit) : null;
       }
-      return w.parts.start.getWorldPosition(v);
+      return at("g_start", "w", w.parts.start);
     }
     if (st === "dry") {
       if (S.lint.open || d.phase === "run" || d.busy) {
         return null;
       }
       if (d.phase === "done") {
-        return (d.doorOpen ? d.parts.drumHit : d.parts.doorHit).getWorldPosition(v);
+        return d.doorOpen ? at("g_unload", "d", d.parts.drumHit) : at("g_open", "d", d.parts.doorHit);
       }
       if (bk.wet > 0 && d.items.length < 6 && (d.doorOpen || !d.items.length)) {
-        return W.basket.hit.getWorldPosition(v);
+        return at("g_load_wet", "d", W.basket.hit);
       }
       if (d.items.length && d.doorOpen) {
-        return d.parts.doorHit.getWorldPosition(v);
+        return at("g_close", "d", d.parts.doorHit);
       }
       if (d.items.length && d.coins < d.need) {
-        return S.purse > 0 ? d.parts.slotHit.getWorldPosition(v) : null;
+        return S.purse > 0 ? at("g_coin", "d", d.parts.slotHit) : null;
       }
       if (d.items.length) {
-        return d.parts.start.getWorldPosition(v);
+        return at("g_start", "d", d.parts.start);
       }
       if (S.lint.amount > 0) {
-        return LT.tabHit.getWorldPosition(v);
+        return at("g_lint", "", LT.tabHit);
       }
       return null;
     }
@@ -2387,27 +2433,68 @@
         return s && s.state === "dry";
       });
       if (dry) {
+        S.guide = { key: "g_unclip", who: "" };
         return dry.obj.root.localToWorld(v.set(0, 0.05, 0.02));
       }
       if (bk.wet > 0) {
-        return W.basket.hit.getWorldPosition(v);
+        return at("g_take_wet", "", W.basket.hit);
       }
       return null;
     }
     if (st === "fold") {
       if (!S.table.shirt && bk.dry > 0) {
-        return W.basket.hit.getWorldPosition(v);
+        return at("g_lay", "", W.basket.hit);
       }
       return null;
     }
     return null;
   }
 
+  const callout = $("callout");
+  const calloutPos = new T.Vector3();
+  let calloutText = "";
+  let calloutW = 0;
+
+  function placeCallout(tgt, show) {
+    if (!callout) {
+      return;
+    }
+    const overlayOpen = !$("done").hidden;
+    if (!show || !tgt || !S.guide || overlayOpen) {
+      callout.classList.remove("on");
+      return;
+    }
+    const who = S.guide.who === "w" ? t("ticket_washer") : S.guide.who === "d" ? t("ticket_dryer") : "";
+    const text = (who ? who + " · " : "") + t(S.guide.key);
+    if (text !== calloutText) {
+      calloutText = text;
+      callout.textContent = text;
+      calloutW = callout.offsetWidth;
+    }
+    calloutPos.copy(tgt).project(W.camera);
+    if (calloutPos.z > 1 || Math.abs(calloutPos.x) > 1.05 || Math.abs(calloutPos.y) > 1.05) {
+      callout.classList.remove("on");
+      return;
+    }
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const half = calloutW / 2 + 10;
+    const x = Math.min(vw - half, Math.max(half, (calloutPos.x + 1) / 2 * vw));
+    const y = (1 - calloutPos.y) / 2 * vh;
+    // flip under the target when it sits close to the top HUD
+    const below = y < 130;
+    callout.classList.toggle("below", below);
+    callout.style.transform = "translate(" + Math.round(x - calloutW / 2) + "px," + Math.round(below ? y + 26 : y - 58) + "px)";
+    callout.classList.add("on");
+  }
+
   function stepGuide() {
     const mk = W.marker;
-    const idle = performance.now() - S.lastInput > (S.loadId <= 1 ? 1400 : 3500);
-    const tgt = idle ? guideTarget() : null;
-    if (!tgt) {
+    const sinceInput = performance.now() - S.lastInput;
+    const tgt = guideTarget();
+    placeCallout(tgt, sinceInput > 650);
+    const idle = sinceInput > (S.loadId <= 1 ? 1400 : 3500);
+    if (!tgt || !idle) {
       mk.visible = false;
       return;
     }
@@ -2836,6 +2923,7 @@
   $("btnAgain").addEventListener("click", anotherLoad);
   $("btnStay").addEventListener("click", function () {
     $("done").hidden = true;
+    document.body.classList.remove("done-open");
     go("sit");
   });
 

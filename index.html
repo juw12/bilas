@@ -19,6 +19,8 @@
 </head>
 <body>
   <canvas id="scene" aria-label="3D coin laundry"></canvas>
+  <div class="lens" aria-hidden="true"></div>
+  <div class="callout" id="callout" aria-hidden="true"></div>
 
   <header class="brand" aria-label="Bilas">
     <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
@@ -98,9 +100,15 @@
   </div>
 
   <div class="overlay" id="done" hidden>
-    <div class="card ticket">
+    <div class="card ticket receipt">
+      <div class="receipt-head">
+        <span class="receipt-brand">bilas</span>
+        <span class="receipt-stamp" id="doneStamp"></span>
+      </div>
       <h2 data-i18n="done_title">Clean, dry, folded.</h2>
+      <ol class="receipt-lines" id="doneLines"></ol>
       <p id="doneBody"></p>
+      <p class="receipt-thanks" data-i18n="rc_thanks">Thank you. Come back soon.</p>
       <div class="done-actions">
         <button class="primary" id="btnAgain" type="button" data-i18n="done_again">Another load</button>
         <button class="secondary" id="btnStay" type="button" data-i18n="done_stay">Stay a while</button>

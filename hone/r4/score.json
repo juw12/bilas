@@ -1,0 +1,143 @@
+{
+  "mode": "score",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "weights": {
+    "C1": 0.3,
+    "C2": 0.25,
+    "C3": 0.25,
+    "C4": 0.2
+  },
+  "judges": {
+    "Pega-Vision": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 7.0,
+        "C4": 8.0
+      },
+      "evidence": {
+        "C1": "'Washing · 0:26 left. Watch the water, or sit for a while.' plus 30 synthesized sound ids and spatial machine loops.",
+        "C2": "'DRAG each coin into the slot' and 'drag across it to peel the felt off' show matched real-laundry gestures.",
+        "C3": "Hanging shirts read as flat cutouts against the skyline, and HUD cards are clean but not distinctive.",
+        "C4": "'Tap the green slot to feed in a note.' plus the 'This load' card give a clear next step, though phone HUD is cramped."
+      },
+      "fixes": [
+        "Raise visual craft: replace flat shirt/line/lint surfaces with believable cloth shading, wrinkles, AO, and richer machine materials so the scene is screenshot-worthy.",
+        "Make every touch feel ASMR: add synchronized micro-animations, ripple/particle feedback, and spatial sound to all taps/drags, not just major steps.",
+        "Tighten onboarding on phone: reduce top-HUD crowding, keep the active shirt fully in frame, and point the next-step hint directly at the 3D object."
+      ],
+      "total": 8.0,
+      "seconds": 159.2
+    },
+    "Pega-Thinking": {
+      "scores": {
+        "C1": 7.0,
+        "C2": 8.0,
+        "C3": 6.0,
+        "C4": 7.0
+      },
+      "evidence": {
+        "C1": "Calm mint/wood palette, visible water and foam in drum, lint felt texture, drape on hanging shirts, 30 synthesized sounds + ambient bed, 'Sit' station invites lingering; but water/foam in screenshots reads subtle and wrinkle-smoothing shows no visible deformation.",
+        "C2": "Full real-laundry chain: note feed + coin cascade, door/basket/detergent drawer/coin-slot drag/start, dryer coin ledge + lint trap peel, pegs on line, smoothing drag + fold-in-thirds; gestures are matched (drag coin, press-and-hold pour, drag to smooth).",
+        "C3": "Coherent palette (mint subway tile, red accents, warm wood) and HUD matches the place (bottom station bar, 'This load' card), but shirts read as flat planes, skyline is a flat illustrated backdrop, machines are basic cylinders with decals — competent but not distinctive enough that a designer would screenshot it.",
+        "C4": "Persistent one-line hint above station bar ('Tap the green slot to feed in a note', 'Washing · 0:26 left'), red underline marks next step, 'This load' card tracks per-shirt state, clear done card; however side hints like 'Lost: grey sock' and 'Dryer a runs hot' are cryptic and the fold step's grid guidance is implicit."
+      },
+      "fixes": [
+        "Raise C3 visual craft: give shirts real cloth thickness/draped silhouette, add material variation (porcelain enamel, brushed steel, wood grain) and deliberate lighting/shadows so the room reads as a designed space rather than primitives with decals.",
+        "Strengthen C1 sensory payoff during interactions: make drum water/foam visibly slosh and shirts tumble, animate wrinkle erasure while smoothing, and add a visible drip/fade on hanging shirts so each touch has an obvious visual consequence.",
+        "Clarify C4 onboarding: rewrite cryptic side hints ('Lost: grey sock', 'Dryer a runs hot') into actionable next steps, and surface fold-progress (e.g. 'Sleeves folded, now fold the bottom up') so a first-time user never wonders what to do."
+      ],
+      "total": 7.0,
+      "seconds": 138.6
+    },
+    "GLM-5.3-Flash": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Strong tactile/sensory design: 'Drum agitates with shader water and foam', 'a soft ripple appears where you touch', 'drips slow as they dry', lingering is invited via the 'Sit' station and 'Stay a while'. But several payoffs (coin scoop, peg tap) are asserted rather than shown, and stills can't confirm 'nothing jarring' in the mix; the modal done-card briefly interrupts the calm.",
+        "C2": "Every anchor-10 element is present with matched gestures: 'DRAG each coin into the slot (2 coins)', 'press and hold the detergent bottle to pour (stream length follows the hold)', 'pull the lint trap and drag across it to peel the felt off', 'fold left sleeve, right sleeve, bottom up', plus neighbourhood texture ('Lost: grey sock… Dryer 4 runs hot' notes). Not 10: no cycle/temperature choice and the fold is sleeve-style rather than thirds; a couple of beats (scoop, pegs) stay thin.",
+        "C3": "Coherent, deliberate look: mint subway tiles, warm wood, red accents, dot-matrix 'WASH 0:26' LCD, 'lavanda 1 kg' box, folding-board guide lines, HUD matches the place ('THIS LOAD' shirt-state card). Held back: hanging shirts read flat against the skyline, several walls/floors sit empty (idle changer shot), and lighting is soft-ambient with little directional shadow — pleasant but not uniformly screenshot-worthy.",
+        "C4": "Always-on contextual hint ('Tap the green slot to feed in a note.', 'Now fold the right side in.'), 'red underline on the next suggested step', progress always visible ('This load' card showing '2 dry · 2 wet', 'Washer 2 · 0:26' with bar), and G2 passed at both sizes. Not 10: the player must 'choose dryer 3' and no still shows the machine being pointed out, so a first-timer can guess which unit."
+      },
+      "fixes": [
+        "Close the C1 gap (highest weight): give every touch an evidenced visual+sound payoff (coin-scoop tinkle/spill, peg flex, latch click), verify the mix has nothing jarring, and consider an in-scene done moment instead of the modal card.",
+        "Lift C3: add directional light with soft contact shadows and fill empty reads (wall poster, vending machine, bench, floor reflection); give hanging shirts a clearer drape silhouette against the skyline.",
+        "Tighten C4: highlight the exact machine for the current step (glow/arrow on dryer 3 or washer 2) and echo the hint as a label on the object itself so no guessing is needed."
+      ],
+      "total": 8.45,
+      "seconds": 183.7
+    }
+  },
+  "quorum": 3,
+  "criterion_median": {
+    "C1": 8.0,
+    "C2": 9.0,
+    "C3": 7.0,
+    "C4": 8.0
+  },
+  "criterion_spread": {
+    "C1": 1.0,
+    "C2": 1.0,
+    "C3": 2.0,
+    "C4": 2.0
+  },
+  "split_criteria": [],
+  "judge_total_range": [
+    7.0,
+    8.45
+  ],
+  "fixes": [
+    {
+      "judge": "Pega-Vision",
+      "fix": "Raise visual craft: replace flat shirt/line/lint surfaces with believable cloth shading, wrinkles, AO, and richer machine materials so the scene is screenshot-worthy."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Make every touch feel ASMR: add synchronized micro-animations, ripple/particle feedback, and spatial sound to all taps/drags, not just major steps."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Tighten onboarding on phone: reduce top-HUD crowding, keep the active shirt fully in frame, and point the next-step hint directly at the 3D object."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Raise C3 visual craft: give shirts real cloth thickness/draped silhouette, add material variation (porcelain enamel, brushed steel, wood grain) and deliberate lighting/shadows so the room reads as a designed space rather than primitives with decals."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Strengthen C1 sensory payoff during interactions: make drum water/foam visibly slosh and shirts tumble, animate wrinkle erasure while smoothing, and add a visible drip/fade on hanging shirts so each touch has an obvious visual consequence."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Clarify C4 onboarding: rewrite cryptic side hints ('Lost: grey sock', 'Dryer a runs hot') into actionable next steps, and surface fold-progress (e.g. 'Sleeves folded, now fold the bottom up') so a first-time user never wonders what to do."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Close the C1 gap (highest weight): give every touch an evidenced visual+sound payoff (coin-scoop tinkle/spill, peg flex, latch click), verify the mix has nothing jarring, and consider an in-scene done moment instead of the modal card."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Lift C3: add directional light with soft contact shadows and fill empty reads (wall poster, vending machine, bench, floor reflection); give hanging shirts a clearer drape silhouette against the skyline."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Tighten C4: highlight the exact machine for the current step (glow/arrow on dryer 3 or washer 2) and echo the hint as a label on the object itself so no guessing is needed."
+    }
+  ],
+  "label": "council-judged (3 judges), mean of 2 runs",
+  "council_score": 7.92,
+  "runs": 2,
+  "run_scores": [
+    7.85,
+    8.0
+  ],
+  "run_spread": 0.15
+}

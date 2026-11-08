@@ -1,0 +1,51 @@
+{
+  "mode": "pair",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "judges": {
+    "Pega-Vision": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Version 2 improves the rubric’s weighted soft criteria, especially clarity/onboarding and visual craft, with object-pinned guidance, a diegetic receipt finish, better materials/lighting, and an added sensory payoff, while retaining the same verified flow.",
+        "Version 1 better satisfies the rubric’s weighted soft criteria through stronger ASMR payoff, clearer onboarding, and more deliberate visual craft, especially the diegetic receipt moment, object-pinned guidance, improved materials/lighting, and extra synthesized feedback. Version 2 has some richer gestures, but its overall presentation and sensory payoff are less polished."
+      ]
+    },
+    "Pega-Thinking": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "V2 improves on V1 across all soft criteria: object-pinned guidance labels with ring markers meaningfully boost onboarding clarity (C4), the thermal receipt printer with its own sound adds a tactile, authentic laundromat payoff (C1, C2), and clearcoat materials, contact shadows, and film-grain/vignette layer raise visual craft (C3). Both pass all hard gates, but V2's weighted soft-criteria advantage is substantial.",
+        "VERSION 1 (r5) edges ahead with stronger onboarding via object-pinned guidance labels, an additional sensory payoff (receipt-printer moment with 31 sounds vs 29), and more visual polish (clearcoat materials, contact shadows, film-grain/vignette). VERSION 2 has comparable interaction fidelity and visual craft, but the accumulated refinements in C1, C3, and C4 give VERSION 1 a slight overall advantage."
+      ]
+    },
+    "GLM-5.3-Flash": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Both versions pass all hard gates with an identical core loop, but VERSION 2 adds object-pinned next-step labels with ring markers (directly strengthening C4 onboarding), a tactile itemized thermal-receipt finale with its own printer sound (C1/C2), and clearcoat/contact-shadow/film-grain polish (C3), with one more distinct sound — a clear weighted improvement over VERSION 1's plain done card and bottom-bar-only hints.",
+        "Version 1 (r5) contains Version 2's feature set plus targeted improvements: object-anchored next-step labels with ring markers (stronger C4 onboarding), a thermal-receipt ending that prints line-by-line with its own sound plus clearcoat/contact-shadow/film-grain polish (stronger C1/C3 payoff), and 30 vs 29 sounds fired. Both claim identical full gate passes and the same core gesture loop, so V1's onboarding and sensory upgrades give it the edge."
+      ]
+    }
+  },
+  "votes": {
+    "A": 0,
+    "B": 3,
+    "tie": 0
+  },
+  "quorum": 3,
+  "b_wins": true,
+  "label": "council-judged (3 judges)"
+}

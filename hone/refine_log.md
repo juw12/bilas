@@ -15,3 +15,4 @@ Next levers judges agree on: volumetric cloth (sag on the line, thickness), rich
 
 | r3 (ship) | 2026-11-08 | Judge-agreed fixes: drape shader, folded thickness, felt lint, machine dials, skyline, glass fog, touch ripple; PWA + signed Android APK | flow desktop+phone PASS 0 errors 29 sounds; G4/G6/G1file/G7 pass; slop 0 | council not re-run (kept 8.22) | shipped |
 | r4 (ship) | 2026-11-08 | Gestures (drag shirts into drums, hold bottle to pour), native iOS app (Capacitor, simulator-checked, unsigned IPA release), iPhone audio (audioSession playback, resume on interrupt), hint no longer blocks drags on phones, emulator CI tap fix | flow desktop r20 + phone m6 PASS 0 errors 29 sounds; WebKit iPhone flow wk2 PASS; gestures g11 phone + g12 desktop PASS; gates g13 pass | council not re-run (kept 8.22) | shipped |
+| 2026-11-08 21:35 | council score | 7.92 | split: - | Pega-Vision=8.0, Pega-Thinking=7.0, GLM-5.3-Flash=8.45 |
