@@ -5,11 +5,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "android:prepare": "node scripts/prepare-android.mjs"
+    "android:prepare": "node scripts/prepare-android.mjs",
+    "ios:prepare": "node scripts/prepare-ios.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.5.3",
-    "@capacitor/core": "8.5.3"
+    "@capacitor/core": "8.5.3",
+    "@capacitor/ios": "8.5.3"
   },
   "devDependencies": {
     "@capacitor/cli": "8.5.3"

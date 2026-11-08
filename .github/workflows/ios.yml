@@ -1,0 +1,111 @@
+name: iOS app
+
+# Builds Bilas for iOS from the same files GitHub Pages serves: runs it in the iOS Simulator
+# (screenshot as proof) and publishes an unsigned IPA to the "ios" release for sideloading.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'manifest.webmanifest'
+      - 'css/**'
+      - 'js/**'
+      - 'icons/**'
+      - 'assets/**'
+      - 'mobile/**'
+      - '.github/workflows/ios.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare the iOS project
+        run: |
+          npm install --no-fund --no-audit
+          npm run ios:prepare
+          ls ios/App
+      - name: Build for the simulator
+        run: |
+          cd ios/App
+          if [ -d App.xcworkspace ]; then TARGET="-workspace App.xcworkspace"; else TARGET="-project App.xcodeproj"; fi
+          xcodebuild $TARGET -scheme App -configuration Release -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath build-sim \
+            CODE_SIGNING_ALLOWED=NO build | tail -n 25
+      - name: Open it in the iOS Simulator
+        run: |
+          mkdir -p dist
+          UDID=$(xcrun simctl list devices available -j | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; print(next(x['udid'] for k,v in d.items() if 'iOS' in k for x in v if x['name'].startswith('iPhone')))")
+          echo "simulator $UDID"
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          APP=$(find ios/App/build-sim -name 'App.app' -path '*iphonesimulator*' | head -n 1)
+          xcrun simctl install "$UDID" "$APP"
+          xcrun simctl launch "$UDID" io.github.juw12.bilas
+          sleep 30
+          xcrun simctl io "$UDID" screenshot dist/ios-simulator.png
+          xcrun simctl spawn "$UDID" launchctl list | grep -i bilas || true
+      - name: Build an unsigned IPA for sideloading
+        run: |
+          cd ios/App
+          if [ -d App.xcworkspace ]; then TARGET="-workspace App.xcworkspace"; else TARGET="-project App.xcodeproj"; fi
+          xcodebuild $TARGET -scheme App -configuration Release -sdk iphoneos \
+            -destination 'generic/platform=iOS' -derivedDataPath build-device \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build | tail -n 25
+          APP=$(find build-device -name 'App.app' -path '*iphoneos*' | head -n 1)
+          rm -rf Payload && mkdir Payload
+          cp -R "$APP" Payload/Bilas.app
+          zip -qry ../../dist/Bilas-unsigned.ipa Payload
+          ls -l ../../dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Bilas-iOS
+          path: mobile/dist
+          retention-days: 14
+
+  publish:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: Bilas-iOS
+          path: dist
+      - name: Publish the IPA to the "ios" release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          cat > notes.md <<EOF
+          Bilas for iPhone and iPad, built from ${GITHUB_SHA::7}.
+
+          **Easiest:** open https://juw12.github.io/bilas/ in Safari, tap Share, then **Add to Home Screen**. It runs full screen and offline, no install needed.
+
+          **Native app (sideload):** \`Bilas-unsigned.ipa\` is not signed and is not on the App Store. Install it with AltStore or Sideloadly, which sign it with your own Apple ID (a free Apple ID needs a re-sign every 7 days).
+
+          The build is checked in the iOS Simulator on every release (\`ios-simulator.png\`).
+          EOF
+          if gh release view ios --repo "$REPO" > /dev/null 2>&1; then
+            gh release upload ios dist/Bilas-unsigned.ipa dist/ios-simulator.png --clobber --repo "$REPO"
+            gh release edit ios --notes-file notes.md --repo "$REPO"
+          else
+            gh release create ios dist/Bilas-unsigned.ipa dist/ios-simulator.png --title "Bilas for iPhone (sideload)" --notes-file notes.md --target "$GITHUB_SHA" --latest=false --repo "$REPO"
+          fi

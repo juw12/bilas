@@ -481,6 +481,20 @@
       toast(wantState === "dirty" ? "toast_no_dirty" : "toast_no_wet");
       return;
     }
+    loadThis(m, s);
+  }
+
+  // load one specific shirt (a tap picks the next one; a drag hands over the one in your hand)
+  function loadThis(m, s) {
+    if (m.phase === "run" || m.items.length >= 6 || (m.phase === "done" && m.items.length)) {
+      return false;
+    }
+    if (m.busy) {
+      later(0.25, function () {
+        loadThis(m, s);
+      });
+      return true;
+    }
     const go = function () {
       s.loc = m.key;
       m.items.push(s);
@@ -499,6 +513,7 @@
     } else {
       go();
     }
+    return true;
   }
 
   function unload(m) {
@@ -578,6 +593,108 @@
             updateHUD();
           });
         });
+      });
+    });
+  }
+
+  /* Pour by hand: pick the bottle up, carry it over the drawer and it tips and pours while you hold it there.
+     The cup fills over about 2 s of pouring; let go early and it remembers how full it is. */
+  const POUR_AT = new T.Vector3(-0.01, 0.77, 0.1);
+  const POUR_RANGE = 0.075;
+  const POUR_TIME = 2.0;
+  const pourPlane = new T.Plane();
+  const pourTmp = new T.Vector3();
+
+  function canPour() {
+    const m = MS.washer;
+    return !(m.soap || m.busy || m.phase === "run");
+  }
+
+  function startPourDrag() {
+    const m = MS.washer;
+    const b = m.parts.bottle;
+    const n = new T.Vector3(0, 0, 1).applyQuaternion(W.washer.group.getWorldQuaternion(new T.Quaternion()));
+    pourPlane.setFromNormalAndCoplanarPoint(n, W.washer.group.localToWorld(POUR_AT.clone()));
+    m.soapFill = m.soapFill || 0;
+    return { kind: "pour", started: false, lastSound: -9, home: m.parts.bottleHome.clone(), b: b };
+  }
+
+  function beginPour(dg) {
+    const m = MS.washer;
+    dg.started = true;
+    m.busy = true;
+    A.play("button");
+    const d = m.parts.drawer;
+    tween(0.3, function (k) {
+      d.position.z = Math.max(d.position.z, 0.09 * k);
+    });
+    toast("h_pour");
+  }
+
+  function movePour(dg) {
+    if (!ray.ray.intersectPlane(pourPlane, pourTmp)) {
+      return;
+    }
+    const local = W.washer.group.worldToLocal(pourTmp.clone());
+    const b = dg.b;
+    b.position.x = Math.max(-0.32, Math.min(0.24, local.x));
+    b.position.y = Math.max(0.62, Math.min(0.98, local.y - 0.05));
+    b.position.z = POUR_AT.z;
+  }
+
+  function stepPour(dt) {
+    const dg = drag;
+    if (!dg || dg.kind !== "pour" || !dg.started) {
+      return;
+    }
+    const m = MS.washer;
+    const b = dg.b;
+    const dist = Math.hypot(b.position.x - POUR_AT.x, b.position.y - POUR_AT.y);
+    const near = dist < POUR_RANGE;
+    const target = near ? 1.9 : 0.25;
+    b.rotation.z += (target - b.rotation.z) * Math.min(1, dt * 9);
+    const pouring = near && b.rotation.z > 1.45;
+    stream.visible = pouring;
+    if (pouring) {
+      m.soapFill = Math.min(1, m.soapFill + dt / POUR_TIME);
+      stream.scale.set(1, 0.6 + 0.4 * Math.sin(performance.now() / 25), 1);
+      const now = performance.now() / 1000;
+      if (now - dg.lastSound > 1.2) {
+        dg.lastSound = now;
+        A.play("pour");
+      }
+      if (m.soapFill >= 1) {
+        drag = null;
+        down = null;
+        finishPour(true);
+      }
+    }
+  }
+
+  // put the bottle back; full = the cup is full and the drawer closes with soap in it
+  function finishPour(full) {
+    const m = MS.washer;
+    const b = m.parts.bottle;
+    const d = m.parts.drawer;
+    const home = m.parts.bottleHome.clone();
+    const p0 = b.position.clone();
+    const r0 = b.rotation.z;
+    stream.visible = false;
+    tween(0.5, function (k) {
+      b.position.lerpVectors(p0, home, k);
+      b.rotation.z = r0 * (1 - k);
+    }, function () {
+      const z0 = d.position.z;
+      tween(0.3, function (k) {
+        d.position.z = z0 * (1 - k);
+      }, function () {
+        if (full) {
+          A.play("button");
+          m.soap = true;
+          m.soapFill = 0;
+        }
+        m.busy = false;
+        updateHUD();
       });
     });
   }
@@ -1837,6 +1954,61 @@
     }, 650);
   }
 
+  /* Carry a shirt from the basket into a drum: it follows your finger a hand's length in front of the camera,
+     and letting go over the open door drops it in. Anywhere else it falls back into the basket. */
+  const carryPlane = new T.Plane();
+  const carryTmp = new T.Vector3();
+
+  function drumScreen(m) {
+    const r = canvas.getBoundingClientRect();
+    const p = m.parts.clothes.getWorldPosition(new T.Vector3()).project(W.camera);
+    return { x: r.left + (p.x + 1) / 2 * r.width, y: r.top + (1 - p.y) / 2 * r.height, size: Math.min(r.width, r.height) };
+  }
+
+  function beginCarry(dg) {
+    const s = dg.s;
+    const fwd = W.camera.getWorldDirection(new T.Vector3());
+    const at = W.camera.position.clone().addScaledVector(fwd, 0.62);
+    carryPlane.setFromNormalAndCoplanarPoint(fwd.clone().negate(), at);
+    dg.started = true;
+    s.flying = true;
+    W.scene.attach(s.obj.root);
+    A.play("clothOut");
+    if (!dg.m.doorOpen && !dg.m.busy) {
+      setDoor(dg.m, true);
+    }
+  }
+
+  function moveCarry(dg, e) {
+    if (!ray.ray.intersectPlane(carryPlane, carryTmp)) {
+      return;
+    }
+    const root = dg.s.obj.root;
+    root.position.lerp(carryTmp, 0.6);
+    const ds = drumScreen(dg.m);
+    const over = Math.hypot(e.clientX - ds.x, e.clientY - ds.y) < ds.size * 0.2;
+    const sc = over ? 0.5 : 0.62;
+    root.scale.setScalar(root.scale.x + (sc - root.scale.x) * 0.3);
+    root.rotation.z = Math.sin(performance.now() / 300) * 0.08;
+    dg.over = over;
+  }
+
+  function dropCarry(dg, e) {
+    const s = dg.s;
+    s.flying = false;
+    const ds = drumScreen(dg.m);
+    const over = e && e.type === "pointerup" && Math.hypot(e.clientX - ds.x, e.clientY - ds.y) < ds.size * 0.2;
+    if (over && loadThis(dg.m, s)) {
+      updateHUD();
+      return;
+    }
+    const i = Math.max(0, basketShirts().indexOf(s));
+    const p = BASKET_SLOTS[i % BASKET_SLOTS.length];
+    const q = new T.Quaternion().setFromEuler(new T.Euler(0.2, i * 1.3, 0.1));
+    A.play("swish");
+    fly(s, W.basket.items, new T.Vector3(p[0], p[1], p[2]), q, 0.85, 0.4, 0.06, layoutBasket);
+  }
+
   canvas.addEventListener("pointerdown", function (e) {
     if (!S.started) {
       return;
@@ -1861,6 +2033,25 @@
         lintDragAt();
       }
       return;
+    }
+    if (r.type === "act" && r.act === "soap" && S.station === "wash" && canPour()) {
+      drag = startPourDrag();
+      return;
+    }
+    const fromBasket = (r.type === "shirt" && r.shirt.loc === "basket") || (r.type === "act" && r.act === "basket");
+    if (fromBasket && (S.station === "wash" || S.station === "dry")) {
+      const cm = S.station === "wash" ? MS.washer : MS.dryer;
+      const want = S.station === "wash" ? "dirty" : "wet";
+      let pickS = r.type === "shirt" ? r.shirt : null;
+      if (!pickS || pickS.state !== want || pickS.flying) {
+        pickS = basketShirts().find(function (x) {
+          return x.state === want && !x.flying;
+        });
+      }
+      if (pickS && cm.phase !== "run" && cm.items.length < 6 && !(cm.phase === "done" && cm.items.length)) {
+        drag = { kind: "carry", s: pickS, m: cm, started: false };
+        return;
+      }
     }
     if (r.type === "coin") {
       const m = MS[r.coin.userData.coin.m];
@@ -1892,6 +2083,24 @@
     setRay(e);
     if (down) {
       down.moved = Math.max(down.moved, Math.hypot(e.clientX - down.x, e.clientY - down.y));
+    }
+    if (drag && drag.kind === "pour") {
+      if (!drag.started && down && down.moved > 10) {
+        beginPour(drag);
+      }
+      if (drag.started) {
+        movePour(drag);
+      }
+      return;
+    }
+    if (drag && drag.kind === "carry") {
+      if (!drag.started && down && down.moved > 10) {
+        beginCarry(drag);
+      }
+      if (drag.started) {
+        moveCarry(drag, e);
+      }
+      return;
     }
     if (drag && drag.kind === "coin") {
       const p = new T.Vector3();
@@ -1946,6 +2155,28 @@
     }
     if (hand) {
       hand.set(0);
+    }
+    if (drag && drag.kind === "pour") {
+      const dg = drag;
+      drag = null;
+      if (dg.started) {
+        finishPour(false);
+      } else if (down && down.moved < 10 && e.type === "pointerup") {
+        tap(down.r);
+      }
+      down = null;
+      return;
+    }
+    if (drag && drag.kind === "carry") {
+      const dg = drag;
+      drag = null;
+      if (dg.started) {
+        dropCarry(dg, e);
+      } else if (down && down.moved < 10 && e.type === "pointerup") {
+        tap(down.r);
+      }
+      down = null;
+      return;
     }
     if (drag && drag.kind === "coin") {
       const m = drag.m;
@@ -2643,6 +2874,7 @@
       return;
     }
     stepTweens(dt);
+    stepPour(dt);
     stepSim(dt);
     stepBackground(dt);
     stepDrips(dt);
@@ -2797,6 +3029,19 @@
           }
         }
         return null;
+      }
+      if (name.indexOf("basketShirt:") === 0) {
+        const want = name.split(":")[1];
+        const s = basketShirts().find(function (x) {
+          return x.state === want && !x.flying;
+        });
+        return s ? screenOf(s.obj.root.getWorldPosition(v)) : null;
+      }
+      if (name === "washerClothes" || name === "dryerClothes") {
+        return screenOf(m.parts.clothes.getWorldPosition(v));
+      }
+      if (name === "pourTarget") {
+        return screenOf(W.washer.group.localToWorld(v.set(POUR_AT.x, POUR_AT.y + 0.05, POUR_AT.z)));
       }
       if (name === "lineShirtDry") {
         const s = S.line.find(function (x) {
