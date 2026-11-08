@@ -1,0 +1,143 @@
+{
+  "mode": "score",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "weights": {
+    "C1": 0.3,
+    "C2": 0.25,
+    "C3": 0.25,
+    "C4": 0.2
+  },
+  "judges": {
+    "Pega-Vision": {
+      "scores": {
+        "C1": 7.0,
+        "C2": 8.0,
+        "C3": 7.0,
+        "C4": 8.0
+      },
+      "evidence": {
+        "C1": "Calm hint 'Watch the water, or sit for a while' and rich sound list, but 'Drag across the screen to peel the lint' feels abstract rather than tactile.",
+        "C2": "Strong laundry-specific gestures: 'DRAG each coin into the slot', lint peel, pegs, smoothing, and folding in thirds.",
+        "C3": "Coherent pastel laundromat and readable HUD, but low-poly shirts, flat water, and simple textures keep it from feeling distinctive.",
+        "C4": "Clear next-step hints like 'Tap the green slot to feed in a note' and 'Now fold the right side in', with progress shown in 'This load'."
+      },
+      "fixes": [
+        "Make every interaction physically anchored and tactile: drag coins visibly into slots, peel lint on the trap itself, and add cloth deformation, particles, and varied sound feedback for each touch.",
+        "Raise visual craft with deliberate materials, lighting, and textures: less flat low-poly shirts/water, richer laundromat surfaces, and a more distinctive art direction worth screenshotting.",
+        "Tighten phone clarity and affordances: prevent HUD crowding, highlight the exact interactive object, and show a hand/cursor or target glow so first-time users know where to touch."
+      ],
+      "total": 7.45,
+      "seconds": 16.5
+    },
+    "Pega-Thinking": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 7.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Calm mint/warm-white palette, visible water + foam in drum, drips on hanging shirts, canvas-erased lint peel, drag-speed-tied smoothing sound; 30 sound ids + ambient bed. Not quite 'every touch' tactile — coin scoop and detergent pour read as taps rather than physical gestures.",
+        "C2": "All real-coin-laundry beats present and gesture-matched: changer with note feed + coin cascade, detergent drawer, DRAG coin into slot, lint trap with drag-peel, pegs, smoothing, fold left/right/bottom. Only minor gap: no visible detergent pour animation or coin-ledge micro-detail shown.",
+        "C3": "Coherent art direction (mint subway tile, warm whites, red accents, matching HUD with 'bilas COIN LAUNDRY' wordmark, station underline). But shirts read flat/2D, washers are generic primitives, lighting is flat — pleasant but not 'designer would screenshot' distinctive.",
+        "C4": "Every screenshot shows a clear one-line hint ('Tap the green slot to feed in a note', 'Drag across the screen to peel the lint', 'Now fold the right side in'), red underline on next station, THIS LOAD card tracks each shirt, coin purse visible. Minor: no first-run intro overlay for total newcomers."
+      },
+      "fixes": [
+        "Push C3: give shirts real cloth thickness/shading, add deliberate window light + cast shadows, and a distinctive laundromat signature (worn signage, scuffed floor, a poster) so the space reads as designed rather than default primitives.",
+        "Push C1: add tactile visual payoff to the under-served beats — visible detergent stream into the drawer, coin clatter physics on the scoop, water splash on shirt load, cloth sag as it dries — so every touch (not just smooth/peel) has a payoff.",
+        "Push C4: add a 3-step first-run intro card (Change → Wash → Dry/Hang/Fold) that auto-dismisses, and a subtle pulse/glow on the currently-afforded 3D object so first-time users instantly see what is interactive on phone and desktop."
+      ],
+      "total": 8.2,
+      "seconds": 11.4
+    },
+    "GLM-5.3-Flash": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Strong pairing of visual+sound payoff: 'canvas-erased texture, peel sound', 'hand-on-cotton sound tied to drag speed', 'drips slow as they dry'; stills show foam/water in drum, lint on trap, visible wrinkles; Sit station + rain ambience invite lingering. Docked: the wrinkle overlay reads as rough scribble lines rather than cloth flattening, and audio quality can't be confirmed from stills.",
+        "C2": "Nearly the full 10-anchor inventory with matched gestures: changer ('feed a note... coins cascade'), 'DRAG each coin into the slot', 'pour detergent into the drawer', lint trap pull-and-peel, 'wooden pegs', 'fold left sleeve, right sleeve, bottom up' / 'Now fold the right side in'. Docked for missing neighbourhood extras (no openable drawer, no bench despite the 'leave it on the bench' note).",
+        "C3": "Coherent mint/cream/red art direction, custom 'bilas COIN LAUNDRY' HUD, green LCD 'WASH 0:26', 'Lost: grey sock' note, red machine numbers. Docked: drum clothes are angular low-poly blobs, changer body and fold table are plain slabs — short of 'a designer would screenshot'.",
+        "C4": "Specific always-on hints ('Tap the green slot to feed in a note.', 'Now fold the right side in.'), 'This load' card with per-shirt states and timers keep progress visible; G2 passed at both sizes. Docked: in the lint-peel screenshot the next-step underline points to Fold while the load is '2 dry · 2 wet' and two shirts still need hanging."
+      },
+      "fixes": [
+        "Rework the weakest tactile visuals: replace the sketchy wrinkle overlay with a cloth-flattening effect and soften the angular low-poly shirt blobs in the drum — biggest lever on C1+C3 (0.55 combined weight).",
+        "Fix the next-step underline logic: during lint peel it underlines Fold while two shirts are still wet and must be hung first; it should always reflect the true next required station.",
+        "Close the fidelity gap to the 10 anchor: openable detergent drawer, a bench by the window for the Sit station, and similar small neighbourhood-laundry details."
+      ],
+      "total": 8.45,
+      "seconds": 46.5
+    }
+  },
+  "quorum": 3,
+  "criterion_median": {
+    "C1": 8.0,
+    "C2": 9.0,
+    "C3": 7.0,
+    "C4": 9.0
+  },
+  "criterion_spread": {
+    "C1": 1.0,
+    "C2": 1.0,
+    "C3": 1.0,
+    "C4": 1.0
+  },
+  "split_criteria": [],
+  "judge_total_range": [
+    7.45,
+    8.45
+  ],
+  "fixes": [
+    {
+      "judge": "Pega-Vision",
+      "fix": "Make every interaction physically anchored and tactile: drag coins visibly into slots, peel lint on the trap itself, and add cloth deformation, particles, and varied sound feedback for each touch."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Raise visual craft with deliberate materials, lighting, and textures: less flat low-poly shirts/water, richer laundromat surfaces, and a more distinctive art direction worth screenshotting."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Tighten phone clarity and affordances: prevent HUD crowding, highlight the exact interactive object, and show a hand/cursor or target glow so first-time users know where to touch."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Push C3: give shirts real cloth thickness/shading, add deliberate window light + cast shadows, and a distinctive laundromat signature (worn signage, scuffed floor, a poster) so the space reads as designed rather than default primitives."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Push C1: add tactile visual payoff to the under-served beats — visible detergent stream into the drawer, coin clatter physics on the scoop, water splash on shirt load, cloth sag as it dries — so every touch (not just smooth/peel) has a payoff."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Push C4: add a 3-step first-run intro card (Change → Wash → Dry/Hang/Fold) that auto-dismisses, and a subtle pulse/glow on the currently-afforded 3D object so first-time users instantly see what is interactive on phone and desktop."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Rework the weakest tactile visuals: replace the sketchy wrinkle overlay with a cloth-flattening effect and soften the angular low-poly shirt blobs in the drum — biggest lever on C1+C3 (0.55 combined weight)."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Fix the next-step underline logic: during lint peel it underlines Fold while two shirts are still wet and must be hung first; it should always reflect the true next required station."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Close the fidelity gap to the 10 anchor: openable detergent drawer, a bench by the window for the Sit station, and similar small neighbourhood-laundry details."
+    }
+  ],
+  "label": "council-judged (3 judges), mean of 2 runs",
+  "council_score": 8.1,
+  "runs": 2,
+  "run_scores": [
+    8.0,
+    8.2
+  ],
+  "run_spread": 0.2
+}

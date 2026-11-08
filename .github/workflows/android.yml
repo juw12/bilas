@@ -1,0 +1,166 @@
+name: Android app
+
+# Builds the Bilas Android APK from the same files that GitHub Pages serves,
+# opens it on an emulator, and publishes the signed APK to the "android" release.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'manifest.webmanifest'
+      - 'css/**'
+      - 'js/**'
+      - 'icons/**'
+      - 'assets/**'
+      - 'mobile/**'
+      - '.github/workflows/android.yml'
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'js/**'
+      - 'mobile/**'
+      - '.github/workflows/android.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Prepare the Android project
+        run: |
+          npm install --no-fund --no-audit
+          npm run android:prepare
+      - name: Restore the signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.BILAS_ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::warning::BILAS_ANDROID_KEYSTORE_BASE64 is not set; only the debug APK will be built."
+            exit 0
+          fi
+          printf '%s' "$KEYSTORE_BASE64" | tr -d '\r\n ' | base64 -d > "$RUNNER_TEMP/bilas-signing.p12"
+          echo "BILAS_ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/bilas-signing.p12" >> "$GITHUB_ENV"
+      - name: Build release and debug APKs
+        env:
+          BILAS_ANDROID_SIGNING_PASSWORD: ${{ secrets.BILAS_ANDROID_SIGNING_PASSWORD }}
+        run: |
+          chmod +x android/gradlew
+          cd android
+          ./gradlew assembleRelease assembleDebug --no-daemon
+      - name: Check the APK contents and signature
+        run: |
+          mkdir -p dist
+          cp android/app/build/outputs/apk/debug/app-debug.apk dist/Bilas-debug.apk
+          unzip -l dist/Bilas-debug.apk | grep -q 'assets/public/index.html'
+          if [ -n "${BILAS_ANDROID_KEYSTORE_PATH:-}" ]; then
+            cp android/app/build/outputs/apk/release/app-release.apk dist/Bilas-android.apk
+            APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -n 1)
+            "$APKSIGNER" verify --print-certs dist/Bilas-android.apk > dist/android-signature.txt
+            cat dist/android-signature.txt
+            EXPECTED=$(tr -d ':\r\n' < android-certificate-sha256.txt | tr 'A-F' 'a-f')
+            grep -qi "$EXPECTED" dist/android-signature.txt
+          fi
+          ls -l dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Bilas-Android
+          path: mobile/dist
+          retention-days: 14
+
+  emulator:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: Bilas-Android
+          path: dist
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install, open and screenshot the app on an emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: |
+            adb install -r dist/Bilas-debug.apk
+            adb shell am start -W -n io.github.juw12.bilas/.MainActivity
+            sleep 20
+            adb exec-out screencap -p > dist/emulator-start.png
+            adb shell pidof io.github.juw12.bilas
+            adb shell input tap 540 1240
+            sleep 4
+            adb exec-out screencap -p > dist/emulator-laundry.png
+            adb shell pidof io.github.juw12.bilas
+            adb logcat -d -s Capacitor:* chromium:* > dist/emulator-logcat.txt || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Bilas-Android-emulator
+          path: |
+            dist/*.png
+            dist/*.txt
+          retention-days: 7
+
+  publish:
+    needs: [build, emulator]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: Bilas-Android
+          path: dist
+      - name: Publish the APK to the "android" release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ ! -f dist/Bilas-android.apk ]; then
+            echo "::warning::No signed APK (signing secrets missing); release left unchanged."
+            exit 0
+          fi
+          cat > notes.md <<EOF
+          Bilas (quiet coin laundry) for Android, built from ${GITHUB_SHA::7}.
+
+          **Install:** on your Android phone open this page, tap \`Bilas-android.apk\`, then allow your browser to install apps when Android asks. Updates install over the old version and keep your settings.
+
+          **No install:** open it in the browser at https://juw12.github.io/bilas/ and use *Add to Home screen* for a full-screen app.
+
+          Not on Google Play; the APK is signed with the project's own key (SHA-256 \`$(cat dist/android-signature.txt | grep -m1 -oiE '[0-9a-f]{64}')\`).
+          EOF
+          if gh release view android --repo "$REPO" > /dev/null 2>&1; then
+            gh release upload android dist/Bilas-android.apk --clobber --repo "$REPO"
+            gh release edit android --notes-file notes.md --repo "$REPO"
+          else
+            gh release create android dist/Bilas-android.apk --title "Bilas for Android" --notes-file notes.md --target "$GITHUB_SHA" --latest --repo "$REPO"
+          fi

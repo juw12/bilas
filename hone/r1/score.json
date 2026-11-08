@@ -1,0 +1,143 @@
+{
+  "mode": "score",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "weights": {
+    "C1": 0.3,
+    "C2": 0.25,
+    "C3": 0.25,
+    "C4": 0.2
+  },
+  "judges": {
+    "Pega-Vision": {
+      "scores": {
+        "C1": 7.0,
+        "C2": 8.0,
+        "C3": 6.0,
+        "C4": 8.0
+      },
+      "evidence": {
+        "C1": "Calm hints like 'Watch the water, or sit for a while' and many synthesized sounds, but fold smoothing looks like blurry smears.",
+        "C2": "Strong gestures: 'DRAG each coin into the slot', 'drag across it to peel the felt', pegs, smoothing, folding.",
+        "C3": "Shirts on the line and table read as flat decals, not 3D cloth; lint trap is a flat tray.",
+        "C4": "One-line hints and 'This load' card show progress, but 'Drag across the screen to peel the lint' is ambiguous."
+      },
+      "fixes": [
+        "Make cloth, lint, and folding physically believable: real 3D wrinkles, depth, and deformation instead of flat decals or smudges.",
+        "Add stronger tactile visual feedback for every touch, especially coin drags, pegs, smoothing, and fold steps, synced to sound.",
+        "Clarify ambiguous instructions and phone HUD: point lint/fold targets directly, avoid 'across the screen', and reduce top-card clutter."
+      ],
+      "total": 7.2,
+      "seconds": 17.9
+    },
+    "Pega-Thinking": {
+      "scores": {
+        "C1": 7.0,
+        "C2": 8.0,
+        "C3": 6.0,
+        "C4": 8.0
+      },
+      "evidence": {
+        "C1": "Rich sound design ('30 one-shot sound ids + continuous wash loop, dry loop + rain/room-tone ambience') and calm palette, but visual feedback during interactions is limited — wash shows static water/foam, fold shows wrinkles but no cloth dynamics, no visible steam from dryer or water splashes.",
+        "C2": "Strong fidelity: 'feed a note into the changer', 'DRAG each coin into the slot', 'drag across it to peel the felt off', 'drag across it to smooth wrinkles', pegs, detergent drawer, lint trap — gestures matched to each real-world action.",
+        "C3": "Coherent mint/warm palette and HUD matches the place, but 3D objects read as default primitives — washers are basic cylinders, shirts are flat planes with stripes, window buildings are generic blocks; not yet 'distinctive, cohesive look a designer would screenshot'.",
+        "C4": "Clear next-step hints ('Tap the green slot to feed a note', 'Drag across the screen to peel the lint', 'Now fold the right side in'), 'THIS LOAD' card with shirt states, red underline on next station, timers visible — a first-time user can follow the flow."
+      },
+      "fixes": [
+        "C3: Elevate visual craft beyond primitives — give washers real paneling/knobs/displays, add material variation (enamel, brushed steel, rubber seals), make shirts volumetric with visible drape and weight, replace generic window buildings with a more characterful streetscape.",
+        "C1: Add tactile visual payoff to interactions — visible steam venting from the dryer, water sloshing/splashing in the drum, cloth deforming as it's smoothed and folded, coins clattering visibly in the tray, drips animating on the line.",
+        "C2: Add small real-laundry details that reward attention — a working detergent cap, fabric-softener tray, washer program selector knob, dryer temperature dial, a 'OUT OF ORDER' sign or stray sock on a bench to sell the neighbourhood feel."
+      ],
+      "total": 7.2,
+      "seconds": 9.3
+    },
+    "GLM-5.3-Flash": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 7.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Strong tactile pairing: 'hand-on-cotton sound tied to drag speed', lint 'canvas-erased texture, peel sound', 'rain/room-tone ambience', 'Sit' station, 'drips slow as they dry'. Held below 9-10 by residual jarring elements: the done state is a plain white modal over a dimmed scene, and the fold screenshot's smoothing marks read as blurry grey smudges rather than cloth creases; lighting in stills is flat, so 'watching the machines' is pleasant but not hypnotic.",
+        "C2": "Every anchor element present with matched gestures: 'DRAG each coin into the slot', 'pull the lint trap and drag across it to peel the felt', 'fold left sleeve, right sleeve, bottom up', pegs, detergent drawer, changer with scoop. Neighbourhood texture: 'Lost: grey sock' note, prices sign, numbered machines, background customers' machines. Not a 10: fold is sleeves-then-bottom rather than the anchor's 'folding in thirds', and there is no folding board/cart/vending layer beyond one note and one sign.",
+        "C3": "Cohesive and non-generic: mint subway tiles, terrazzo floor with speckles, red accent system (CHANGE sign, machine numbers, basket), knit bump on shirts, paper-cut city window, matching HUD wordmark. But fold/done views show a large bare beige table and empty floor dominating the frame, walls above the tiles are blank, claimed 'light shafts' are barely visible in stills, and the wrinkle smudges look like blur artifacts — short of 'a designer would screenshot'.",
+        "C4": "Persistent one-line hint at every state ('Tap the green slot to feed in a note.', 'Now fold the right side in.', 'Drag across the screen to peel the lint.'), red underline on next station, 'This load' card with per-shirt states ('2 dry · 2 wet', '4 folded'), live machine timers ('Washer 2 · 0:26'). G2 passed at both sizes. Not 10: no whole-flow progress sense beyond the underline, and small targets (green slot, coin ledge) rely on text alone rather than a visual pointer."
+      },
+      "fixes": [
+        "Lift C3 (biggest weighted gap): fill the sparse fold/done views — ground the bare table zone and empty floor with deliberate props (bench, rolling cart, detergent vending, fuller notice board) and make the light actually visible (warm pools, readable shafts, stronger day/night contrast) so the look reaches designer-screenshot level.",
+        "Deepen C1 payoff and remove the last jarring notes: replace the blurry grey smoothing smudges with soft crease shading that visibly fades as you drag, and make the 'Clean, dry, folded.' modal diegetic or softer (in-scene card / gentle fade) so the ending matches the calm of the rest.",
+        "Close the C2 fidelity gap to the anchor's own examples: fold in thirds on a marked folding board, and add a little more neighbourhood density (detergent vending, more bulletin notes, another customer's basket or cart) so it reads as a lived-in real coin laundry rather than a very good simulation of one."
+      ],
+      "total": 8.2,
+      "seconds": 31.8
+    }
+  },
+  "quorum": 3,
+  "criterion_median": {
+    "C1": 7.0,
+    "C2": 8.0,
+    "C3": 6.0,
+    "C4": 8.0
+  },
+  "criterion_spread": {
+    "C1": 1.0,
+    "C2": 1.0,
+    "C3": 1.0,
+    "C4": 1.0
+  },
+  "split_criteria": [],
+  "judge_total_range": [
+    7.2,
+    8.2
+  ],
+  "fixes": [
+    {
+      "judge": "Pega-Vision",
+      "fix": "Make cloth, lint, and folding physically believable: real 3D wrinkles, depth, and deformation instead of flat decals or smudges."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Add stronger tactile visual feedback for every touch, especially coin drags, pegs, smoothing, and fold steps, synced to sound."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Clarify ambiguous instructions and phone HUD: point lint/fold targets directly, avoid 'across the screen', and reduce top-card clutter."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "C3: Elevate visual craft beyond primitives — give washers real paneling/knobs/displays, add material variation (enamel, brushed steel, rubber seals), make shirts volumetric with visible drape and weight, replace generic window buildings with a more characterful streetscape."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "C1: Add tactile visual payoff to interactions — visible steam venting from the dryer, water sloshing/splashing in the drum, cloth deforming as it's smoothed and folded, coins clattering visibly in the tray, drips animating on the line."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "C2: Add small real-laundry details that reward attention — a working detergent cap, fabric-softener tray, washer program selector knob, dryer temperature dial, a 'OUT OF ORDER' sign or stray sock on a bench to sell the neighbourhood feel."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Lift C3 (biggest weighted gap): fill the sparse fold/done views — ground the bare table zone and empty floor with deliberate props (bench, rolling cart, detergent vending, fuller notice board) and make the light actually visible (warm pools, readable shafts, stronger day/night contrast) so the look reaches designer-screenshot level."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Deepen C1 payoff and remove the last jarring notes: replace the blurry grey smoothing smudges with soft crease shading that visibly fades as you drag, and make the 'Clean, dry, folded.' modal diegetic or softer (in-scene card / gentle fade) so the ending matches the calm of the rest."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Close the C2 fidelity gap to the anchor's own examples: fold in thirds on a marked folding board, and add a little more neighbourhood density (detergent vending, more bulletin notes, another customer's basket or cart) so it reads as a lived-in real coin laundry rather than a very good simulation of one."
+    }
+  ],
+  "label": "council-judged (3 judges), mean of 2 runs",
+  "council_score": 7.6,
+  "runs": 2,
+  "run_scores": [
+    8.0,
+    7.2
+  ],
+  "run_spread": 0.8
+}

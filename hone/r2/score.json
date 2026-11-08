@@ -1,0 +1,143 @@
+{
+  "mode": "score",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "weights": {
+    "C1": 0.3,
+    "C2": 0.25,
+    "C3": 0.25,
+    "C4": 0.2
+  },
+  "judges": {
+    "Pega-Vision": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 7.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Watch the water, or sit for a while; lint peel and drips give visible payoff, but sound payoff is only claimed.",
+        "C2": "DRAG each coin into the slot; drag over lint screen; fold left sleeve, right sleeve, bottom up.",
+        "C3": "Coherent pastel laundromat, but lint screen, shirts, and changer read as flat/simple primitives.",
+        "C4": "red underline on the next suggested step; This load card shows each shirt state."
+      },
+      "fixes": [
+        "Raise visual craft: add real cloth deformation, contact shadows, stronger light shafts, and tactile lint/felt geometry instead of flat speckled planes.",
+        "Make every tap a physical gesture with micro-feedback: tilt/pour bottle, pull pegs, lift shirts, toss coins, and show lint curling as it peels.",
+        "Tighten first-time onboarding: highlight the actual target object, gray or explain future stations, and reduce phone HUD crowding so the next action is unmistakable."
+      ],
+      "total": 8.2,
+      "seconds": 14.9
+    },
+    "Pega-Thinking": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 7.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Calm mint/wood palette, ambient bed + rain mentioned, 'Sit' station invites lingering, tactile gestures (drag to smooth wrinkles, drag to peel lint felt, drag coin into slot) provide sound+visual payoff. Some interactions like the changer feel more functional than tactile.",
+        "C2": "Each station has its own gesture: feed note + scoop coins, open door + load + pour detergent + drag coin + start, drag lint felt, peg shirts, smooth + fold in thirds with dashed guide board visible in screenshot. Realistic details: detergent drawer, lint trap, pegs, folding board with thirds guides.",
+        "C3": "Coherent art direction with nice lived-in details (notice board with handwritten notes, lost grey sock, lavanda box, spray bottle, red mug, rolling cart). HUD matches the place. However, 3D objects are simple primitives — washer is a box with a circle, shirts on the line look flat/2D, lint felt reads as scattered orange marks rather than actual felt texture.",
+        "C4": "Always-visible one-line hint above station bar ('Tap the green slot to feed in a note', 'Drag over the lint screen to peel the felt off', 'Now fold the right side in'), red underline on next station, 'THIS LOAD' card tracks each shirt's state, coin purse top-right, timer on LCD. Works clearly on both desktop and phone."
+      },
+      "fixes": [
+        "Upgrade 3D model detail and materials — the washer/dryer read as basic geometric primitives; richer modeling, paneling, and PBR materials would push visual craft from coherent to distinctive.",
+        "Make shirts more dimensional — the shirts on the line and in the drum look flat; add fabric thickness, subtle sag/cloth simulation, and better knit bump shading so they read as cloth rather than decals.",
+        "Improve the lint trap felt texture — the current scattered orange/brown marks look like debris rather than matted felt; a denser, fibrous texture with visible buildup would make the peel gesture feel more satisfying and the dryer more believable."
+      ],
+      "total": 8.2,
+      "seconds": 13.2
+    },
+    "GLM-5.3-Flash": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Strong sensory loop: 'hand-on-cotton sound tied to drag speed', 'drips slow as they dry', shader water/foam in drum, 'Sit' station + rain/room-tone ambience invite lingering. Held back from 9-10: the done moment contradicts the claim of a 'paper slip low in the frame, with only a soft bottom fade' — screenshot 6 shows a large centered modal with a saturated red 'Another load' button, the most jarring element in the set; changer screen is otherwise static.",
+        "C2": "Full anchor-10 checklist present with matched gestures: 'DRAG each coin into the slot', 'pull the lint trap and drag across it to peel the felt off', 'fold left sleeve, right sleeve, bottom up' on 'dashed thirds guides', pegs, changer, detergent drawer. Not 10: 'tap the bottle to pour' and 'tap the basket to load' are plain taps, and the 'Folding board - please wipe after' note teases an interaction that doesn't exist.",
+        "C3": "Coherent, deliberate look: mint subway tiles, speckled terrazzo floor, birch-grain table, handwritten notice-board notes, knit bump on shirts, diegetic LCD and red machine badges, HUD pills that match the place. Not 9-10: flat pastel-block skyline through the window reads generic, washer/dryer bodies are plain white boxes, and the phone fold shot shows the striped shirt overhanging the folding board mid-step.",
+        "C4": "A specific hint is visible in every screenshot ('Tap the green slot to feed in a note.', 'Now fold the right side in.'), red underline tracks the next step (pointing to 'Sit' while washing, explained by the hint), and progress is always visible via 'This load' shirt states plus 'Washer 2 0:26' / 'Line 0:39' timers. Not 10: no evidence of what happens when a user taps an off-path station or wrong object, and the per-shirt state dots are very small on phone."
+      },
+      "fixes": [
+        "Make the done card match its own spec: replace the large centered modal + saturated red 'Another load' button with the claimed low paper-slip and soft fade so the finish isn't jarring (biggest C1 lever, w=0.30).",
+        "Convert tap-only steps into matched gestures — tilt/drag the detergent bottle to pour, drag shirts from basket to drum, pull the door handle — and implement the folding-board wipe the handwritten note promises (pushes C2 to 10).",
+        "Visual craft pass: enrich the window view (deeper skyline, evening variation) and machine materials (panel seams, control detail), and fix the striped shirt overhanging the folding board on phone (C3)."
+      ],
+      "total": 8.45,
+      "seconds": 26.9
+    }
+  },
+  "quorum": 3,
+  "criterion_median": {
+    "C1": 8.0,
+    "C2": 9.0,
+    "C3": 7.0,
+    "C4": 9.0
+  },
+  "criterion_spread": {
+    "C1": 0.0,
+    "C2": 0.0,
+    "C3": 1.0,
+    "C4": 0.0
+  },
+  "split_criteria": [],
+  "judge_total_range": [
+    8.2,
+    8.45
+  ],
+  "fixes": [
+    {
+      "judge": "Pega-Vision",
+      "fix": "Raise visual craft: add real cloth deformation, contact shadows, stronger light shafts, and tactile lint/felt geometry instead of flat speckled planes."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Make every tap a physical gesture with micro-feedback: tilt/pour bottle, pull pegs, lift shirts, toss coins, and show lint curling as it peels."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Tighten first-time onboarding: highlight the actual target object, gray or explain future stations, and reduce phone HUD crowding so the next action is unmistakable."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Upgrade 3D model detail and materials — the washer/dryer read as basic geometric primitives; richer modeling, paneling, and PBR materials would push visual craft from coherent to distinctive."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Make shirts more dimensional — the shirts on the line and in the drum look flat; add fabric thickness, subtle sag/cloth simulation, and better knit bump shading so they read as cloth rather than decals."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Improve the lint trap felt texture — the current scattered orange/brown marks look like debris rather than matted felt; a denser, fibrous texture with visible buildup would make the peel gesture feel more satisfying and the dryer more believable."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Make the done card match its own spec: replace the large centered modal + saturated red 'Another load' button with the claimed low paper-slip and soft fade so the finish isn't jarring (biggest C1 lever, w=0.30)."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Convert tap-only steps into matched gestures — tilt/drag the detergent bottle to pour, drag shirts from basket to drum, pull the door handle — and implement the folding-board wipe the handwritten note promises (pushes C2 to 10)."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Visual craft pass: enrich the window view (deeper skyline, evening variation) and machine materials (panel seams, control detail), and fix the striped shirt overhanging the folding board on phone (C3)."
+    }
+  ],
+  "label": "council-judged (3 judges), mean of 2 runs",
+  "council_score": 8.22,
+  "runs": 2,
+  "run_scores": [
+    8.25,
+    8.2
+  ],
+  "run_spread": 0.05
+}

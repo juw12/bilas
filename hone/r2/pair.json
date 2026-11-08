@@ -1,0 +1,51 @@
+{
+  "mode": "pair",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "judges": {
+    "Pega-Vision": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Both versions satisfy the hard gates and share the same rich interaction and sound design, but version 2 improves visual craft and onboarding with cloth textures, lived-in props, light shafts, clearer next-step cues, and a less intrusive done state.",
+        "Version 1 improves the rubric-relevant soft criteria with richer lived-in details, better cloth/texture feedback, clearer next-step hints, and folding guides, while keeping the same verified flow and gates. Version 2 is plainer and less distinctive, with weaker visual craft and onboarding clarity."
+      ]
+    },
+    "Pega-Thinking": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "VERSION 2 meaningfully improves visual craft (knit bump textures, birch-grain folding table with dashed thirds guides, lived-in details like the lavanda box, mug, cart, sock, and additional notes, window light shafts, floor scuffs), fixes onboarding logic (next-step underline correctly points to Dry while lint remains, Hang before Fold for wet shirts, object-pointing lint hint), and softens the done moment — all of which lift C1, C2, C3, and C4 versus VERSION 1's more sterile baseline.",
+        "VERSION 1 (r2) shows clear improvements across all soft criteria: richer visual craft (knit bump textures, birch-grain table, window light shafts, lived-in props like lavanda box and rolling cart), better interaction fidelity (folding board with thirds guides, detergent box with scoop), and improved onboarding (fixed next-step underline logic, more specific lint hint). The screenshots confirm a more cohesive, distinctive aesthetic with more tactile detail than VERSION 2."
+      ]
+    },
+    "GLM-5.3-Flash": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Both versions claim identical hard-gate passes and the same interaction flow, but Version 2's screenshots show real gains on the soft criteria: a folding board with dashed thirds guides, textured shirts and lived-in props (C3), a corrected next-step underline and an object-pointing lint hint (C4), with no visible regressions.",
+        "Both versions claim identical passing gates and the same interaction set, but Version 1 (r2) demonstrably improves the soft criteria over the v0 baseline: knit-textured shirts, a birch folding board with dashed thirds guides, lived-in props and notes, varied floor tiles, an object-pointing lint hint, and a quieter done card that keeps the folded stack visible, whereas Version 2 shows blobbier shirts, a plain table, a dimming modal that hides the payoff, and sketchier wrinkles — clear gains on C1, C3, and C4 with no regressions."
+      ]
+    }
+  },
+  "votes": {
+    "A": 0,
+    "B": 3,
+    "tie": 0
+  },
+  "quorum": 3,
+  "b_wins": true,
+  "label": "council-judged (3 judges)"
+}

@@ -1,0 +1,9 @@
+hone/shots/
+hone/logs/
+hone/*/src/
+tests/__pycache__/
+__pycache__/
+*.p12
+*.jks
+*.keystore
+tests/run_bg.ps1

@@ -1,0 +1,51 @@
+{
+  "mode": "pair",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "judges": {
+    "Pega-Vision": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Version 2 keeps the same verified flow, sound coverage, and gate results while improving visual craft with better shirt texture, softer wrinkles, and room lighting, and it fixes the next-step underline so onboarding is clearer. Version 1 shows sketchier cloth and misleading step hints in the screenshots.",
+        "Both versions satisfy the same hard gates and interaction flow, but Version 1 improves the rubric-relevant soft criteria with better cloth/room visual craft and a clearer next-step hint, making it more polished and less AI-generic."
+      ]
+    },
+    "Pega-Thinking": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "VERSION 2 makes targeted improvements to visual craft (knit bump textures on shirts, softer blurred wrinkles, denser crumpled mesh, floor tile variation, window light shafts) and fixes the next-step underline logic, giving it a slight edge on C3 and C4 while remaining equivalent on C1 and C2.",
+        "VERSION 1 explicitly describes targeted improvements against the soft criteria: knit bump textures and softer wrinkles on shirts, floor scuffs and window light shafts for visual craft (C3), and a fixed next-step underline that points to the correct station based on shirt state for clarity (C4). These are visible in the screenshots (more textured shirts, varied floor) and directly address the rubric's higher-weighted criteria, while both versions pass all hard gates identically."
+      ]
+    },
+    "GLM-5.3-Flash": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Both versions claim identical hard-gate passes and the same interaction set, but Version 2's screenshots show the claimed craft fixes (softer blurred wrinkles instead of sketchy lines, cloth-like shirts, floor variation) and a corrected next-step underline that no longer points to Fold while lint peeling or hanging is still pending, giving it an edge on C3 and C4 with no regressions.",
+        "Both versions claim identical passing gates and the same interaction set, but Version 1 (r1) is a corroborated polish iteration: its screenshots show softer, blurred wrinkle creases versus Version 2's sketchy scribble lines (C3), and its fixed next-step underline addresses the misleading hint visible in Version 2's own screenshot, where Fold is suggested while lint remains unpeeled and shirts are still wet (C4), with knit/shirt texture adding tactile payoff (C1) and no visible regressions."
+      ]
+    }
+  },
+  "votes": {
+    "A": 0,
+    "B": 3,
+    "tie": 0
+  },
+  "quorum": 3,
+  "b_wins": true,
+  "label": "council-judged (3 judges)"
+}

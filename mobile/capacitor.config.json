@@ -1,0 +1,9 @@
+{
+  "appId": "io.github.juw12.bilas",
+  "appName": "Bilas",
+  "webDir": "www",
+  "backgroundColor": "#151d20",
+  "android": {
+    "allowMixedContent": false
+  }
+}
