@@ -1,0 +1,143 @@
+{
+  "mode": "score",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "weights": {
+    "C1": 0.3,
+    "C2": 0.25,
+    "C3": 0.25,
+    "C4": 0.2
+  },
+  "judges": {
+    "Pega-Vision": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 7.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "hand-on-cotton sound tied to drag speed",
+        "C2": "DRAG each coin into the slot",
+        "C3": "clearcoat material, but HUD remains generic rounded cards",
+        "C4": "Now fold the right side in."
+      },
+      "fixes": [
+        "Replace the generic rounded HUD/station bar with in-world laundromat signage and thermal-paper UI, and add richer shirt/pegs/city detail so the look is distinctive rather than merely coherent.",
+        "Add synchronized micro-visual payoffs to every tap/drag such as coin spin, water splash, lint curl, peg spring, and fabric ripple, plus stronger spatial ambience so interactions feel tactile rather than button-like.",
+        "Make the fold sequence physically faithful and unambiguous: show ghost fold lines for true thirds, animate sleeve tuck and cloth deformation, and keep phone HUD cards from obscuring in-world signs."
+      ],
+      "total": 8.2,
+      "seconds": 22.6
+    },
+    "Pega-Thinking": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 7.0,
+        "C4": 8.0
+      },
+      "evidence": {
+        "C1": "Rich synthesized sound palette (30+ ids including coinCascade, lintPeel, smooth, wetSlap) plus ambient rain/room-tone and a dedicated 'Sit' station invite lingering; visible feedback like shader water/foam in drum and drips slowing on the line is described, though the drum screenshot reads as fairly static.",
+        "C2": "Each station has a distinct, believable gesture: feed note → coin cascade → scoop; drag coin into slot; pour detergent into drawer; pull lint trap and drag to peel felt; peg shirts on line; smooth wrinkles then fold left sleeve, right sleeve, bottom up. Receipt lists every coin used. Matches a real coin-laundry workflow closely.",
+        "C3": "Coherent palette (mint subway tile, warm wood, white enamel with red number badges), clearcoat machines, contact shadows, film-grain/vignette, and a designed receipt with torn zigzag give a clear art direction. However the washer/dryer bodies still read as generic white boxes with circles, shirts on the line and on the table look like flat planes, and the window cityscape is very simple — not yet 'designer-screenshot' distinctive.",
+        "C4": "Always-on contextual hint bar ('Tap the green slot to feed a note', 'Drag over the lint screen to peel the felt off', 'Now fold the right side in'), pinned object labels ('Washer 2 · Open the door', 'Hold to pour'), red underline on next station, and a 'THIS LOAD' card tracking shirt states (4 unwashed → 2 dry·2 wet → 4 dry → 4 folded) keep progress and next step visible on both desktop and phone."
+      },
+      "fixes": [
+        "Give the washers/dryers and shirts more distinctive form and material: the machines read as flat white boxes and the shirts on the line and table look like flat planes — add panel seams, drum ribs, fabric drape/wrinkles, and a subtle weave texture so the scene looks designed rather than primitive.",
+        "Enrich the environment to reward lingering: the window cityscape is a flat silhouette, the walls are bare tile, and there is little ambient motion beyond the machines — add passing clouds, a flickering neon sign, a clock hand, steam from the dryer vent, or a second customer's distant cycle so the 'Sit' station feels inhabited.",
+        "Make the smoothing/folding interaction visually satisfying: the shirt on the table looks like a static plane with faint wrinkles; tie the smoothing drag to visible wrinkle reduction (vertex displacement or a canvas mask that clears as the cursor passes) and animate the fold creases so the gesture has a clear before/after payoff."
+      ],
+      "total": 8.0,
+      "seconds": 16.1
+    },
+    "GLM-5.3-Flash": {
+      "scores": {
+        "C1": 9.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Per-action payoff is specific: 'hand-on-cotton sound tied to drag speed', 'drips slow as they dry', 'shader water and foam', lint 'canvas-erased texture, peel sound'; 'Sit' station + 'rain/room-tone ambience' invite lingering. Screenshots confirm foam in drum, darker wet shirts, erased wrinkles, peeled lint felt. Only risk to 'nothing jarring': visible grain speckle on large flat walls/floor and the loud pure-red CHANGE sign.",
+        "C2": "Every anchor-10 element present: changer ('feed a note... coins cascade... scoop 4 coins'), 'DRAG each coin into the slot', 'pour detergent into the drawer', 'pull the lint trap and drag across it to peel', 'wooden pegs', smoothing drag, sleeve/bottom fold; wall notes ('Lost: grey sock... dryer 3') sell the neighbourhood feel. Gaps: fold is sleeves-then-bottom, not thirds; dryer uses a 'coin ledge' unlike the washer slot.",
+        "C3": "Cohesive mint/warm palette, 'clearcoat material' enamel, 'soft contact shadows', themed HUD, monospace thermal receipt with 'torn zigzag bottom' — deliberate light/materials/type. But composition slips: phone fold shot is mostly empty mat with cropped machines and the shirt barely visible; Prices sign is clipped by the top of the changer frame; folded stack reads as flat slabs.",
+        "C4": "'a small label pins to the exact machine... with a soft ring marker', one-line hint always present ('Drag over the lint screen to peel the felt off.'), 'This load' card tracks each shirt, machine cards show timer+progress; G2 passed at both sizes. One ambiguity: during wash the red 'next suggested step' underline sits on 'Sit' — an optional wait action that could read as required."
+      },
+      "fixes": [
+        "Recompose the weak framings: phone fold view (empty mat, cropped washer, shirt nearly invisible at the mat edge), the lint close-up's dead floor space, and the Prices sign clipped at the top of the changer shot — this is what holds visual craft at 8.",
+        "Disambiguate optional vs required steps: during cycles the red next-step underline points to 'Sit' (and later 'Fold'), which can read as a mandatory action; reserve the underline for the actual next task and use a calmer affordance for 'you can wait/sit'.",
+        "Close the last sensory/fidelity gaps: tame the grain/vignette speckle on large flat surfaces and soften the saturated red CHANGE sign so nothing is jarring; make the detergent drawer physically slide open to receive the pour and align the fold with a real technique (thirds/board)."
+      ],
+      "total": 8.75,
+      "seconds": 62.9
+    }
+  },
+  "quorum": 3,
+  "criterion_median": {
+    "C1": 8.0,
+    "C2": 9.0,
+    "C3": 7.0,
+    "C4": 9.0
+  },
+  "criterion_spread": {
+    "C1": 1.0,
+    "C2": 0.0,
+    "C3": 1.0,
+    "C4": 1.0
+  },
+  "split_criteria": [],
+  "judge_total_range": [
+    8.0,
+    8.75
+  ],
+  "fixes": [
+    {
+      "judge": "Pega-Vision",
+      "fix": "Replace the generic rounded HUD/station bar with in-world laundromat signage and thermal-paper UI, and add richer shirt/pegs/city detail so the look is distinctive rather than merely coherent."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Add synchronized micro-visual payoffs to every tap/drag such as coin spin, water splash, lint curl, peg spring, and fabric ripple, plus stronger spatial ambience so interactions feel tactile rather than button-like."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Make the fold sequence physically faithful and unambiguous: show ghost fold lines for true thirds, animate sleeve tuck and cloth deformation, and keep phone HUD cards from obscuring in-world signs."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Give the washers/dryers and shirts more distinctive form and material: the machines read as flat white boxes and the shirts on the line and table look like flat planes — add panel seams, drum ribs, fabric drape/wrinkles, and a subtle weave texture so the scene looks designed rather than primitive."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Enrich the environment to reward lingering: the window cityscape is a flat silhouette, the walls are bare tile, and there is little ambient motion beyond the machines — add passing clouds, a flickering neon sign, a clock hand, steam from the dryer vent, or a second customer's distant cycle so the 'Sit' station feels inhabited."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Make the smoothing/folding interaction visually satisfying: the shirt on the table looks like a static plane with faint wrinkles; tie the smoothing drag to visible wrinkle reduction (vertex displacement or a canvas mask that clears as the cursor passes) and animate the fold creases so the gesture has a clear before/after payoff."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Recompose the weak framings: phone fold view (empty mat, cropped washer, shirt nearly invisible at the mat edge), the lint close-up's dead floor space, and the Prices sign clipped at the top of the changer shot — this is what holds visual craft at 8."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Disambiguate optional vs required steps: during cycles the red next-step underline points to 'Sit' (and later 'Fold'), which can read as a mandatory action; reserve the underline for the actual next task and use a calmer affordance for 'you can wait/sit'."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Close the last sensory/fidelity gaps: tame the grain/vignette speckle on large flat surfaces and soften the saturated red CHANGE sign so nothing is jarring; make the detergent drawer physically slide open to receive the pour and align the fold with a real technique (thirds/board)."
+    }
+  ],
+  "label": "council-judged (3 judges), mean of 2 runs",
+  "council_score": 8.1,
+  "runs": 2,
+  "run_scores": [
+    8.0,
+    8.2
+  ],
+  "run_spread": 0.2
+}

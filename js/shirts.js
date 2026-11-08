@@ -153,13 +153,13 @@
     // broad, gentle rumple shading first
     c.filter = "blur(10px)";
     for (let i = 0; i < 7; i++) {
-      c.fillStyle = r() < 0.5 ? "rgba(20,15,10,0.10)" : "rgba(255,255,255,0.10)";
+      c.fillStyle = r() < 0.5 ? "rgba(20,15,10,0.06)" : "rgba(255,255,255,0.08)";
       c.beginPath();
       c.ellipse(px(-0.25 + r() * 0.5), py(-0.28 + r() * 0.56), 12 + r() * 22, 6 + r() * 12, r() * Math.PI, 0, Math.PI * 2);
       c.fill();
     }
     const anchors = [[-0.22, 0.28], [0.22, 0.28], [-0.16, 0.12], [0.16, 0.12], [0, -0.3], [-0.12, -0.3], [0.12, -0.3]];
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 20; i++) {
       const a0 = anchors[Math.floor(r() * anchors.length)];
       const x = a0[0] + (r() - 0.5) * 0.08;
       const y = a0[1] + (r() - 0.5) * 0.06;
@@ -170,17 +170,17 @@
       const bend = (r() - 0.5) * 0.08;
       const bx = (x + x2) / 2 - Math.sin(ang) * bend;
       const by = (y + y2) / 2 + Math.cos(ang) * bend;
-      const w = 4 + r() * 5;
-      c.filter = "blur(" + (2 + w * 0.35).toFixed(1) + "px)";
-      c.strokeStyle = "rgba(25,18,12,0.32)";
+      const w = 2.5 + r() * 3;
+      c.filter = "blur(" + (0.8 + w * 0.25).toFixed(1) + "px)";
+      c.strokeStyle = "rgba(25,18,12,0.26)";
       c.lineWidth = w;
       c.beginPath();
       c.moveTo(px(x), py(y));
       c.quadraticCurveTo(px(bx), py(by), px(x2), py(y2));
       c.stroke();
-      c.filter = "blur(2px)";
-      c.strokeStyle = "rgba(255,250,240,0.30)";
-      c.lineWidth = w * 0.5;
+      c.filter = "blur(1.6px)";
+      c.strokeStyle = "rgba(255,250,240,0.2)";
+      c.lineWidth = w * 0.6;
       const ox = -Math.sin(ang) * w * 0.8;
       const oy = Math.cos(ang) * w * 0.8;
       c.beginPath();
@@ -290,16 +290,31 @@
   // the line, sag between the pegs and hem ripples. Displacement is a function of the panel's own
   // shirt coordinates, so neighbouring panels stay stitched together.
   const DRAPE_GLSL = [
-    "uniform float uRumple; uniform float uBillow; uniform float uSag; uniform float uSeed;",
-    "float drapeZ(vec2 p){",
-    "  float n = sin(p.x*23.0+uSeed)*sin(p.y*19.0+uSeed*1.7)*0.5 + sin(p.x*41.0-p.y*37.0+uSeed*2.3)*0.3 + sin((p.x+p.y)*67.0+uSeed)*0.12;",
+    "uniform float uRumple; uniform float uBillow; uniform float uSag; uniform float uSeed; uniform float uBack; uniform float uOnLine;",
+    "varying float vFold;",
+    // pull folds: shallow ridges that fan out from each peg when the shirt hangs
+    "float pegFolds(vec2 p){",
+    "  float f = 0.0;",
+    "  for (int i = 0; i < 2; i++) {",
+    "    vec2 d = p - vec2(i == 0 ? -0.19 : 0.19, " + TOP.toFixed(3) + ");",
+    "    float r = length(d);",
+    "    float a = atan(d.y, d.x);",
+    "    f += sin(a*9.0 + uSeed) * smoothstep(0.34, 0.05, r) * smoothstep(0.0, 0.05, r);",
+    "  }",
+    "  return f;",
+    "}",
+    "float drapeZf(vec2 p, float hi){",
+    "  float n = sin(p.x*23.0+uSeed)*sin(p.y*19.0+uSeed*1.7)*0.5 + hi*(sin(p.x*41.0-p.y*37.0+uSeed*2.3)*0.3 + sin((p.x+p.y)*67.0+uSeed)*0.12);",
     "  float rumple = uRumple*(0.55+0.45*n);",
     "  float bx = 1.0 - pow(clamp(abs(p.x)/" + (HALF * 1.05).toFixed(3) + ", 0.0, 1.0), 2.0);",
     "  float by = smoothstep(" + TOP.toFixed(3) + ", " + (TOP - 0.16).toFixed(3) + ", p.y) * (0.55 + 0.45*smoothstep(-" + TOP.toFixed(3) + ", -" + (TOP - 0.18).toFixed(3) + ", p.y));",
     "  float hem = smoothstep(-0.05, -" + TOP.toFixed(3) + ", p.y);",
     "  float ripple = sin(p.x*26.0+uSeed*3.0)*0.35 + sin(p.x*47.0-uSeed)*0.15;",
-    "  return rumple + uBillow*(bx*by + hem*ripple*0.45);",
+    "  return rumple + uBillow*(bx*by + hem*ripple*0.45) + uSag*0.32*pegFolds(p);",
     "}",
+    "float drapeZ(vec2 p){ return drapeZf(p, 1.0); }",
+    // shading uses only the broad folds, so fine rumple never reads as blotches
+    "float drapeS(vec2 p){ return drapeZf(p, 0.0); }",
     "float drapeY(vec2 p){",
     "  float top = smoothstep(" + (TOP - 0.2).toFixed(3) + ", " + TOP.toFixed(3) + ", p.y);",
     "  float between = max(0.0, 1.0 - pow(p.x/0.19, 2.0));",
@@ -311,6 +326,19 @@
   function addDrape(material, uniforms) {
     material.onBeforeCompile = function (shader) {
       Object.assign(shader.uniforms, uniforms);
+      shader.fragmentShader = shader.fragmentShader
+        .replace("#include <common>", "#include <common>\nuniform float uBack; uniform float uOnLine; varying float vFold;")
+        .replace("#include <color_fragment>", [
+          "#include <color_fragment>",
+          // ridges catch the light, valleys between folds fall into soft shade
+          "float foldSide = gl_FrontFacing ? 1.0 : -1.0;",
+          "diffuseColor.rgb *= clamp(1.0 + vFold * foldSide, 0.66, 1.14);"
+        ].join("\n"))
+        .replace("#include <emissivemap_fragment>", [
+          "#include <emissivemap_fragment>",
+          // daylight through thin cotton on the line
+          "totalEmissiveRadiance += diffuseColor.rgb * uBack * uOnLine;"
+        ].join("\n"));
       shader.vertexShader = shader.vertexShader
         .replace("#include <common>", "#include <common>\n" + DRAPE_GLSL)
         .replace("#include <beginnormal_vertex>", [
@@ -327,12 +355,18 @@
         ].join("\n"))
         .replace("#include <begin_vertex>", [
           "vec3 transformed = vec3(position);",
+          "{",
+          "  float e2 = 0.012;",
+          "  float c0 = drapeS(position.xy);",
+          "  float lap = drapeS(position.xy + vec2(e2, 0.0)) + drapeS(position.xy - vec2(e2, 0.0)) + drapeS(position.xy + vec2(0.0, e2)) + drapeS(position.xy - vec2(0.0, e2)) - 4.0*c0;",
+          "  vFold = clamp(-lap / (e2*e2) * 0.035, -0.26, 0.12);",
+          "}",
           "transformed.z += drapeZ(position.xy);",
           "transformed.y += drapeY(position.xy);"
         ].join("\n"));
     };
     material.customProgramCacheKey = function () {
-      return "bilas-drape";
+      return "bilas-drape-2";
     };
   }
 
@@ -371,6 +405,11 @@
   }
 
   let seedCounter = 1;
+  const BACKLIGHT = { value: 0.2 };
+
+  SH.setBacklight = function (v) {
+    BACKLIGHT.value = v;
+  };
 
   SH.create = function (spec) {
     const seed = seedCounter++;
@@ -396,7 +435,9 @@
       uRumple: { value: 0 },
       uBillow: { value: 0 },
       uSag: { value: 0 },
-      uSeed: { value: seed * 1.37 }
+      uSeed: { value: seed * 1.37 },
+      uBack: BACKLIGHT,
+      uOnLine: { value: 0 }
     };
     addDrape(mat, drape);
     const crumpleTex = tex.clone();
@@ -487,7 +528,8 @@
       shirt.drapeKind = kind;
       drape.uBillow.value = kind === "line" ? 0.03 : 0;
       drape.uSag.value = kind === "line" ? 0.018 : 0;
-      drape.uRumple.value = kind === "line" ? 0.004 : kind === "table" ? 0.011 * shirt.wrinkles : 0;
+      drape.uRumple.value = kind === "line" ? 0.004 : kind === "table" ? 0.014 * shirt.wrinkles : 0;
+      drape.uOnLine.value = kind === "line" ? 1 : 0;
       slab.visible = kind === "folded";
     };
 
@@ -526,7 +568,7 @@
       }
       shirt.wrinkles = 1 - Math.min(1, shirt.touched.size / (shirt.cells * 0.62));
       if (shirt.drapeKind === "table") {
-        drape.uRumple.value = 0.011 * shirt.wrinkles;
+        drape.uRumple.value = 0.014 * shirt.wrinkles;
       }
       shirt.compose();
       return shirt.wrinkles;

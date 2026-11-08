@@ -2808,7 +2808,9 @@
     document.querySelectorAll("#stations button").forEach(function (b) {
       const st = b.getAttribute("data-st");
       b.setAttribute("aria-current", String(st === S.station));
-      b.classList.toggle("next", st === next && st !== S.station);
+      // red underline only for a real task; "sit" while machines run gets a quiet dotted mark
+      b.classList.toggle("next", st === next && st !== S.station && next !== "sit");
+      b.classList.toggle("wait", st === next && st !== S.station && next === "sit");
     });
     renderLoad();
     renderTickets();
@@ -2821,6 +2823,7 @@
     document.documentElement.dataset.theme = th;
     document.querySelector('meta[name="theme-color"]').setAttribute("content", th === "day" ? "#e9e4d8" : "#151d20");
     W.setTheme(th);
+    SH.setBacklight(th === "day" ? 0.2 : 0.04);
     if (A.ready()) {
       A.setAmbient(th);
     }

@@ -1,0 +1,51 @@
+{
+  "mode": "pair",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "judges": {
+    "Pega-Vision": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Both versions pass the hard gates, but VERSION 2 better satisfies the soft rubric through stronger onboarding, richer sensory payoff, and more deliberate visual craft, especially with object-pinned guidance, the printed receipt moment, improved cloth/material treatment, and clearer folding contrast.",
+        "Version 1 better satisfies the weighted soft criteria: its object-pinned guidance, receipt payoff, clearer cloth/material treatment, and calmer frame improve ASMR payoff, visual craft, and onboarding. Version 2 has some gesture and packaging strengths, but they do not offset the weaker sensory and visual polish under the rubric."
+      ]
+    },
+    "Pega-Thinking": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "VERSION 2 shows meaningful improvements in visual craft (clearcoat materials, contact shadows, film grain/vignette, distinctive green cutting mat with grid, better cloth rendering with daylight glow) and onboarding (object-pinned labels with soft ring markers, clearer required-vs-optional task distinction, more authentic thermal receipt). These upgrades meaningfully raise C3 and C4 scores, with smaller gains in C1 (extra receipt-printer sound) and C2 (more authentic receipt), making V2 the stronger candidate overall.",
+        "VERSION 1 (r6) shows clear improvements over VERSION 2 (r4) across all soft criteria: object-pinned guidance labels improve onboarding (C4), the thermal receipt end card and additional printer sound enhance ASMR payoff (C1), clearcoat materials, contact shadows, drape-driven cloth shading, and the green cutting mat elevate visual craft (C3), and the more detailed interaction feedback (e.g., 'Hold to pour' on the bottle) strengthens fidelity (C2). The screenshots confirm VERSION 1's more deliberate, cohesive look versus VERSION 2's flatter, more generic presentation."
+      ]
+    },
+    "GLM-5.3-Flash": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Both versions claim identical hard-gate passes and share the same core loop, but Version 2 adds on-object next-step labels with ring markers (stronger C4 onboarding, especially on phone), plus clearcoat materials, contact shadows, curvature-driven fold shading, a high-contrast green cutting mat, and an in-scene printed receipt — tangible gains in visual craft and sensory payoff (C1/C3) with no visible regressions.",
+        "Both versions claim all hard gates pass, but Version 1 (r6) improves the weighted soft criteria over Version 2 (r4): object-pinned next-step labels and the required-vs-optional underline fix onboarding (C4), the thermal-receipt done moment, contact shadows, clearcoat materials and fold-shading add sensory payoff (C1), and the green cutting mat plus softened palette give stronger contrast and visual craft than V2's white-on-white folding mat (C3), with no apparent regressions."
+      ]
+    }
+  },
+  "votes": {
+    "A": 0,
+    "B": 3,
+    "tie": 0
+  },
+  "quorum": 3,
+  "b_wins": true,
+  "label": "council-judged (3 judges)"
+}

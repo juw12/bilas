@@ -8,7 +8,7 @@
   const PAL = {
     ink: "#1d2629",
     paper: "#f4f0e7",
-    red: "#c8442c",
+    red: "#b8503a",
     celadon: "#9cc5b5",
     brass: "#c9a14a",
     enamel: "#f1eee8"
@@ -1238,9 +1238,9 @@
 
     // folding board with thirds guides (sleeve, sleeve, bottom up)
     const boardTex = canvasTex(740, 640, function (c, w, h) {
-      c.fillStyle = "#cfd8d2";
+      c.fillStyle = "#2f5650";
       c.fillRect(0, 0, w, h);
-      c.strokeStyle = "rgba(43,50,54,0.10)";
+      c.strokeStyle = "rgba(235,242,236,0.13)";
       c.lineWidth = 2;
       for (let x = 20; x < w; x += 40) {
         c.beginPath();
@@ -1254,7 +1254,7 @@
         c.lineTo(w, y);
         c.stroke();
       }
-      c.strokeStyle = "rgba(200,72,48,0.55)";
+      c.strokeStyle = "rgba(244,222,170,0.75)";
       c.lineWidth = 4;
       c.setLineDash([18, 12]);
       [w / 3, (2 * w) / 3].forEach(function (x) {
@@ -1268,7 +1268,7 @@
       c.lineTo(w - 18, h * 0.55);
       c.stroke();
       c.setLineDash([]);
-      c.strokeStyle = "rgba(43,50,54,0.35)";
+      c.strokeStyle = "rgba(235,242,236,0.35)";
       c.lineWidth = 6;
       c.strokeRect(6, 6, w - 12, h - 12);
     }, true);
