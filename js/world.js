@@ -471,6 +471,8 @@
       drawer.add(df);
       const grip = mesh(new T.BoxGeometry(0.09, 0.008, 0.006), M.panel, 0, -0.012, 0.021);
       drawer.add(grip);
+      df.userData.act = "drawer";
+      grip.userData.act = "drawer";
       parts.drawer = drawer;
 
       const bottle = new T.Group();
