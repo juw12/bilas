@@ -25,7 +25,7 @@
     if (srgb !== false) {
       t.colorSpace = T.SRGBColorSpace;
     }
-    t.anisotropy = 4;
+    t.anisotropy = 8;
     t.userData.draw = draw;
     return t;
   }
@@ -260,12 +260,24 @@
             "  float surf = uLevel + wave;",
             "  if (vP.y > surf) discard;",
             "  float depth = clamp(surf - vP.y, 0.0, 1.0);",
-            "  vec3 col = mix(vec3(0.80,0.90,0.93), vec3(0.36,0.55,0.62), depth);",
-            "  float foam = smoothstep(0.12, 0.0, surf - vP.y) * uFoam;",
-            "  vec2 cell = floor((vP + vec2(0.0, -uTime*0.25)) * 22.0);",
-            "  float b = step(0.975, h(cell)) * uFoam;",
-            "  col = mix(col, vec3(1.0), clamp(foam*0.9 + b*0.5, 0.0, 1.0));",
-            "  gl_FragColor = vec4(col, 0.42 + foam*0.4 + depth*0.15);",
+            "  vec3 col = mix(vec3(0.74,0.88,0.92), vec3(0.24,0.45,0.55), depth);",
+            // slow swirl streaks under the surface
+            "  float ang = atan(vP.y, vP.x) + uTime*1.4 + uSlosh*3.0;",
+            "  float swirl = smoothstep(0.6, 1.0, sin(ang*3.0 + length(vP)*9.0)) * (1.0 - depth*0.6);",
+            "  col += vec3(0.10,0.12,0.12) * swirl;",
+            // a bright line where the water meets the glass
+            "  float men = smoothstep(0.035, 0.0, surf - vP.y);",
+            "  col = mix(col, vec3(0.95,0.99,1.0), men*0.7);",
+            // foam cap with a broken lower edge, and bubbles in two sizes
+            "  float edge = 0.12 + 0.08*h(floor(vec2(vP.x*18.0, 0.0) + floor(uTime*2.0)));",
+            "  float foam = smoothstep(edge + 0.06, edge - 0.04, surf - vP.y) * uFoam;",
+            "  vec2 c1 = (vP + vec2(sin(uTime*0.7)*0.03, -uTime*0.22)) * 14.0;",
+            "  float b1 = step(0.93, h(floor(c1))) * smoothstep(0.42, 0.18, length(fract(c1) - 0.5));",
+            "  vec2 c2 = (vP + vec2(0.0, -uTime*0.4)) * 30.0;",
+            "  float b2 = step(0.95, h(floor(c2) + 7.0)) * smoothstep(0.4, 0.15, length(fract(c2) - 0.5));",
+            "  float bubbles = (b1 + b2*0.7) * uFoam;",
+            "  col = mix(col, vec3(1.0), clamp(foam*0.92 + bubbles*0.75, 0.0, 1.0));",
+            "  gl_FragColor = vec4(col, 0.58 + foam*0.35 + depth*0.18 + men*0.2);",
             "}"
           ].join("\n")
         })
@@ -412,6 +424,37 @@
     num.position.set(0.25, 0.09, 0.002);
     g.add(num);
 
+    // rounded front corners so the cabinet reads as pressed steel, not a box
+    [-1, 1].forEach(function (sx) {
+      const edge = mesh(new T.CylinderGeometry(0.014, 0.014, h - 0.03, 12, 1, false, sx < 0 ? Math.PI : 0, Math.PI), M.enamel, sx * (w / 2 - 0.013), h / 2, -0.012);
+      edge.castShadow = true;
+      g.add(edge);
+    });
+    // deep rubber gasket inside the porthole
+    g.add(mesh(new T.TorusGeometry(R + 0.002, 0.016, 12, 56), M.rubber, 0, cy, -0.022));
+    // brushed maker's plate
+    const plateTex = canvasTex(256, 64, function (c, pw, ph) {
+      const gr = c.createLinearGradient(0, 0, pw, 0);
+      gr.addColorStop(0, "#c9cdd0");
+      gr.addColorStop(0.5, "#eef0f1");
+      gr.addColorStop(1, "#c3c7ca");
+      c.fillStyle = gr;
+      c.fillRect(0, 0, pw, ph);
+      for (let y = 0; y < ph; y += 2) {
+        c.fillStyle = "rgba(0,0,0," + (0.02 + Math.random() * 0.03).toFixed(3) + ")";
+        c.fillRect(0, y, pw, 1);
+      }
+      c.fillStyle = "#3a4044";
+      c.font = "bold 26px " + FONT_DISPLAY;
+      c.textAlign = "left";
+      c.fillText("bilas", 14, 40);
+      c.font = "600 15px " + FONT_DISPLAY;
+      c.textAlign = "right";
+      c.fillText(kind === "washer" ? "PRO 7 KG" : "HEAT 8 KG", pw - 14, 39);
+    }, true);
+    const makerPlate = mesh(new T.PlaneGeometry(0.11, 0.0275), new T.MeshStandardMaterial({ map: plateTex, metalness: 0.65, roughness: 0.35 }), -0.2, 0.095, 0.002);
+    g.add(makerPlate);
+
     if (kind === "washer") {
       const drawer = new T.Group();
       drawer.position.set(-0.17, 0.655, 0.0);
@@ -424,16 +467,48 @@
 
       const bottle = new T.Group();
       const prof = [];
-      const pts = [[0, 0], [0.032, 0], [0.036, 0.01], [0.036, 0.11], [0.03, 0.14], [0.014, 0.155], [0.014, 0.17], [0, 0.17]];
+      const pts = [[0, 0], [0.028, 0], [0.034, 0.004], [0.037, 0.016], [0.037, 0.104], [0.035, 0.122], [0.029, 0.138], [0.019, 0.149], [0.0145, 0.153], [0.0145, 0.17], [0, 0.17]];
       pts.forEach(function (p) {
         prof.push(new T.Vector2(p[0], p[1]));
       });
-      const btl = mesh(new T.LatheGeometry(prof, 28), std("#4f8f86", { roughness: 0.35 }), 0, 0, 0);
+      const jugMat = new T.MeshPhysicalMaterial({ color: "#4f8f86", roughness: 0.32, clearcoat: 0.5, clearcoatRoughness: 0.35 });
+      const btl = mesh(new T.LatheGeometry(prof, 40), jugMat, 0, 0, 0);
       btl.castShadow = true;
       bottle.add(btl);
-      const label = mesh(new T.CylinderGeometry(0.0365, 0.0365, 0.05, 28, 1, true), std("#f4f0e7", { roughness: 0.6 }), 0, 0.06, 0);
+      // moulded carry handle on the back of the jug
+      const handle = mesh(new T.TorusGeometry(0.026, 0.0075, 10, 24, Math.PI), jugMat, 0, 0.098, -0.034);
+      handle.rotation.set(0, Math.PI / 2, Math.PI / 2);
+      handle.castShadow = true;
+      bottle.add(handle);
+      const labelTex = canvasTex(512, 128, function (c, lw, lh) {
+        c.fillStyle = "#f6f1e6";
+        c.fillRect(0, 0, lw, lh);
+        c.fillStyle = "#7a93b8";
+        c.beginPath();
+        c.moveTo(0, lh * 0.72);
+        for (let x = 0; x <= lw; x += 8) {
+          c.lineTo(x, lh * 0.72 + Math.sin(x / 34) * 7);
+        }
+        c.lineTo(lw, lh);
+        c.lineTo(0, lh);
+        c.fill();
+        c.fillStyle = "#2b3236";
+        c.textAlign = "center";
+        c.font = "bold 44px " + FONT_DISPLAY;
+        c.fillText("lavanda", lw * 0.25, lh * 0.5);
+        c.font = "600 18px " + FONT_DISPLAY;
+        c.fillText("liquid · 1.5 L", lw * 0.25, lh * 0.66);
+        c.font = "500 15px " + FONT_DISPLAY;
+        c.fillText("1 cap per load", lw * 0.75, lh * 0.45);
+      }, true);
+      labelTex.wrapS = T.RepeatWrapping;
+      const label = mesh(new T.CylinderGeometry(0.0375, 0.0375, 0.056, 40, 1, true), std("#ffffff", { map: labelTex, roughness: 0.55 }), 0, 0.062, 0);
+      label.rotation.y = Math.PI * 0.5;
       bottle.add(label);
-      const cap = mesh(new T.CylinderGeometry(0.017, 0.017, 0.022, 20), M.red, 0, 0.18, 0);
+      const capPts = [[0, 0], [0.0185, 0], [0.0185, 0.004], [0.017, 0.006], [0.0185, 0.008], [0.0185, 0.012], [0.017, 0.014], [0.0185, 0.016], [0.0185, 0.022], [0.016, 0.026], [0, 0.026]];
+      const cap = mesh(new T.LatheGeometry(capPts.map(function (p) {
+        return new T.Vector2(p[0], p[1]);
+      }), 28), M.red, 0, 0.167, 0);
       bottle.add(cap);
       const bhit = mesh(new T.CylinderGeometry(0.06, 0.06, 0.22, 10), M.hit, 0, 0.1, 0);
       bhit.userData.act = "soap";
@@ -844,10 +919,10 @@
     return new T.ShaderMaterial({
       transparent: true,
       depthWrite: false,
-      uniforms: { uTime: { value: 0 }, uOn: { value: 1 } },
+      uniforms: { uTime: { value: 0 }, uOn: { value: 1 }, uStreak: { value: 1 } },
       vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
       fragmentShader: [
-        "uniform float uTime; uniform float uOn; varying vec2 vUv;",
+        "uniform float uTime; uniform float uOn; uniform float uStreak; varying vec2 vUv;",
         "float h(float n){ return fract(sin(n)*43758.5453); }",
         "void main(){",
         "  vec2 uv = vUv * vec2(48.0, 1.0);",
@@ -861,15 +936,76 @@
         "  float dropOn = step(0.82, h(id.x*13.0 + id.y*7.0));",
         "  float d = length(fract(g) - 0.5);",
         "  float drop = dropOn * smoothstep(0.2, 0.05, d);",
-        "  float a = (streak*lane*0.5 + drop*0.35) * uOn;",
+        // sliding drops: a bead with a fading trail above it
+        "  vec2 sg = vUv * vec2(22.0, 1.0);",
+        "  float sc = floor(sg.x);",
+        "  float sOn = step(0.6, h(sc*5.3));",
+        "  float sy = 1.0 - fract(uTime*(0.05 + h(sc*2.7)*0.08) + h(sc*9.1));",
+        "  float sx = abs(fract(sg.x) - 0.5 - 0.15*sin(vUv.y*20.0 + sc));",
+        "  float bead = smoothstep(0.035, 0.0, length(vec2(sx*0.045, vUv.y - sy)));",
+        "  float trail = smoothstep(0.06, 0.0, sx) * smoothstep(sy, sy + 0.25, vUv.y) * (1.0 - smoothstep(sy + 0.25, sy + 0.5, vUv.y)) * step(sy, vUv.y);",
+        "  float slide = sOn * (bead*0.9 + trail*0.25);",
+        "  float a = ((streak*lane*0.5 + slide) * uStreak + drop*0.35) * uOn;",
         "  gl_FragColor = vec4(vec3(0.85,0.9,0.95), a);",
         "}"
       ].join("\n")
     });
   }
 
+  // soft vapour puffs: a small pool of billboards that rise, spread and fade
+  const puffs = [];
+  W.puff = function (pos, count) {
+    if (!W.puffTex) {
+      W.puffTex = canvasTex(64, 64, function (c, s) {
+        const gr = c.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+        gr.addColorStop(0, "rgba(255,255,255,0.9)");
+        gr.addColorStop(0.5, "rgba(255,255,255,0.35)");
+        gr.addColorStop(1, "rgba(255,255,255,0)");
+        c.fillStyle = gr;
+        c.fillRect(0, 0, s, s);
+      });
+    }
+    for (let i = 0; i < (count || 10); i++) {
+      const mat = new T.SpriteMaterial({ map: W.puffTex, transparent: true, depthWrite: false, opacity: 0, color: "#f4f1ea" });
+      const sp = new T.Sprite(mat);
+      sp.position.copy(pos).add(new T.Vector3((Math.random() - 0.5) * 0.18, (Math.random() - 0.5) * 0.12, Math.random() * 0.06));
+      sp.scale.setScalar(0.06);
+      sp.userData = { t: -i * 0.07, life: 1.8 + Math.random() * 0.8, vx: (Math.random() - 0.5) * 0.05, vy: 0.12 + Math.random() * 0.08, vz: 0.05 + Math.random() * 0.05 };
+      W.scene.add(sp);
+      puffs.push(sp);
+    }
+  };
+  W.stepPuffs = function (dt) {
+    for (let i = puffs.length - 1; i >= 0; i--) {
+      const sp = puffs[i];
+      const u = sp.userData;
+      u.t += dt;
+      if (u.t < 0) {
+        continue;
+      }
+      const k = u.t / u.life;
+      if (k >= 1) {
+        W.scene.remove(sp);
+        sp.material.dispose();
+        puffs.splice(i, 1);
+        continue;
+      }
+      sp.position.x += u.vx * dt;
+      sp.position.y += u.vy * dt;
+      sp.position.z += u.vz * dt;
+      sp.scale.setScalar(0.06 + k * 0.22);
+      sp.material.opacity = 0.32 * Math.sin(Math.PI * Math.min(1, k * 1.3)) * (1 - k * 0.5);
+    }
+  };
+
   function poster(lines, w, h, opts) {
-    const t = canvasTex(Math.round(w * 1000), Math.round(h * 1000), function (c, cw, ch) {
+    // drawn at 2.4x density so pinned notes stay crisp at desktop size
+    const K = 2.4;
+    const t = canvasTex(Math.round(w * 1000 * K), Math.round(h * 1000 * K), function (c, fullW, fullH) {
+      c.save();
+      c.scale(K, K);
+      const cw = fullW / K;
+      const ch = fullH / K;
       c.fillStyle = opts.bg;
       c.fillRect(0, 0, cw, ch);
       c.fillStyle = opts.fg;
@@ -884,6 +1020,7 @@
         c.fillStyle = "rgba(240,225,170,0.85)";
         c.fillRect(cw / 2 - 40, 0, 80, 22);
       }
+      c.restore();
     });
     const m = new T.Mesh(new T.PlaneGeometry(w, h), new T.MeshStandardMaterial({ map: t, roughness: 0.8 }));
     m.userData.tex = t;
@@ -1300,13 +1437,52 @@
     decor.push(box);
     const scoop = mesh(new T.CylinderGeometry(0.03, 0.025, 0.035, 18, 1, true), std("#e8e3d8", { roughness: 0.4, side: T.DoubleSide }), 0.39, 0.868, 0.56);
     decor.push(scoop);
-    const sprayBody = mesh(new T.CylinderGeometry(0.03, 0.034, 0.17, 20), std("#a8c7bd", { roughness: 0.25, transparent: true, opacity: 0.85 }), 1.46, 0.935, 0.54);
-    const sprayHead = mesh(new T.BoxGeometry(0.035, 0.04, 0.06), std("#2b3236", { roughness: 0.5 }), 1.46, 1.04, 0.55);
-    decor.push(sprayBody, sprayHead);
-    const mug = mesh(new T.CylinderGeometry(0.038, 0.034, 0.085, 24), std("#c8483a", { roughness: 0.35 }), 0.16, 0.893, 1.17);
-    const mugHandle = mesh(new T.TorusGeometry(0.022, 0.006, 8, 16), std("#c8483a", { roughness: 0.35 }), 0.12, 0.895, 1.17);
-    mugHandle.rotation.y = Math.PI / 2;
-    decor.push(mug, mugHandle);
+    const spray = new T.Group();
+    const sprayPts = [[0, 0], [0.03, 0], [0.034, 0.006], [0.034, 0.118], [0.03, 0.136], [0.016, 0.152], [0.0135, 0.158], [0.0135, 0.168], [0, 0.168]];
+    const sprayGlass = new T.MeshPhysicalMaterial({ color: "#cfe3dc", roughness: 0.12, transmission: W.lite ? 0 : 0.6, transparent: true, opacity: 0.78, thickness: 0.01 });
+    spray.add(mesh(new T.LatheGeometry(sprayPts.map(function (p) {
+      return new T.Vector2(p[0], p[1]);
+    }), 32), sprayGlass, 0, 0, 0));
+    spray.add(mesh(new T.CylinderGeometry(0.031, 0.031, 0.075, 28), std("#7fb7a7", { roughness: 0.2, transparent: true, opacity: 0.7 }), 0, 0.042, 0));
+    const darkPlastic = std("#2b3236", { roughness: 0.45 });
+    spray.add(mesh(new T.CylinderGeometry(0.017, 0.017, 0.016, 20), darkPlastic, 0, 0.174, 0));
+    const headShape = new T.Shape();
+    headShape.moveTo(-0.016, 0);
+    headShape.lineTo(0.05, 0);
+    headShape.lineTo(0.056, 0.012);
+    headShape.lineTo(0.05, 0.03);
+    headShape.quadraticCurveTo(0.0, 0.05, -0.02, 0.032);
+    headShape.lineTo(-0.016, 0);
+    const head = mesh(new T.ExtrudeGeometry(headShape, { depth: 0.026, bevelEnabled: true, bevelSize: 0.003, bevelThickness: 0.003, bevelSegments: 2 }), darkPlastic, 0, 0.181, -0.013);
+    spray.add(head);
+    const triggerShape = new T.Shape();
+    triggerShape.moveTo(0, 0);
+    triggerShape.quadraticCurveTo(0.014, -0.02, 0.008, -0.05);
+    triggerShape.lineTo(0.0, -0.05);
+    triggerShape.quadraticCurveTo(0.004, -0.02, -0.006, 0);
+    spray.add(mesh(new T.ExtrudeGeometry(triggerShape, { depth: 0.012, bevelEnabled: false }), std("#d9cbb0", { roughness: 0.5 }), 0.032, 0.184, -0.006));
+    spray.add(mesh(new T.CylinderGeometry(0.004, 0.005, 0.01, 10), std("#c8442c", { roughness: 0.5 }), 0.06, 0.193, 0).rotateZ(Math.PI / 2));
+    spray.position.set(1.46, 0.85, 0.54);
+    spray.rotation.y = -0.6;
+    spray.traverse(function (o) {
+      o.castShadow = true;
+    });
+    decor.push(spray);
+    const mug = new T.Group();
+    const glaze = new T.MeshPhysicalMaterial({ color: "#b8503a", roughness: 0.28, clearcoat: 0.7, clearcoatRoughness: 0.2 });
+    const mugPts = [[0, 0.004], [0.03, 0], [0.034, 0.004], [0.038, 0.08], [0.039, 0.086], [0.0345, 0.086], [0.0335, 0.012], [0, 0.012]];
+    mug.add(mesh(new T.LatheGeometry(mugPts.map(function (p) {
+      return new T.Vector2(p[0], p[1]);
+    }), 36), glaze, 0, 0, 0));
+    mug.add(mesh(new T.CircleGeometry(0.0338, 32), std("#6b3f22", { roughness: 0.15 }), 0, 0.07, 0).rotateX(-Math.PI / 2));
+    const mugHandle = mesh(new T.TorusGeometry(0.021, 0.0065, 10, 20, Math.PI * 1.15), glaze, -0.038, 0.045, 0);
+    mugHandle.rotation.z = Math.PI * 0.43;
+    mug.add(mugHandle);
+    mug.position.set(0.16, 0.851, 1.17);
+    mug.traverse(function (o) {
+      o.castShadow = true;
+    });
+    decor.push(mug);
 
     // rolling laundry cart parked behind the table
     const cart = new T.Group();
@@ -1462,7 +1638,8 @@
     L.sun.intensity = night ? 0.35 : 2.6;
     W.renderer.toneMappingExposure = night ? 1.0 : 1.05;
     W.scene.background = new T.Color(night ? "#0e1417" : "#e9e4d8");
-    W.rain.material.uniforms.uOn.value = night ? 1 : 0;
+    W.rain.material.uniforms.uOn.value = night ? 1 : 0.45;
+    W.rain.material.uniforms.uStreak.value = night ? 1 : 0;
     if (W.windowLight) {
       // day: warm sun through the glass; night: a faint cool streetlamp spill
       W.windowLight.shaftMat.color.set(night ? "#9fb6d6" : "#ffe3b8");

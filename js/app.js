@@ -100,6 +100,8 @@
   try {
     W.build(canvas, t);
   } catch (e) {
+    // never fail silently: a build bug must not masquerade as "no WebGL"
+    console.error("Bilas world build failed:", e);
     showNoGL();
     return;
   }
@@ -448,6 +450,10 @@
     m.doorOpen = open;
     m.busy = true;
     A.play(open ? "doorOpen" : "doorClose");
+    // a warm breath of vapour when you open the dryer on a finished load
+    if (open && m.key === "dryer" && m.phase === "done") {
+      W.puff(m.parts.group.localToWorld(new T.Vector3(0, m.parts.cy, 0.08)), 12);
+    }
     const h = m.parts.hinge;
     const a0 = h.rotation.y;
     const a1 = open ? -1.95 : 0;
@@ -1637,8 +1643,14 @@
 
   const cam = { key: "overview", pos: new T.Vector3(), look: new T.Vector3(), moving: false, factor: 1, fov: 50 };
 
+  // portrait phones: frame the fold board itself, a little more top-down, so the whole shirt
+  // and the next fold line stay on screen (the stack can sit just off to the right)
+  const VIEWS_PORTRAIT = {
+    fold: [[0.62, 2.12, 1.62], [0.62, 0.84, 0.86]]
+  };
+
   function targetOf(key) {
-    const v = VIEWS[key];
+    const v = (cam.factor > 1.2 && VIEWS_PORTRAIT[key]) || VIEWS[key];
     const look = new T.Vector3(v[1][0], v[1][1], v[1][2]);
     const pos = new T.Vector3(v[0][0], v[0][1], v[0][2]);
     pos.sub(look).multiplyScalar(cam.factor).add(look);
@@ -2980,6 +2992,7 @@
     MS.washer.parts.water.material.uniforms.uTime.value = tt;
     W.washerBg.water.material.uniforms.uTime.value = tt;
     W.rain.material.uniforms.uTime.value = tt;
+    W.stepPuffs(dt);
     clockT += dt;
     if (clockT > 1) {
       clockT = 0;
