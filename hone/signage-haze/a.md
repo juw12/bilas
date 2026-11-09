@@ -1,0 +1,1 @@
+﻿Bilas main (9581b5e): 3D coin-laundromat sim. HUD is plain cream rounded cards (brand, coin count, THIS LOAD, station bar with a dark current station). Daytime city outside the window is flat pale towers with little depth. On phone, folded shirt edges have light shading.

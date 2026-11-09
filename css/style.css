@@ -1039,3 +1039,85 @@ body.done-open .hint {
     letter-spacing: 0;
   }
 }
+
+/* ---------- laundromat signage ----------
+   The brand is an enamel shop sign (inner cream rule, four screw heads), the purse is a brass
+   token plate, the current place on the station strip lights up like an enamel number plate,
+   and the load card carries a small enamel header strip. Paper tickets stay paper. */
+:root {
+  --enamel: #1f4f48;
+  --enamel-ink: #f3ecdc;
+  --enamel-rule: rgba(243, 236, 220, 0.55);
+}
+
+html[data-theme="day"] {
+  --enamel: #245a51;
+}
+
+.brand {
+  color: var(--enamel-ink);
+  background:
+    radial-gradient(circle 2.2px at 7px 7px, var(--enamel-rule) 1.5px, transparent 2.2px),
+    radial-gradient(circle 2.2px at calc(100% - 7px) 7px, var(--enamel-rule) 1.5px, transparent 2.2px),
+    radial-gradient(circle 2.2px at 7px calc(100% - 7px), var(--enamel-rule) 1.5px, transparent 2.2px),
+    radial-gradient(circle 2.2px at calc(100% - 7px) calc(100% - 7px), var(--enamel-rule) 1.5px, transparent 2.2px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.1)),
+    var(--enamel);
+  box-shadow:
+    inset 0 0 0 3px var(--enamel),
+    inset 0 0 0 4.5px var(--enamel-rule),
+    var(--shadow);
+  padding-left: 14px;
+  padding-right: 18px;
+}
+
+.brand-mark {
+  color: var(--enamel-ink);
+}
+
+.brand-name {
+  letter-spacing: 0.06em;
+}
+
+.brand-sub {
+  color: rgba(243, 236, 220, 0.82);
+}
+
+.purse {
+  color: #2b2111;
+  background: linear-gradient(180deg, #e4c47c 0%, #c9a14a 58%, #b38b3a 100%);
+  background-color: #c9a14a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.22),
+    inset 0 0 0 1.5px rgba(122, 90, 28, 0.35),
+    var(--shadow);
+}
+
+.purse svg circle:first-child {
+  fill: #f1d792;
+}
+
+.stations button {
+  box-shadow:
+    inset 0 0 0 3px var(--card),
+    inset 0 0 0 4px var(--line),
+    var(--shadow);
+}
+
+.stations button[aria-current="true"] {
+  background: var(--enamel);
+  color: var(--enamel-ink);
+  box-shadow:
+    inset 0 0 0 3px var(--enamel),
+    inset 0 0 0 4px var(--enamel-rule),
+    var(--shadow);
+}
+
+.load-title {
+  display: inline-block;
+  padding: 2px 8px 1px;
+  border-radius: 4px;
+  background: var(--enamel);
+  color: var(--enamel-ink);
+}

@@ -840,8 +840,19 @@
           }
         }
       }
+      // day: a pale ridge of very distant towers first (deterministic, so the shared random
+      // sequence of both layers is untouched), then the far towers a step darker
+      if (!night) {
+        ink.fillStyle = "#d9e2e4";
+        for (let x = -10, i = 0; x < w; i++) {
+          const bw = 38 + 34 * Math.abs(Math.sin(i * 2.31));
+          const bh = 250 + 130 * Math.abs(Math.sin(i * 1.73 + 0.4));
+          ink.fillRect(x, h - bh - 60, bw, bh);
+          x += bw + 3 + 10 * Math.abs(Math.sin(i * 3.1));
+        }
+      }
       // far towers in haze
-      ink.fillStyle = night ? "#1c2836" : "#c3cfd3";
+      ink.fillStyle = night ? "#1c2836" : "#b4c3c8";
       for (let x = -20; x < w; ) {
         const bw = 50 + rnd() * 70;
         const bh = 190 + rnd() * 160;
@@ -856,6 +867,14 @@
         x += bw + 8 + rnd() * 30;
       }
       if (far) {
+        // day haze pooling at the foot of the far towers
+        if (!night) {
+          const haze = c.createLinearGradient(0, h - 300, 0, h - 30);
+          haze.addColorStop(0, "rgba(238,240,234,0)");
+          haze.addColorStop(1, "rgba(238,240,234,0.62)");
+          c.fillStyle = haze;
+          c.fillRect(0, h - 300, w, 270);
+        }
         return;
       }
       // mid-rise flats with rooftop water tanks and AC boxes
@@ -898,13 +917,13 @@
         }
         x += bw + 6 + rnd() * 18;
       }
-      // street haze settles between the flats and the shophouses by day
+      // day: thin air between the flats and the street so the flats sit back behind the shophouses
       if (!night) {
-        const haze = c.createLinearGradient(0, h - 170, 0, h - 80);
-        haze.addColorStop(0, "rgba(242,240,232,0)");
-        haze.addColorStop(1, "rgba(242,240,232,0.45)");
-        c.fillStyle = haze;
-        c.fillRect(0, h - 170, w, 90);
+        const air = c.createLinearGradient(0, h - 320, 0, h - 88);
+        air.addColorStop(0, "rgba(226,234,236,0.10)");
+        air.addColorStop(1, "rgba(236,238,232,0.42)");
+        c.fillStyle = air;
+        c.fillRect(0, h - 320, w, 232);
       }
       // near shophouses with striped awnings
       for (let x = -30; x < w; ) {
