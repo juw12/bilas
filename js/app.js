@@ -153,6 +153,79 @@
     dryer: makeMachineState("dryer", W.dryer, 1)
   };
 
+  /* Program dial: four detents printed on the dial face. Washer = water temperature (hotter runs longer),
+     dryer = heat (hotter finishes sooner). The middle-left detent is the default and keeps the base cycle time. */
+  const PROGS = {
+    washer: [{ lcd: "30\u00b0C", k: 0.85 }, { lcd: "40\u00b0C", k: 1 }, { lcd: "60\u00b0C", k: 1.15 }, { lcd: "90\u00b0C", k: 1.3 }],
+    dryer: [{ lcd: "40\u00b0C", k: 1.2 }, { lcd: "55\u00b0C", k: 1 }, { lcd: "70\u00b0C", k: 0.85 }, { lcd: "MAX", k: 0.75 }]
+  };
+  const DIAL_ANG = [0.75 * Math.PI, 0.25 * Math.PI, -0.25 * Math.PI, -0.75 * Math.PI];
+  const DRAWER_OUT = 0.09;
+
+  function progOf(m) {
+    return PROGS[m.key][m.prog];
+  }
+
+  function cycleFor(m) {
+    return (m.key === "washer" ? 1 : 0.8) * S.cycle * progOf(m).k;
+  }
+
+  [MS.washer, MS.dryer].forEach(function (m) {
+    m.prog = 1;
+    m.progShow = 0;
+    m.parts.dial.rotation.z = DIAL_ANG[1];
+  });
+
+  function setProg(m, i) {
+    i = Math.max(0, Math.min(3, i));
+    if (i === m.prog) {
+      return false;
+    }
+    m.prog = i;
+    m.progShow = performance.now() + 2200;
+    A.play("button");
+    if (navigator.vibrate) {
+      try {
+        navigator.vibrate(6);
+      } catch (err) {
+        /* ignore */
+      }
+    }
+    return true;
+  }
+
+  function settleDial(m) {
+    const dial = m.parts.dial;
+    const a0 = dial.rotation.z;
+    const a1 = DIAL_ANG[m.prog];
+    tween(0.16, function (k) {
+      dial.rotation.z = a0 + (a1 - a0) * k;
+    });
+  }
+
+  function turnKnob(m) {
+    if (m.phase === "run") {
+      toast("toast_dial_locked");
+      A.play("beep");
+      return;
+    }
+    setProg(m, (m.prog + 1) % 4);
+    settleDial(m);
+    toast("toast_prog", { p: progOf(m).lcd, time: fmtTime(cycleFor(m)) });
+  }
+
+  function setDrawer(open) {
+    const m = MS.washer;
+    const d = m.parts.drawer;
+    const z0 = d.position.z;
+    const z1 = open ? DRAWER_OUT : 0;
+    m.drawerOpen = open;
+    A.play(open ? "button" : "thump");
+    tween(0.25, function (k) {
+      d.position.z = z0 + (z1 - z0) * k;
+    });
+  }
+
   W.washer.group.userData.station = "wash";
   W.washerBg.group.userData.station = "wash";
   W.dryer.group.userData.station = "dry";
@@ -692,6 +765,7 @@
       b.rotation.z = r0 * (1 - k);
     }, function () {
       const z0 = d.position.z;
+      MS.washer.drawerOpen = false;
       tween(0.3, function (k) {
         d.position.z = z0 * (1 - k);
       }, function () {
@@ -812,7 +886,7 @@
     }
     m.phase = "run";
     m.t = 0;
-    m.dur = (m.key === "washer" ? 1 : 0.8) * S.cycle;
+    m.dur = cycleFor(m);
     if (S.receipt) {
       S.receipt[m.key] += m.need;
     }
@@ -1860,7 +1934,7 @@
     if (act === "bill" || act === "tray") {
       return "change";
     }
-    if (act.indexOf("washer") === 0 || act === "soap") {
+    if (act.indexOf("washer") === 0 || act === "soap" || act === "drawer") {
       return "wash";
     }
     if (act.indexOf("dryer") === 0 || act.indexOf("lint") === 0) {
@@ -1916,6 +1990,14 @@
       case "washerStart":
         pressStart(w);
         break;
+      case "washerKnob":
+        turnKnob(w);
+        break;
+      case "drawer":
+        if (!w.busy) {
+          setDrawer(!w.drawerOpen);
+        }
+        break;
       case "dryerDoor":
         setDoor(d, !d.doorOpen);
         break;
@@ -1933,6 +2015,9 @@
         break;
       case "dryerStart":
         pressStart(d);
+        break;
+      case "dryerKnob":
+        turnKnob(d);
         break;
       case "lintTab":
         toggleLint();
@@ -2115,6 +2200,17 @@
       drag = startPourDrag();
       return;
     }
+    if (r.type === "act" && (r.act === "washerKnob" || r.act === "dryerKnob")) {
+      const km = r.act === "washerKnob" ? MS.washer : MS.dryer;
+      if (S.station === (km.key === "washer" ? "wash" : "dry") && km.phase !== "run") {
+        drag = { kind: "knob", m: km, lx: e.clientX, ly: e.clientY, ang: km.parts.dial.rotation.z, turned: false };
+        return;
+      }
+    }
+    if (r.type === "act" && r.act === "drawer" && S.station === "wash" && !MS.washer.busy && MS.washer.phase !== "run") {
+      drag = { kind: "drawer", y0: e.clientY, z0: MS.washer.parts.drawer.position.z };
+      return;
+    }
     const fromBasket = (r.type === "shirt" && r.shirt.loc === "basket") || (r.type === "act" && r.act === "basket");
     if (fromBasket && (S.station === "wash" || S.station === "dry")) {
       const cm = S.station === "wash" ? MS.washer : MS.dryer;
@@ -2168,6 +2264,15 @@
       if (drag.started) {
         movePour(drag);
       }
+      return;
+    }
+    if (drag && drag.kind === "knob") {
+      moveKnob(drag, e);
+      return;
+    }
+    if (drag && drag.kind === "drawer") {
+      const d = MS.washer.parts.drawer;
+      d.position.z = Math.max(0, Math.min(DRAWER_OUT, drag.z0 + (e.clientY - drag.y0) * 0.0016));
       return;
     }
     if (drag && drag.kind === "carry") {
@@ -2226,6 +2331,41 @@
     }
   });
 
+  function knobScreen(m) {
+    const r = canvas.getBoundingClientRect();
+    const p = m.parts.dial.getWorldPosition(new T.Vector3()).project(W.camera);
+    return { x: r.left + (p.x + 1) / 2 * r.width, y: r.top + (1 - p.y) / 2 * r.height };
+  }
+
+  function moveKnob(dg, e) {
+    const c = knobScreen(dg.m);
+    const dx = e.clientX - dg.lx;
+    const dy = e.clientY - dg.ly;
+    dg.lx = e.clientX;
+    dg.ly = e.clientY;
+    const rx = e.clientX - c.x;
+    const ry = e.clientY - c.y;
+    const rad = Math.hypot(rx, ry);
+    const w = Math.min(1, rad / 36);
+    // screen y points down, so a clockwise finger gives a positive cross product -> negative rotation.z
+    const tangential = rad > 1 ? (rx * dy - ry * dx) / (rad * Math.max(rad, 36)) : 0;
+    const linear = dx / 40;
+    const delta = -(w * tangential + (1 - w) * linear);
+    const lo = DIAL_ANG[3] - 0.25;
+    const hi = DIAL_ANG[0] + 0.25;
+    dg.ang = Math.max(lo, Math.min(hi, dg.ang + delta));
+    dg.m.parts.dial.rotation.z = dg.ang;
+    let best = 0;
+    for (let i = 1; i < 4; i++) {
+      if (Math.abs(DIAL_ANG[i] - dg.ang) < Math.abs(DIAL_ANG[best] - dg.ang)) {
+        best = i;
+      }
+    }
+    if (setProg(dg.m, best)) {
+      dg.turned = true;
+    }
+  }
+
   function endPointer(e) {
     if (!S.started) {
       return;
@@ -2240,6 +2380,31 @@
         finishPour(false);
       } else if (down && down.moved < 10 && e.type === "pointerup") {
         tap(down.r);
+      }
+      down = null;
+      return;
+    }
+    if (drag && drag.kind === "knob") {
+      const dg = drag;
+      drag = null;
+      if (down && down.moved < 8 && e.type === "pointerup") {
+        tap(down.r);
+      } else {
+        settleDial(dg.m);
+        if (dg.turned) {
+          toast("toast_prog", { p: progOf(dg.m).lcd, time: fmtTime(cycleFor(dg.m)) });
+          updateHUD();
+        }
+      }
+      down = null;
+      return;
+    }
+    if (drag && drag.kind === "drawer") {
+      drag = null;
+      if (down && down.moved < 8 && e.type === "pointerup") {
+        tap(down.r);
+      } else {
+        setDrawer(MS.washer.parts.drawer.position.z > DRAWER_OUT / 2);
       }
       down = null;
       return;
@@ -2357,6 +2522,10 @@
     if (m.phase === "run") {
       a = { fill: "FILL", wash: "WASH", drain: "DRAIN", rinse: "RINSE", spin: "SPIN", dry: "DRY", cool: "COOL" }[m.ph] || "RUN";
       b = fmtTime(m.dur - m.t);
+    } else if (performance.now() < m.progShow) {
+      a = progOf(m).lcd;
+      b = fmtTime(cycleFor(m));
+      col = "#ffd27a";
     } else if (m.phase === "done") {
       a = "DONE";
       b = m.doorOpen ? "TAKE OUT" : "OPEN DOOR";
@@ -3221,6 +3390,9 @@
         dryerDrum: W.dryer.drumHit,
         dryerSlot: W.dryer.slotHit,
         dryerStart: W.dryer.start,
+        washerKnob: W.washer.dial,
+        dryerKnob: W.dryer.dial,
+        drawer: W.washer.drawer,
         lintTab: LT.tabHit
       };
       if (name === "washerCoin" || name === "dryerCoin") {
