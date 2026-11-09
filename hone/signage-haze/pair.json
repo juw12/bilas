@@ -1,0 +1,51 @@
+{
+  "mode": "pair",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "judges": {
+    "Pega-Vision": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Version 2 significantly improves Visual Craft (C3) and ASMR atmosphere (C1) by replacing generic UI cards with thematic enamel/brass signage and adding atmospheric depth to the background window, creating a more cohesive and inviting sensory experience.",
+        "Version 1 significantly outperforms Version 2 on Visual Craft (C3) and ASMR Sensory Payoff (C1) by replacing generic UI cards with diegetic enamel signage and brass plates, and by adding atmospheric depth (haze, layered city) and tactile shirt shading that Version 2 lacks."
+      ]
+    },
+    "Pega-Thinking": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Version 2 demonstrates stronger visual craft (C3, w=0.25): the HUD is restyled as cohesive laundromat signage (green enamel brand sign with screw heads, brass token plate, enamel header strips) that matches the place rather than generic cream cards, the cityscape has atmospheric depth with haze and layered ridges, and folded shirts show better crease shading with lit ridges and contact shadows. Other criteria are equivalent since both share the same build.",
+        "Version 1's HUD restyled as laundromat signage (enamel signs, brass token plate, screw heads) and the atmospheric depth in the daytime city (haze, layered towers) deliver a clearly more distinctive and cohesive visual craft (C3) than Version 2's plain cream rounded cards and flat cityscape, while sharing the same underlying build for interaction fidelity."
+      ]
+    },
+    "GLM-5.3-Flash": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Both builds are functionally identical, but Version 2's laundromat-signage HUD (enamel brand sign, brass token plate), layered city depth with haze, and stronger crease/contact shading on folded shirts directly lift C3 (cohesive, place-matched art direction) and slightly C1's tactile payoff, with no visible loss in clarity or interaction fidelity versus Version 1's plainer cream cards and flat backdrop.",
+        "Both versions share the same build, interactions, and onboarding, so C2 and C4 are effectively tied; Version 1's laundromat-signage HUD (enamel brand, brass token plate), hazed layered city depth, and stronger crease/contact shading on folded shirts make the look more cohesive and deliberate (C3) with a slightly more tactile, inviting feel (C1), while Version 2's plain cream cards and flat city read as more generic."
+      ]
+    }
+  },
+  "votes": {
+    "A": 0,
+    "B": 3,
+    "tie": 0
+  },
+  "quorum": 3,
+  "b_wins": true,
+  "label": "council-judged (3 judges)"
+}

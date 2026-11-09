@@ -183,27 +183,33 @@
     if (which === "L" || which === "R") {
       const s = which === "L" ? -1 : 1;
       // turned edge on the flap, darkest right at the hinge line
-      const g = c.createLinearGradient(px(s * (Q + 0.03)), 0, px(s * Q), 0);
+      const g = c.createLinearGradient(px(s * (Q + 0.045)), 0, px(s * Q), 0);
       g.addColorStop(0, "rgba(40,28,16,0)");
-      g.addColorStop(0.7, "rgba(40,28,16,0.16)");
-      g.addColorStop(1, "rgba(40,28,16,0.34)");
+      g.addColorStop(0.6, "rgba(40,28,16,0.2)");
+      g.addColorStop(1, "rgba(40,28,16,0.46)");
       c.fillStyle = g;
-      c.fillRect(Math.min(px(s * (Q + 0.03)), px(s * Q)), 0, Math.abs(px(s * Q) - px(s * (Q + 0.03))), TEX);
+      c.fillRect(Math.min(px(s * (Q + 0.045)), px(s * Q)), 0, Math.abs(px(s * Q) - px(s * (Q + 0.045))), TEX);
+      // a thin lit ridge just past the shade, where the roll turns back toward the light
+      c.fillStyle = "rgba(255,250,240,0.22)";
+      c.fillRect(Math.min(px(s * (Q + 0.05)), px(s * (Q + 0.046))), 0, Math.abs(px(s * (Q + 0.05)) - px(s * (Q + 0.046))), TEX);
       // contact shadow along the flap's free edge, mirrored onto the layer below
       c.filter = "blur(2.5px)";
-      c.strokeStyle = "rgba(35,24,12,0.42)";
-      c.lineWidth = 5;
+      c.strokeStyle = "rgba(35,24,12,0.52)";
+      c.lineWidth = 7;
       c.beginPath();
       const edge = which === "L" ? [[0.006, -TOP], [0.006, 0.17]] : [[-0.244, -TOP], [-0.244, 0.17]];
       c.moveTo(px(edge[0][0]), py(edge[0][1]));
       c.lineTo(px(edge[1][0]), py(edge[1][1]));
       c.stroke();
     } else {
-      const g = c.createLinearGradient(0, py(-0.03), 0, py(0));
+      const g = c.createLinearGradient(0, py(-0.045), 0, py(0));
       g.addColorStop(0, "rgba(40,28,16,0)");
-      g.addColorStop(1, "rgba(40,28,16,0.3)");
+      g.addColorStop(0.6, "rgba(40,28,16,0.18)");
+      g.addColorStop(1, "rgba(40,28,16,0.42)");
       c.fillStyle = g;
-      c.fillRect(0, py(0), TEX, py(-0.03) - py(0));
+      c.fillRect(0, py(0), TEX, py(-0.045) - py(0));
+      c.fillStyle = "rgba(255,250,240,0.2)";
+      c.fillRect(0, py(-0.046), TEX, py(-0.05) - py(-0.046));
     }
     c.restore();
   }
