@@ -395,12 +395,20 @@
     });
     const dialFace = mesh(new T.CircleGeometry(0.046, 40), new T.MeshStandardMaterial({ map: dialTex, transparent: true, roughness: 0.6 }), 0.004, 0.765, 0.0356);
     g.add(dialFace);
-    const knob = mesh(new T.CylinderGeometry(0.019, 0.021, 0.018, 28), std("#d9dcde", { metalness: 0.75, roughness: 0.32 }), 0.004, 0.765, 0.044);
+    // knob + pointer turn together on a pivot so the program dial can be twisted between detents
+    const dial = new T.Group();
+    dial.position.set(0.004, 0.765, 0);
+    g.add(dial);
+    const knob = mesh(new T.CylinderGeometry(0.019, 0.021, 0.018, 28), std("#d9dcde", { metalness: 0.75, roughness: 0.32 }), 0, 0, 0.044);
     knob.rotation.x = Math.PI / 2;
-    g.add(knob);
-    const pointer = mesh(new T.BoxGeometry(0.004, 0.016, 0.003), M.red, 0.004, 0.774, 0.0545);
-    g.add(pointer);
+    dial.add(knob);
+    const pointer = mesh(new T.BoxGeometry(0.004, 0.016, 0.003), M.red, 0, 0.009, 0.0545);
+    dial.add(pointer);
+    const knobHit = mesh(new T.CircleGeometry(0.034, 20), M.hit, 0.004, 0.765, 0.057);
+    knobHit.userData.act = kind + "Knob";
+    g.add(knobHit);
     parts.knob = knob;
+    parts.dial = dial;
 
     // panel seams, brushed top trim, kick plate with vent slots, rubber feet
     const groove = std("#b9b5ad", { roughness: 0.7 });
@@ -463,6 +471,8 @@
       drawer.add(df);
       const grip = mesh(new T.BoxGeometry(0.09, 0.008, 0.006), M.panel, 0, -0.012, 0.021);
       drawer.add(grip);
+      df.userData.act = "drawer";
+      grip.userData.act = "drawer";
       parts.drawer = drawer;
 
       const bottle = new T.Group();
