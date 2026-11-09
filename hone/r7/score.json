@@ -1,0 +1,143 @@
+{
+  "mode": "score",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "weights": {
+    "C1": 0.3,
+    "C2": 0.25,
+    "C3": 0.25,
+    "C4": 0.2
+  },
+  "judges": {
+    "Pega-Vision": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 7.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Calm pacing and feedback are visible ('Washing · 0:24 left. Watch the water, or sit for a while.'), but some touch targets still read as plain UI pills.",
+        "C2": "The flow uses distinct gestures: 'DRAG each coin into the slot' and 'drag across it to peel the felt off'.",
+        "C3": "Art direction is coherent, yet the changer is a flat black panel with '1 note = 4 coins' text and table wrinkles look like bright gray streaks.",
+        "C4": "A one-line hint and 'This load' card keep progress visible, though active station vs next-step underline can be slightly ambiguous."
+      },
+      "fixes": [
+        "Rebuild the changer and HUD as tactile, diegetic objects (real slot, coin tray, paper tags, metal purse) instead of flat panels and generic pills.",
+        "Replace the gray-streak wrinkles and flat shirt shading with believable cloth creases, soft shadows, and drag-responsive compression.",
+        "Make next-step affordances unambiguous on phone: unify active/next markers, prevent HUD overlap, and show explicit drag/hand cues for coins, lint, smoothing, and folding."
+      ],
+      "total": 8.2,
+      "seconds": 68.8
+    },
+    "Pega-Thinking": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Calm mint/wood palette, visible feedback (water with foam and meniscus, drips on window, lint felt to peel, fabric drape shading), 30 synthesized sounds + spatial ambient, Sit station invites lingering; however station-bar tab switches read as plain icon toggles without a tactile payoff of their own.",
+        "C2": "Real-flow gestures are matched to each step: drag coin into slot, drag across lint screen to peel felt, drag across shirt to smooth wrinkles, fold left/right/bottom; receipt lists every coin ('Washer 2  2 coins', 'Dryer 3  1 coin', 'Window line  2 free'); detergent drawer, lint trap, pegs, thirds-fold all present.",
+        "C3": "Coherent art direction (mint tile, warm wood, softened brand red, green cutting mat with thirds guides), clearcoat enamel on machines, brushed maker plates, deliberate receipt typography; but the detergent bottle perched on the washer reads as undersized, the cityscape outside the window is flat geometric blocks, and shirts inside the drum read as colorful blobs rather than fabric at distance.",
+        "C4": "Contextual one-line hint always visible ('Tap the green slot to feed a note', 'Drag over the lint screen to peel the felt off', 'Now fold the right side in'), object-pinned labels with soft ring marker, 'This load' card tracks each shirt's state, station bar underlines the next real task, timer counts down on the LCD."
+      },
+      "fixes": [
+        "Add a tactile visual + sound payoff to station-bar tab switches (e.g., a soft camera settle, ambient swell, or a brief whoosh) so leaving the current station doesn't feel like a plain button press.",
+        "Refine prop scale and silhouette: the detergent bottle on top of the washer looks tiny against the machine, and the window cityscape is flat blocks — give the bottle a proper cap-and-label silhouette at machine scale and add a couple of layered midground buildings with windows/rooftops for depth.",
+        "Make the 'This load' shirt icons more legible at a glance (distinct silhouettes or color chips per shirt, plus a brief micro-animation when a shirt changes state from unwashed→wet→dry→folded) so progress is readable without reading the timer."
+      ],
+      "total": 8.45,
+      "seconds": 134.2
+    },
+    "GLM-5.3-Flash": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Rich sensory layering: 'drips slow as they dry', night rain 'beads slide down the glass leaving thin trails', steam puff on dryer open, 'smooth' sound 'tied to drag speed', Sit station with background machines. Held below 10 because the smoothing payoff still reads as pale scribble streaks on the table and drum clothes are low-poly blobs, so not every repeated touch has full tactile payoff.",
+        "C2": "Every 10-anchor prop is present with matched gestures: 'feed a note into the changer, coins cascade', 'DRAG each coin into the slot', 'pour detergent into the drawer', 'pull the lint trap and drag across it to peel the felt off', wooden pegs, drag-to-smooth, itemized receipt. Only gap vs the anchor: fold is sleeves-then-bottom, not literal 'folding in thirds'.",
+        "C3": "Coherent mint-tile/cream palette, 'clearcoat material' enamel, 'brushed metal maker's plate (bilas PRO 7 KG)', green cutting mat with cream thirds guides, thermal-receipt end card — deliberate and screenshot-worthy. Not 10: wall notes ('Lost: grey sock', prices) render visibly blurry at 1280x800, and the phone mid-fold shirt shows a jagged polygon edge on the right sleeve.",
+        "C4": "Always-on next step: pinned object labels ('Washer 2 · Open the door', 'Hold to pour') with ring marker, one-line hints ('Tap the green slot to feed in a note.'), per-shirt 'This load' states ('2 dry · 2 wet') plus machine timers, red underline only on real tasks. Minor: in the Hang screenshot the active station is Hang while Fold is underlined, which can momentarily split a first-timer's attention."
+      },
+      "fixes": [
+        "Fix the deformed/jagged shirt mesh visible during the right-side fold step on phone — it undermines the payoff of the signature fold gesture.",
+        "Rework the wrinkle smoothing visual: current light streaks read as scribbles; use crisp creases with lifted highlights so the before/after of smoothing is unmistakable.",
+        "Increase wall note/poster texture sharpness (prices and handwriting are blurry at desktop size) and keep HUD cards from occluding the prices note."
+      ],
+      "total": 8.45,
+      "seconds": 91.5
+    }
+  },
+  "quorum": 3,
+  "criterion_median": {
+    "C1": 8.0,
+    "C2": 9.0,
+    "C3": 8.0,
+    "C4": 9.0
+  },
+  "criterion_spread": {
+    "C1": 0.0,
+    "C2": 0.0,
+    "C3": 1.0,
+    "C4": 0.0
+  },
+  "split_criteria": [],
+  "judge_total_range": [
+    8.2,
+    8.45
+  ],
+  "fixes": [
+    {
+      "judge": "Pega-Vision",
+      "fix": "Rebuild the changer and HUD as tactile, diegetic objects (real slot, coin tray, paper tags, metal purse) instead of flat panels and generic pills."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Replace the gray-streak wrinkles and flat shirt shading with believable cloth creases, soft shadows, and drag-responsive compression."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Make next-step affordances unambiguous on phone: unify active/next markers, prevent HUD overlap, and show explicit drag/hand cues for coins, lint, smoothing, and folding."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Add a tactile visual + sound payoff to station-bar tab switches (e.g., a soft camera settle, ambient swell, or a brief whoosh) so leaving the current station doesn't feel like a plain button press."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Refine prop scale and silhouette: the detergent bottle on top of the washer looks tiny against the machine, and the window cityscape is flat blocks — give the bottle a proper cap-and-label silhouette at machine scale and add a couple of layered midground buildings with windows/rooftops for depth."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Make the 'This load' shirt icons more legible at a glance (distinct silhouettes or color chips per shirt, plus a brief micro-animation when a shirt changes state from unwashed→wet→dry→folded) so progress is readable without reading the timer."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Fix the deformed/jagged shirt mesh visible during the right-side fold step on phone — it undermines the payoff of the signature fold gesture."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Rework the wrinkle smoothing visual: current light streaks read as scribbles; use crisp creases with lifted highlights so the before/after of smoothing is unmistakable."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Increase wall note/poster texture sharpness (prices and handwriting are blurry at desktop size) and keep HUD cards from occluding the prices note."
+    }
+  ],
+  "label": "council-judged (3 judges), mean of 2 runs",
+  "council_score": 8.45,
+  "runs": 2,
+  "run_scores": [
+    8.45,
+    8.45
+  ],
+  "run_spread": 0.0
+}

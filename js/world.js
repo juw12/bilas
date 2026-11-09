@@ -1012,8 +1012,17 @@
       c.textAlign = "left";
       let y = opts.pad + opts.size;
       lines().forEach(function (ln, i) {
-        c.font = (i === 0 ? "bold " : "500 ") + (i === 0 ? opts.size * 1.25 : opts.size) + "px " + FONT_DISPLAY;
-        c.fillText(ln, opts.pad, y);
+        const weight = i === 0 ? "bold " : "500 ";
+        let px = i === 0 ? opts.size * 1.25 : opts.size;
+        c.font = weight + px + "px " + FONT_DISPLAY;
+        // shrink long lines to fit instead of clipping at the card edge
+        const room = cw - opts.pad * 2;
+        const wide = c.measureText(ln).width;
+        if (wide > room) {
+          px = Math.max(px * 0.6, px * room / wide);
+          c.font = weight + px + "px " + FONT_DISPLAY;
+        }
+        c.fillText(ln, opts.pad, y, room);
         y += opts.size * (i === 0 ? 1.7 : 1.35);
       });
       if (opts.tape) {
@@ -1222,25 +1231,25 @@
     const price = poster(function () {
       return [W.str("p_price_t"), W.str("p_price_1"), W.str("p_price_2"), W.str("p_price_3")];
     }, 0.36, 0.3, { bg: "#fffdf7", fg: "#2b3236", size: 30, pad: 26 });
-    price.position.set(1.12, 1.45, -1.995);
+    price.position.set(1.22, 1.33, -1.995);
     price.rotation.z = 0.01;
     scene.add(price);
     const note = poster(function () {
       return [W.str("p_note_t"), W.str("p_note_1"), W.str("p_note_2")];
     }, 0.22, 0.17, { bg: "#f3e7b8", fg: "#3a3326", size: 22, pad: 16, tape: true });
-    note.position.set(1.12, 1.17, -1.995);
+    note.position.set(1.22, 1.05, -1.995);
     note.rotation.z = -0.04;
     scene.add(note);
     const note2 = poster(function () {
       return [W.str("p_note2_t"), W.str("p_note2_1"), W.str("p_note2_2")];
     }, 0.2, 0.15, { bg: "#dfeae4", fg: "#2b3236", size: 20, pad: 14, tape: true });
-    note2.position.set(1.36, 1.2, -1.994);
+    note2.position.set(1.46, 1.08, -1.994);
     note2.rotation.z = 0.05;
     scene.add(note2);
     const note3 = poster(function () {
       return [W.str("p_note3_t"), W.str("p_note3_1")];
     }, 0.16, 0.11, { bg: "#fbf8f1", fg: "#3a3326", size: 18, pad: 12, tape: true });
-    note3.position.set(1.15, 0.97, -1.994);
+    note3.position.set(1.25, 0.86, -1.994);
     note3.rotation.z = -0.07;
     scene.add(note3);
     W.posters = [price, note, note2, note3];
@@ -1370,8 +1379,8 @@
     scene.add(table);
     W.table = table;
     W.tableTopY = 0.85;
-    W.tableSpot = new T.Vector3(0.62, 0.852, 0.88);
-    W.stackSpot = new T.Vector3(1.25, 0.852, 0.88);
+    W.tableSpot = new T.Vector3(0.62, 0.854, 0.88);
+    W.stackSpot = new T.Vector3(1.25, 0.854, 0.88);
 
     // folding board with thirds guides (sleeve, sleeve, bottom up)
     const boardTex = canvasTex(740, 640, function (c, w, h) {
@@ -1409,7 +1418,8 @@
       c.lineWidth = 6;
       c.strokeRect(6, 6, w - 12, h - 12);
     }, true);
-    const boardMat = new T.MeshStandardMaterial({ map: boardTex, roughness: 0.85, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
+    const boardMat = new T.MeshStandardMaterial({ map: boardTex, roughness: 0.85, polygonOffset: true, polygonOffsetFactor: 0, polygonOffsetUnits: -2 });
+    // slope-independent offset: a slope factor pulled the board through the shirt at grazing phone angles
     const board = mesh(new T.PlaneGeometry(0.74, 0.64), boardMat, W.tableSpot.x, 0.8505, W.tableSpot.z);
     board.rotation.x = -Math.PI / 2;
     board.receiveShadow = true;

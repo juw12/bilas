@@ -919,3 +919,18 @@ html[data-theme="night"] .lens {
 body.done-open .hint {
   visibility: hidden;
 }
+
+/* a load chip pops once when its shirt changes state */
+@keyframes loadPop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.32) translateY(-2px); }
+  100% { transform: scale(1); }
+}
+.load-list li.just svg {
+  animation: loadPop 0.55s cubic-bezier(0.3, 1.4, 0.5, 1) 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .load-list li.just svg {
+    animation: none;
+  }
+}

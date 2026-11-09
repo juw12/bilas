@@ -1739,6 +1739,9 @@
       S.lint.open = false;
       LT.group.position.z = -0.11;
     }
+    if (st !== S.station) {
+      A.play("step");
+    }
     S.station = st;
     if (st === "sit") {
       $("btnStand").hidden = false;
@@ -2726,6 +2729,8 @@
   let lastLoadSig = "";
   let lastTicketSig = "";
 
+  let lastLoadStates = null;
+
   function renderLoad() {
     const ls = loadShirts();
     const sig = lang + ls.map(function (s) {
@@ -2735,7 +2740,13 @@
       return;
     }
     lastLoadSig = sig;
-    $("loadList").innerHTML = ls.map(function (s) {
+    const prev = lastLoadStates;
+    lastLoadStates = ls.map(function (s) {
+      return s.state;
+    });
+    $("loadList").innerHTML = ls.map(function (s, i) {
+      // a shirt whose state just changed gets a short pop so progress reads at a glance
+      const just = prev && prev.length === ls.length && prev[i] !== s.state ? " just" : "";
       const col = s.spec.color.base;
       let badge = "";
       if (s.state === "dirty") {
@@ -2745,7 +2756,7 @@
       } else if (s.state === "folded") {
         badge = '<path d="M15.5 17.5l2 2 4-4.5" fill="none" stroke="#3b8f5c" stroke-width="2" stroke-linecap="round"/>';
       }
-      return '<li class="st-' + s.state + '" title="' + t("state_" + s.state) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + TEE + '" fill="' + col + '" stroke="rgba(0,0,0,.35)" stroke-width=".8"/>' + badge + '</svg><span class="sr">' + t("state_" + s.state) + "</span></li>";
+      return '<li class="st-' + s.state + just + '" title="' + t("state_" + s.state) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + TEE + '" fill="' + col + '" stroke="rgba(0,0,0,.35)" stroke-width=".8"/>' + badge + '</svg><span class="sr">' + t("state_" + s.state) + "</span></li>";
     }).join("");
     const counts = {};
     const order = [];

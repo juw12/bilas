@@ -1,0 +1,51 @@
+{
+  "mode": "pair",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "judges": {
+    "Pega-Vision": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Both versions report identical passing hard gates and the same interaction flow, but V2 layers targeted polish onto the same build—turned/clearcoat props, deeper drum water with meniscus and bubbles, dryer steam, night rain trails, porthole gaskets, and a fixed phone fold framing—each of which lifts C3 visual craft and C1 sensory payoff (and C4 on phone) with no visible regression in the screenshots.",
+        "Both versions claim the same hard gates, but VERSION 1’s r7 changes add stronger sensory and visual payoff—more detailed props, water, rain, steam, machine materials, and a better phone fold framing—giving it a clear edge on C1 and C3 while matching VERSION 2 on interaction and clarity."
+      ]
+    },
+    "Pega-Thinking": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "VERSION 2 (r7) builds on VERSION 1's foundation with meaningful visual craft and sensory improvements: more detailed turned props (detergent jug with label, glass spray bottle, glazed mug), richer water rendering in the drum (meniscus, foam, bubbles), window rain beads at night, steam from the dryer, and machine details (gaskets, maker's plates). These refinements lift C1 (sensory payoff) and C3 (visual craft) without regressing C2 or C4, giving VERSION 2 a slight edge overall.",
+        "VERSION 1 (r7) adds meaningful visual and sensory upgrades over VERSION 2 (r6): lathe-turned props with clearcoat materials and labels, richer water rendering (meniscus, bubbles, swirl), window rain beads, dryer steam, maker's plates, and a better-framed phone fold view. These directly strengthen C1 (sensory payoff) and C3 (visual craft), with minor spillover into C2, while C4 is comparable."
+      ]
+    },
+    "GLM-5.3-Flash": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Both versions claim identical hard-gate passes and identical interaction flow, sound set, and onboarding, but Version 2 (r7) is a strict superset of r6 whose additions target the highest-weighted criteria: rebuilt lathe/plastic props, richer drum water with foam and meniscus, dryer steam, crisper textures, gaskets/maker's plates, and better phone fold framing — visible in the screenshots as equal-or-better in every shot with no regression. That is a consistent, non-negligible gain in C1 sensory payoff and C3 visual craft.",
+        "Both versions claim identical hard-gate passes and the same interaction flow, but Version 1 (r7) adds documented and screenshot-corroborated refinements — lathe-turned labelled props, denser textures, foam/bubble drum water with meniscus, rain beads and dryer steam, and a better-framed phone fold view — that directly raise C1 (sensory payoff) and C3 (visual craft), which carry 55% of the soft weight, while C2/C4 remain equal."
+      ]
+    }
+  },
+  "votes": {
+    "A": 0,
+    "B": 3,
+    "tie": 0
+  },
+  "quorum": 3,
+  "b_wins": true,
+  "label": "council-judged (3 judges)"
+}

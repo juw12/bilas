@@ -1,6 +1,6 @@
 /* Bilas service worker: everything is local, so cache it all and play offline.
    Bump VERSION whenever a file changes; the old cache is dropped on activate. */
-const VERSION = "bilas-v5";
+const VERSION = "bilas-v6";
 const FILES = [
   "./",
   "index.html",

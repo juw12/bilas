@@ -330,6 +330,15 @@
     noise({ t: t, f: 700, f2: 2400, q: 0.8, attack: 0.08, decay: 0.28, peak: 0.08 });
   };
 
+  // two muffled steps on tile when you walk to another station
+  S.step = function (t) {
+    for (let i = 0; i < 2; i++) {
+      const tt = t + i * rnd(0.26, 0.32);
+      noise({ t: tt, f: rnd(260, 340), q: 0.7, attack: 0.004, decay: 0.09, peak: 0.05, filter: "lowpass" });
+      noise({ t: tt + 0.012, f: rnd(1800, 2400), q: 1.2, attack: 0.002, decay: 0.03, peak: 0.008 });
+    }
+  };
+
   S.pat = function (t) {
     noise({ t: t, f: 500, q: 0.6, attack: 0.002, decay: 0.07, peak: 0.12, filter: "lowpass" });
     tone({ t: t, f: 140, f2: 70, decay: 0.07, peak: 0.08 });

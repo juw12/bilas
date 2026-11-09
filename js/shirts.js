@@ -7,6 +7,9 @@
   window.BilasShirts = SH;
 
   const TEX = 256;
+  // wrinkle + composite layers are drawn at twice the fabric density so creases stay crisp
+  const WTEX = 512;
+  const WS = WTEX / TEX;
   const BX = 0.9;
   const BY = 0.7;
   const Q = 0.125;
@@ -140,54 +143,120 @@
   }
 
   function drawWrinkles(c, seed) {
-    // soft cotton creases: a blurred shadow band with a lifted highlight beside it,
-    // long and flowing (from shoulders, armpits and the hem), never pen-like strokes
-    c.clearRect(0, 0, TEX, TEX);
+    // Cotton creases as a cloth would really hold them: tapered folds in near-parallel families
+    // (drag folds from each armpit, compression ripples above the hem, one fold down each sleeve).
+    // Each fold is a soft shaded valley with a thin lit ridge on its upper-left side.
+    c.clearRect(0, 0, WTEX, WTEX);
     let s = seed;
     function r() {
       s = (s * 9301 + 49297) % 233280;
       return s / 233280;
     }
-    c.save();
-    c.lineCap = "round";
-    // broad, gentle rumple shading first
-    c.filter = "blur(10px)";
-    for (let i = 0; i < 7; i++) {
-      c.fillStyle = r() < 0.5 ? "rgba(20,15,10,0.06)" : "rgba(255,255,255,0.08)";
+    function wx(x) {
+      return px(x) * WS;
+    }
+    function wy(y) {
+      return py(y) * WS;
+    }
+    function band(pts, widths, side) {
+      // closed tapered ribbon along pts, offset by `side` (in widths) from the centre line
       c.beginPath();
-      c.ellipse(px(-0.25 + r() * 0.5), py(-0.28 + r() * 0.56), 12 + r() * 22, 6 + r() * 12, r() * Math.PI, 0, Math.PI * 2);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < pts.length; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(pts.length - 1, i + 1)];
+        const dx = b[0] - a[0];
+        const dy = b[1] - a[1];
+        const len = Math.hypot(dx, dy) || 1;
+        const nx = -dy / len;
+        const ny = dx / len;
+        const w = widths[i];
+        const o = side * w;
+        left.push([pts[i][0] + nx * (o + w * 0.5), pts[i][1] + ny * (o + w * 0.5)]);
+        right.push([pts[i][0] + nx * (o - w * 0.5), pts[i][1] + ny * (o - w * 0.5)]);
+      }
+      left.forEach(function (p, i) {
+        if (i === 0) {
+          c.moveTo(p[0], p[1]);
+        } else {
+          c.lineTo(p[0], p[1]);
+        }
+      });
+      for (let i = right.length - 1; i >= 0; i--) {
+        c.lineTo(right[i][0], right[i][1]);
+      }
+      c.closePath();
       c.fill();
     }
-    const anchors = [[-0.22, 0.28], [0.22, 0.28], [-0.16, 0.12], [0.16, 0.12], [0, -0.3], [-0.12, -0.3], [0.12, -0.3]];
-    for (let i = 0; i < 20; i++) {
-      const a0 = anchors[Math.floor(r() * anchors.length)];
-      const x = a0[0] + (r() - 0.5) * 0.08;
-      const y = a0[1] + (r() - 0.5) * 0.06;
-      const ang = Math.atan2(-y, -x) + (r() - 0.5) * 1.1;
-      const len = 0.12 + r() * 0.18;
-      const x2 = x + Math.cos(ang) * len;
-      const y2 = y + Math.sin(ang) * len;
-      const bend = (r() - 0.5) * 0.08;
-      const bx = (x + x2) / 2 - Math.sin(ang) * bend;
-      const by = (y + y2) / 2 + Math.cos(ang) * bend;
-      const w = 2.5 + r() * 3;
-      c.filter = "blur(" + (0.8 + w * 0.25).toFixed(1) + "px)";
-      c.strokeStyle = "rgba(25,18,12,0.26)";
-      c.lineWidth = w;
-      c.beginPath();
-      c.moveTo(px(x), py(y));
-      c.quadraticCurveTo(px(bx), py(by), px(x2), py(y2));
-      c.stroke();
-      c.filter = "blur(1.6px)";
-      c.strokeStyle = "rgba(255,250,240,0.2)";
-      c.lineWidth = w * 0.6;
-      const ox = -Math.sin(ang) * w * 0.8;
-      const oy = Math.cos(ang) * w * 0.8;
-      c.beginPath();
-      c.moveTo(px(x) + ox, py(y) + oy);
-      c.quadraticCurveTo(px(bx) + ox, py(by) + oy, px(x2) + ox, py(y2) + oy);
-      c.stroke();
+    function fold(x1, y1, x2, y2, bend, width, depth) {
+      const pts = [];
+      const widths = [];
+      const n = 26;
+      const mx = (x1 + x2) / 2;
+      const my = (y1 + y2) / 2;
+      const ang = Math.atan2(y2 - y1, x2 - x1);
+      const cx = mx - Math.sin(ang) * bend;
+      const cy = my + Math.cos(ang) * bend;
+      for (let i = 0; i <= n; i++) {
+        const t = i / n;
+        const u = 1 - t;
+        const x = u * u * x1 + 2 * u * t * cx + t * t * x2;
+        const y = u * u * y1 + 2 * u * t * cy + t * t * y2;
+        pts.push([wx(x), wy(y)]);
+        widths.push(width * WS * Math.pow(Math.sin(Math.PI * t), 0.75));
+      }
+      // valley: soft shade spread wider than the crease
+      c.filter = "blur(" + (2.2 * WS).toFixed(1) + "px)";
+      c.fillStyle = "rgba(24,16,10," + (0.2 * depth).toFixed(3) + ")";
+      band(pts, widths.map(function (w) {
+        return w * 1.6;
+      }), 0.15);
+      // crease core: narrow, darker, nearly sharp
+      c.filter = "blur(" + (0.6 * WS).toFixed(1) + "px)";
+      c.fillStyle = "rgba(20,12,6," + (0.26 * depth).toFixed(3) + ")";
+      band(pts, widths.map(function (w) {
+        return w * 0.42;
+      }), 0.35);
+      // lit ridge beside it, thin and quiet so dark shirts never look scribbled
+      c.filter = "blur(" + (0.9 * WS).toFixed(1) + "px)";
+      c.fillStyle = "rgba(255,250,238," + (0.13 * depth).toFixed(3) + ")";
+      band(pts, widths.map(function (w) {
+        return w * 0.5;
+      }), -0.55);
     }
+    c.save();
+    // broad rumple underneath, very low contrast
+    c.filter = "blur(" + (14 * WS).toFixed(0) + "px)";
+    for (let i = 0; i < 6; i++) {
+      c.fillStyle = r() < 0.5 ? "rgba(20,15,10,0.05)" : "rgba(255,255,255,0.05)";
+      c.beginPath();
+      c.ellipse(wx(-0.2 + r() * 0.4), wy(-0.26 + r() * 0.52), (14 + r() * 20) * WS, (7 + r() * 10) * WS, r() * Math.PI, 0, Math.PI * 2);
+      c.fill();
+    }
+    // drag folds fanning from each armpit toward the opposite hip
+    [-1, 1].forEach(function (side) {
+      const count = 3 + Math.floor(r() * 2);
+      for (let i = 0; i < count; i++) {
+        const sx = side * (0.17 - i * 0.012) + (r() - 0.5) * 0.01;
+        const sy = 0.12 - i * 0.045 + (r() - 0.5) * 0.015;
+        const len = 0.15 + r() * 0.08 - i * 0.01;
+        const a = -Math.PI / 2 - side * (0.3 + i * 0.05 + (r() - 0.5) * 0.1);
+        fold(sx, sy, sx + Math.cos(a) * len, sy + Math.sin(a) * len, (r() - 0.5) * 0.03, 5 + r() * 2.5, 0.85 + r() * 0.3);
+      }
+    });
+    // compression ripples above the hem, staggered so they never line up
+    for (let i = 0; i < 3; i++) {
+      const y = -0.17 - i * 0.045 + (r() - 0.5) * 0.012;
+      const x0 = -0.2 + r() * 0.12;
+      const x1 = x0 + 0.14 + r() * 0.16;
+      fold(x0, y, Math.min(0.22, x1), y + (r() - 0.5) * 0.03, (r() - 0.5) * 0.025, 4.5 + r() * 2, 0.8 + r() * 0.3);
+    }
+    // one soft fold down each sleeve and a small dip under the collar
+    [-1, 1].forEach(function (side) {
+      fold(side * 0.27, 0.23 + (r() - 0.5) * 0.02, side * 0.38, 0.17, (r() - 0.5) * 0.02, 4, 0.8);
+    });
+    fold(-0.05, 0.25, 0.05, 0.25, -0.012, 3.5, 0.6);
     c.restore();
   }
 
@@ -418,11 +487,11 @@
     base.height = TEX;
     drawFabric(base.getContext("2d"), spec);
     const wr = document.createElement("canvas");
-    wr.width = TEX;
-    wr.height = TEX;
+    wr.width = WTEX;
+    wr.height = WTEX;
     const comp = document.createElement("canvas");
-    comp.width = TEX;
-    comp.height = TEX;
+    comp.width = WTEX;
+    comp.height = WTEX;
     const tex = new T.CanvasTexture(comp);
     tex.colorSpace = T.SRGBColorSpace;
     tex.wrapS = T.RepeatWrapping;
@@ -514,8 +583,8 @@
 
     shirt.compose = function () {
       const c = comp.getContext("2d");
-      c.clearRect(0, 0, TEX, TEX);
-      c.drawImage(base, 0, 0);
+      c.clearRect(0, 0, WTEX, WTEX);
+      c.drawImage(base, 0, 0, WTEX, WTEX);
       if (shirt.wrinkles > 0) {
         c.drawImage(wr, 0, 0);
       }
@@ -547,14 +616,15 @@
       const c = wr.getContext("2d");
       c.save();
       c.globalCompositeOperation = "destination-out";
-      const gx = px(x);
-      const gy = py(y);
-      const grd = c.createRadialGradient(gx, gy, 2, gx, gy, 22);
+      const gx = px(x) * WS;
+      const gy = py(y) * WS;
+      const rad = 22 * WS;
+      const grd = c.createRadialGradient(gx, gy, 2 * WS, gx, gy, rad);
       grd.addColorStop(0, "rgba(0,0,0,1)");
       grd.addColorStop(1, "rgba(0,0,0,0)");
       c.fillStyle = grd;
       c.beginPath();
-      c.arc(gx, gy, 22, 0, Math.PI * 2);
+      c.arc(gx, gy, rad, 0, Math.PI * 2);
       c.fill();
       c.restore();
       for (let dx = -1; dx <= 1; dx++) {
