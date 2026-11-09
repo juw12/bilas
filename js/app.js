@@ -145,13 +145,60 @@
       vel: 0,
       busy: false,
       lastThump: 0,
+      prog: 1,
       baseX: parts.group.position.x
     };
+  }
+
+  /* ---------- program dial: four detents, clockwise = hotter / longer ---------- */
+  const DIAL_ROT = [0.75 * Math.PI, 0.25 * Math.PI, -0.25 * Math.PI, -0.75 * Math.PI];
+  const DIAL_LEN = [0.85, 1, 1.15, 1.3];
+
+  function nearestDetent(rot) {
+    let best = 0;
+    DIAL_ROT.forEach(function (r, i) {
+      if (Math.abs(r - rot) < Math.abs(DIAL_ROT[best] - rot)) {
+        best = i;
+      }
+    });
+    return best;
+  }
+
+  function setProg(m, i, quiet) {
+    const dial = m.parts.dial;
+    const from = dial.rotation.z;
+    const to = DIAL_ROT[i];
+    const changed = m.prog !== i;
+    m.prog = i;
+    tween(0.16, function (k) {
+      dial.rotation.z = from + (to - from) * k;
+    });
+    if (!quiet) {
+      A.play("button", 0.55);
+      if (changed) {
+        const lab = m.parts.dialLabels[i];
+        toast(m.key === "washer" ? "toast_dial_wash" : "toast_dial_dry", { p: lab === "+" ? t("dial_extra") : lab + "°" });
+      }
+    }
+  }
+
+  function turnDial(m) {
+    if (m.phase === "run") {
+      toast("toast_locked");
+      A.play("beep");
+      return;
+    }
+    setProg(m, (m.prog + 1) % DIAL_ROT.length);
   }
   const MS = {
     washer: makeMachineState("washer", W.washer, 2),
     dryer: makeMachineState("dryer", W.dryer, 1)
   };
+  [W.washer, W.dryer, W.washerBg, W.dryerTop].forEach(function (p) {
+    if (p && p.dial) {
+      p.dial.rotation.z = DIAL_ROT[1];
+    }
+  });
 
   W.washer.group.userData.station = "wash";
   W.washerBg.group.userData.station = "wash";
@@ -812,7 +859,7 @@
     }
     m.phase = "run";
     m.t = 0;
-    m.dur = (m.key === "washer" ? 1 : 0.8) * S.cycle;
+    m.dur = (m.key === "washer" ? 1 : 0.8) * S.cycle * DIAL_LEN[m.prog];
     if (S.receipt) {
       S.receipt[m.key] += m.need;
     }
@@ -856,6 +903,9 @@
     return 0;
   }
 
+  const tumbleDir = new T.Vector3();
+  const tumbleQ = new T.Quaternion();
+
   function tumble(m, dt, omega, near) {
     const R = m.parts.R;
     m.parts.drumMats[0].userData.ang = m.ang;
@@ -898,6 +948,22 @@
       if (omega !== 0) {
         root.rotation.z += tb.spin * dt;
         root.rotation.x += tb.spin * dt * 0.4;
+      }
+      // the cloth streams behind its own motion: along the drum wall while carried, downward when it drops
+      if (s.obj.setTumble) {
+        const dirSign = omega >= 0 ? 1 : -1;
+        let flow;
+        if (tb.falling) {
+          tumbleDir.set(0, -1, 0);
+          flow = 0.85;
+        } else {
+          tumbleDir.set(Math.cos(tb.phi) * dirSign, Math.sin(tb.phi) * dirSign, 0);
+          flow = Math.min(1, Math.abs(omega) * tb.r * 1.6);
+        }
+        tb.flow = (tb.flow || 0) + (flow - (tb.flow || 0)) * Math.min(1, dt * 5);
+        tumbleQ.copy(root.quaternion).invert();
+        tumbleDir.applyQuaternion(tumbleQ);
+        s.obj.setTumble(tb.flow, tumbleDir, performance.now() / 1000 + tb.k * 7);
       }
     });
   }
@@ -1899,6 +1965,12 @@
       case "washerStart":
         pressStart(w);
         break;
+      case "washerDial":
+        turnDial(w);
+        break;
+      case "dryerDial":
+        turnDial(d);
+        break;
       case "dryerDoor":
         setDoor(d, !d.doorOpen);
         break;
@@ -2098,6 +2170,18 @@
       drag = startPourDrag();
       return;
     }
+    if (r.type === "act" && (r.act === "washerDial" || r.act === "dryerDial")) {
+      const dm = r.act === "washerDial" ? MS.washer : MS.dryer;
+      let owner = r.obj;
+      while (owner && owner !== dm.parts.dial) {
+        owner = owner.parent;
+      }
+      if (owner && dm.phase !== "run") {
+        const c = screenOf(dm.parts.dial.getWorldPosition(new T.Vector3()));
+        drag = { kind: "dial", m: dm, cx: c.x, cy: c.y, prevA: Math.atan2(e.clientY - c.y, e.clientX - c.x), turned: 0, rot0: dm.parts.dial.rotation.z, last: dm.prog, started: false };
+        return;
+      }
+    }
     const fromBasket = (r.type === "shirt" && r.shirt.loc === "basket") || (r.type === "act" && r.act === "basket");
     if (fromBasket && (S.station === "wash" || S.station === "dry")) {
       const cm = S.station === "wash" ? MS.washer : MS.dryer;
@@ -2159,6 +2243,28 @@
       }
       if (drag.started) {
         moveCarry(drag, e);
+      }
+      return;
+    }
+    if (drag && drag.kind === "dial") {
+      if (!drag.started && down && down.moved > 6) {
+        drag.started = true;
+      }
+      if (drag.started) {
+        // accumulate the turn move by move so a half turn or more never wraps the wrong way
+        const a = Math.atan2(e.clientY - drag.cy, e.clientX - drag.cx);
+        let step = a - drag.prevA;
+        step = Math.atan2(Math.sin(step), Math.cos(step));
+        drag.prevA = a;
+        drag.turned += step;
+        // screen y points down, so a clockwise drag is a negative turn about the dial's axis
+        const rot = Math.max(DIAL_ROT[3], Math.min(DIAL_ROT[0], drag.rot0 - drag.turned));
+        drag.m.parts.dial.rotation.z = rot;
+        const i = nearestDetent(rot);
+        if (i !== drag.last) {
+          drag.last = i;
+          A.play("button", 0.4);
+        }
       }
       return;
     }
@@ -2232,6 +2338,18 @@
       drag = null;
       if (dg.started) {
         dropCarry(dg, e);
+      } else if (down && down.moved < 10 && e.type === "pointerup") {
+        tap(down.r);
+      }
+      down = null;
+      return;
+    }
+    if (drag && drag.kind === "dial") {
+      const dg = drag;
+      drag = null;
+      if (dg.started) {
+        setProg(dg.m, nearestDetent(dg.m.parts.dial.rotation.z));
+        updateHUD();
       } else if (down && down.moved < 10 && e.type === "pointerup") {
         tap(down.r);
       }
@@ -3197,6 +3315,8 @@
         soap: W.washer.bottle,
         washerSlot: W.washer.slotHit,
         washerStart: W.washer.start,
+        washerDial: W.washer.knob,
+        dryerDial: W.dryer.knob,
         dryerDoor: W.dryer.doorHit,
         dryerDrum: W.dryer.drumHit,
         dryerSlot: W.dryer.slotHit,

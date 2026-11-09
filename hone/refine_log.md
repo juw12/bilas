@@ -28,3 +28,4 @@ Next levers judges agree on: secondary props (bottle, mug, spray) are bare primi
 | 2026-11-09 10:13 | council score | 8.35 | split: - | Pega-Vision=8.45, Pega-Thinking=8.2, GLM-5.3-Flash=8.95 |
 | 2026-11-09 10:58 | council score | 8.22 | split: - | Pega-Vision=8.2, Pega-Thinking=8.25, GLM-5.3-Flash=8.45 |
 | 2026-11-09 11:14 | council score | 8.46 | split: - | Pega-Vision=8.45, Pega-Thinking=8.45, GLM-5.3-Flash=8.45 |
+| 2026-11-09 16:41 | council score | 9.0 | split: - | Pega-Vision=9.7, Pega-Thinking=8.25, GLM-5.3-Flash=9.25 |

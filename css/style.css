@@ -15,6 +15,8 @@ html[data-theme="night"] {
   --muted: #bdb7a9;
   --line: rgba(239, 233, 220, 0.14);
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --plate-line: rgba(239, 233, 220, 0.24);
+  --rivet: rgba(239, 233, 220, 0.4);
 }
 
 html[data-theme="day"] {
@@ -25,6 +27,8 @@ html[data-theme="day"] {
   --muted: #535b58;
   --line: rgba(29, 38, 41, 0.14);
   --shadow: 0 10px 26px rgba(60, 50, 30, 0.18);
+  --plate-line: rgba(29, 38, 41, 0.22);
+  --rivet: rgba(29, 38, 41, 0.3);
 }
 
 * {
@@ -966,5 +970,47 @@ body.done-open .hint {
 @media (prefers-reduced-motion: reduce) {
   .drag-cue {
     display: none;
+  }
+}
+
+/* Enamel sign plates: the fixed controls read like the painted signs over the machines - a printed
+   keyline just inside the edge, and two rivets on the larger plates. Paper tickets stay paper. */
+.brand,
+.stations button {
+  background-image:
+    radial-gradient(circle at 7px 7px, var(--rivet) 0 1.5px, transparent 2.1px),
+    radial-gradient(circle at calc(100% - 7px) 7px, var(--rivet) 0 1.5px, transparent 2.1px);
+  background-repeat: no-repeat;
+}
+
+.brand,
+.stations button,
+.purse,
+.icon-btn {
+  box-shadow: inset 0 0 0 3px var(--card), inset 0 0 0 4px var(--plate-line), var(--shadow);
+}
+
+.stations button[aria-current="true"] {
+  background-image: none;
+  box-shadow: inset 0 0 0 3px var(--text), inset 0 0 0 4px var(--plate-line), var(--shadow);
+}
+
+.stations button span {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11.5px;
+}
+
+/* Phone: four plates share ~370px, so the stencil caps tighten up to keep long labels (CHANGE, GANTI) whole. */
+@media (max-width: 640px) {
+  .stations button span {
+    font-size: 10.5px;
+    letter-spacing: 0.02em;
+  }
+}
+@media (max-width: 360px) {
+  .stations button span {
+    font-size: 10px;
+    letter-spacing: 0;
   }
 }

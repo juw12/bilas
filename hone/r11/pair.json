@@ -1,0 +1,51 @@
+{
+  "mode": "pair",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "judges": {
+    "Pega-Vision": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Version 2 (r11) includes all features of Version 1 (r10) while adding significant high-fidelity interactions (turnable program dial with detents) and enhanced sensory details (cloth motion in drum, rolled cotton edges on folds, enamel HUD plates), directly improving scores on weighted criteria C1, C2, and C3.",
+        "Version 1 (r11) includes all features of Version 2 plus significant r11 enhancements like the interactive program dial and dynamic cloth motion, yielding higher scores in Interaction Richness (C2) and Visual Craft (C3)."
+      ]
+    },
+    "Pega-Thinking": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "VERSION 2 (r11) adds a turnable program dial with detents and ticks that locks while running, directly improving C2 interaction fidelity to a real coin laundry, plus drum cloth motion (vertex shader trailing), enamel HUD plates with rivets, deeper daytime city, and rolled cotton fold edges that incrementally improve C1 ASMR payoff and C3 visual craft. The screenshots confirm the polish is visible but the core flow is unchanged, so the margin is modest.",
+        "VERSION 1 (r11) is a strict superset of VERSION 2 (r10), adding the turnable program dial (a meaningful fidelity gain for a real coin laundry), drum cloth vertex-shader motion, HUD enamel sign plates with rivets, daytime city depth, rolled cotton fold edges, 31 vs 29 synthesized sounds, and 135 vs 132 i18n keys — all of which improve C1 (sensory payoff), C2 (interaction fidelity), and C3 (visual craft) without regressing C4."
+      ]
+    },
+    "GLM-5.3-Flash": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Version 2 (r11) is a strict superset of Version 1 with all gates still passing, and its additions map directly onto the highest-weighted criteria: a real rotary program dial with detents strengthens interaction fidelity (C2), drum cloth simulation and rolled fold edges improve sensory/craft payoff (C1/C3), with no visible regressions in the screenshots.",
+        "Version 1 (r11) is a strict superset of Version 2 (r10): it adds the turnable program dial (a real laundry gesture with detents, toasts, and lockout), drum cloth motion that enriches the tumbling payoff, enamel-plate HUD craft, and city-depth polish, directly strengthening C1, C2, and C3 with no regressions or gate failures relative to Version 2."
+      ]
+    }
+  },
+  "votes": {
+    "A": 0,
+    "B": 3,
+    "tie": 0
+  },
+  "quorum": 3,
+  "b_wins": true,
+  "label": "council-judged (3 judges)"
+}

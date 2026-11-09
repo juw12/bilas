@@ -513,6 +513,28 @@
     crumpleTex.repeat.set(2.2, 2.2);
     crumpleTex.offset.set(0.1, 0.2);
     const crumpleMat = new T.MeshStandardMaterial({ map: crumpleTex, bumpMap: knit.crumple, bumpScale: 1.6, roughness: 0.95, color: "#ffffff" });
+    // Cloth in motion inside the drum: the side trailing the motion streams out behind like a
+    // dragged sleeve, and the folds ripple and shift while it tumbles. uFlow is 0 at rest.
+    const tumbleU = { uFlow: { value: 0 }, uT: { value: 0 }, uDir: { value: new T.Vector3(1, 0, 0) } };
+    crumpleMat.onBeforeCompile = function (shader) {
+      Object.assign(shader.uniforms, tumbleU);
+      shader.vertexShader = shader.vertexShader
+        .replace("#include <common>", "#include <common>\nuniform float uFlow; uniform float uT; uniform vec3 uDir;")
+        .replace("#include <begin_vertex>", [
+          "vec3 transformed = vec3(position);",
+          "if (uFlow > 0.001) {",
+          "  vec3 n = normalize(position);",
+          "  float trail = smoothstep(-0.1, 0.95, -dot(n, uDir));",
+          "  float lobe = 0.6 + 0.4 * sin(atan(n.z, n.x) * 3.0 + uT * 2.3);",
+          "  transformed -= uDir * uFlow * 0.11 * trail * trail * lobe;",
+          "  float w = sin(position.x * 38.0 + uT * 8.0) * sin(position.z * 31.0 - uT * 6.0) + 0.5 * sin(position.y * 45.0 + uT * 11.0);",
+          "  transformed += n * uFlow * 0.014 * w;",
+          "}"
+        ].join("\n"));
+    };
+    crumpleMat.customProgramCacheKey = function () {
+      return "bilas-tumble-1";
+    };
 
     const root = new T.Group();
     const flat = new T.Group();
@@ -563,6 +585,34 @@
     slab.receiveShadow = true;
     slab.visible = false;
     flat.add(slab);
+
+    // Rolled fold edges: as a panel folds over, a soft cloth roll grows along its hinge so the fold
+    // reads as a thick crease (not a paper hinge) even at phone size. Lower rolls ride on the
+    // bottom panel so they flip with it.
+    const ROLL_R = 0.0055;
+    function roll(len, parent, x, y, z, alongX) {
+      const r = new T.Mesh(new T.CylinderGeometry(ROLL_R, ROLL_R, len, 12, 1), slabMat);
+      r.position.set(x, y, z);
+      if (alongX) {
+        r.rotation.z = Math.PI / 2;
+      }
+      r.castShadow = true;
+      r.visible = false;
+      parent.add(r);
+      return r;
+    }
+    const rolls = {
+      L: [roll(TOP * 0.92, flat, -Q, TOP * 0.46, 0.0025), roll(TOP, pivots.b, -Q, -TOP / 2, -0.0035)],
+      R: [roll(TOP * 0.92, flat, Q, TOP * 0.46, 0.0045), roll(TOP, pivots.b, Q, -TOP / 2, -0.0015)],
+      B: [roll(2 * Q, flat, 0, 0, 0.0065, true)]
+    };
+    function setRoll(which, k) {
+      const s = Math.sin(Math.min(1, Math.max(0, k)) * Math.PI / 2);
+      rolls[which].forEach(function (r) {
+        r.visible = s > 0.02;
+        r.scale.set(s, 1, s);
+      });
+    }
 
     const shirt = {
       spec: spec,
@@ -668,8 +718,18 @@
       crumpleMat.emissive.copy(mat.emissive);
     };
 
+    // flow 0..1 and the motion direction in the shirt's own space; called by the drum each frame
+    shirt.setTumble = function (flow, dir, t) {
+      tumbleU.uFlow.value = flow;
+      tumbleU.uT.value = t;
+      if (dir) {
+        tumbleU.uDir.value.copy(dir).normalize();
+      }
+    };
+
     shirt.setMode = function (mode) {
       shirt.mode = mode;
+      tumbleU.uFlow.value = 0;
       if (mode === "crumple") {
         shirt.setDrape("none");
       }
@@ -681,6 +741,9 @@
         pivots.rt.rotation.set(0, 0, 0);
         pivots.rb.rotation.set(0, 0, 0);
         pivots.b.rotation.set(0, 0, 0);
+        setRoll("L", 0);
+        setRoll("R", 0);
+        setRoll("B", 0);
       }
     };
 
@@ -696,6 +759,7 @@
       } else {
         pivots.b.rotation.x = -a;
       }
+      setRoll(which, k);
     };
 
     shirt.setMode("crumple");

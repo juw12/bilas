@@ -1,0 +1,143 @@
+{
+  "mode": "score",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "weights": {
+    "C1": 0.3,
+    "C2": 0.25,
+    "C3": 0.25,
+    "C4": 0.2
+  },
+  "judges": {
+    "Pega-Vision": {
+      "scores": {
+        "C1": 9.0,
+        "C2": 10.0,
+        "C3": 10.0,
+        "C4": 10.0
+      },
+      "evidence": {
+        "C1": "ghost fingertip demonstrates the current drag gesture",
+        "C2": "drag across it to peel the felt off, cream thirds guides",
+        "C3": "odd chipped corner showing the biscuit, enamel sign plates... rivets",
+        "C4": "small label pins to the exact machine, red underline marks only a real next task"
+      },
+      "fixes": [
+        "Replace the non-diegetic 'ghost fingertip' tutorial overlay with a subtle diegetic cue (e.g. object highlight) to preserve ASMR immersion.",
+        "Add a toggle for the 'film-grain and vignette' post-processing to ensure texture clarity on lower-resolution mobile displays.",
+        "In 'Sit' mode, disable camera collision or navigation triggers to ensure the user can truly linger without accidental state changes."
+      ],
+      "total": 9.7,
+      "seconds": 85.4
+    },
+    "Pega-Thinking": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 8.0
+      },
+      "evidence": {
+        "C1": "Calm mint/teal palette, 29 synthesized sounds + ambient bed, visible water/foam in drum, lint peeling, billowing shirts on line, 'Sit' station for lingering; tactile payoff for every action is claimed but not fully verifiable from static screenshots.",
+        "C2": "Each station has a distinct gesture: feed note + coin cascade, drag coin into slot, detergent drawer, lint trap with felt peeling, pegs, smoothing stroke, fold in thirds; receipt lists every coin used — highly faithful to a real coin laundry.",
+        "C3": "Coherent art direction: enamel sign plates with rivets, stencil caps, glazed ceramic tiles with bevels and chipped corners, two-layer parallax city, clearcoat machines, film grain/vignette; machines themselves still read as fairly standard white boxes.",
+        "C4": "Every screenshot shows a clear one-line hint ('Tap the green slot to feed a note', 'Drag over the lint screen to peel the felt off'), red underline on next step, 'This load' card with shirt states, in-scene object labels, ghost-finger drag cue."
+      },
+      "fixes": [
+        "Push C1 higher by making mid-action feedback more pronounced — e.g., visible water displacement when shirts drop into the drum, a subtle camera/light response when coins clink into the tray, and a clearer pour stream from the detergent bottle — so every touch reads as tactile rather than button-press.",
+        "Raise C3 by giving the washers/dryers more distinctive silhouette and material character (e.g., varied brand plates, colored enamel accents, worn edges) so the machines feel like a specific neighbourhood laundromat rather than generic white boxes.",
+        "Strengthen C4 for first-time users by adding a brief intro beat (e.g., a one-time overlay or the changer auto-feeding a demo note) so the very first interaction is unambiguous, and ensure the in-scene object label appears even when the player hasn't paused."
+      ],
+      "total": 8.25,
+      "seconds": 138.6
+    },
+    "GLM-5.3-Flash": {
+      "scores": {
+        "C1": 9.0,
+        "C2": 10.0,
+        "C3": 9.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Rich per-action payoff: 'hand-on-cotton sound tied to drag speed', 'coins cascade into the tray', canvas-erased lint peel, shader water/foam in drum, rain beads, 'Sit' station with machines 'keep humming' — 29 one-shots + ambience, spatialized. Screenshots show calm mint/cream palette and pleasant mid-states. Held off 10 because tap-only actions (start button, basket load, scoop) read as simpler than the drag gestures, and audio quality can't be confirmed from stills.",
+        "C2": "Every anchor item present with matched gestures: changer ('feed a note... tap to scoop 4 coins'), 'DRAG each coin into the slot', 'pour detergent into the drawer' ('Hold to pour'), 'pull the lint trap and drag across it to peel the felt off', wooden pegs, 'drag across it to smooth', 'fold left sleeve, right sleeve, bottom up' with thirds guides on the mat; plus program dial, drain/spin phases, itemized receipt.",
+        "C3": "Deliberate art direction: tiles with 'darker warm-grey grout, a lit bevel... chipped corner showing the biscuit', 'enamel sign plates... two rivets... stencil caps', maker's plates, contact shadows, parallax city, coherent mint/terracotta/green-mat palette across all screenshots. Not 10: the small 'Fading guard' wall note is barely legible even on desktop, and the floor reads as plain speckled tiles next to the richly detailed walls/machines.",
+        "C4": "'a small label pins to the exact machine or item for the next step' plus one-line hint at all times, ghost-fingertip drag demo after 1.5s idle, 'This load' card with per-shirt states, per-machine progress ('Washer 2 · 0:26'), hints sized to fit at 390px. Not 10: in the hang screenshot FOLD is underlined while shirts are still drying on the line, and pinned label + bottom hint can duplicate the same instruction."
+      },
+      "fixes": [
+        "C1: Bring the tap-only interactions (start button, loading the basket, scooping coins) up to the same tactile bar as the drag gestures — button travel, splash/coin-tray physicality — and verify no one-shot pokes above the ambient bed.",
+        "C3: Fix legibility of the smallest wall notes/posters (e.g., the 'Fading guard' note) at phone size and oblique angles, and add subtle variation to the floor so it doesn't read as the flattest surface in an otherwise crafted scene.",
+        "C4: Make the red underline always track the immediate action during waits (keep it on the active station or use the dotted Sit mark until take-down), and suppress the duplicate prompt when the pinned object label and the hint line say the same step."
+      ],
+      "total": 9.25,
+      "seconds": 126.7
+    }
+  },
+  "quorum": 3,
+  "criterion_median": {
+    "C1": 9.0,
+    "C2": 10.0,
+    "C3": 9.0,
+    "C4": 9.0
+  },
+  "criterion_spread": {
+    "C1": 1.0,
+    "C2": 1.0,
+    "C3": 2.0,
+    "C4": 2.0
+  },
+  "split_criteria": [],
+  "judge_total_range": [
+    8.25,
+    9.7
+  ],
+  "fixes": [
+    {
+      "judge": "Pega-Vision",
+      "fix": "Replace the non-diegetic 'ghost fingertip' tutorial overlay with a subtle diegetic cue (e.g. object highlight) to preserve ASMR immersion."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Add a toggle for the 'film-grain and vignette' post-processing to ensure texture clarity on lower-resolution mobile displays."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "In 'Sit' mode, disable camera collision or navigation triggers to ensure the user can truly linger without accidental state changes."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Push C1 higher by making mid-action feedback more pronounced — e.g., visible water displacement when shirts drop into the drum, a subtle camera/light response when coins clink into the tray, and a clearer pour stream from the detergent bottle — so every touch reads as tactile rather than button-press."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Raise C3 by giving the washers/dryers more distinctive silhouette and material character (e.g., varied brand plates, colored enamel accents, worn edges) so the machines feel like a specific neighbourhood laundromat rather than generic white boxes."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Strengthen C4 for first-time users by adding a brief intro beat (e.g., a one-time overlay or the changer auto-feeding a demo note) so the very first interaction is unambiguous, and ensure the in-scene object label appears even when the player hasn't paused."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "C1: Bring the tap-only interactions (start button, loading the basket, scooping coins) up to the same tactile bar as the drag gestures — button travel, splash/coin-tray physicality — and verify no one-shot pokes above the ambient bed."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "C3: Fix legibility of the smallest wall notes/posters (e.g., the 'Fading guard' note) at phone size and oblique angles, and add subtle variation to the floor so it doesn't read as the flattest surface in an otherwise crafted scene."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "C4: Make the red underline always track the immediate action during waits (keep it on the active station or use the dotted Sit mark until take-down), and suppress the duplicate prompt when the pinned object label and the hint line say the same step."
+    }
+  ],
+  "label": "council-judged (3 judges), mean of 2 runs",
+  "council_score": 9.0,
+  "runs": 2,
+  "run_scores": [
+    8.75,
+    9.25
+  ],
+  "run_spread": 0.5
+}

@@ -370,6 +370,7 @@
     parts.coins = [];
 
     // program dial with printed ticks (knurled knob, pointer)
+    const labels = kind === "washer" ? ["30", "40", "60", "90"] : ["40", "55", "70", "+"];
     const dialTex = canvasTex(256, 256, function (g2, s) {
       g2.clearRect(0, 0, s, s);
       g2.strokeStyle = "#e9e5dc";
@@ -378,7 +379,6 @@
       g2.textAlign = "center";
       g2.textBaseline = "middle";
       g2.font = "bold 30px " + FONT_MONO;
-      const labels = kind === "washer" ? ["30", "40", "60", "90"] : ["40", "55", "70", "+"];
       for (let i = 0; i < 9; i++) {
         const a = Math.PI * (0.75 + i * 0.1875);
         const r1 = s * 0.4;
@@ -395,12 +395,20 @@
     });
     const dialFace = mesh(new T.CircleGeometry(0.046, 40), new T.MeshStandardMaterial({ map: dialTex, transparent: true, roughness: 0.6 }), 0.004, 0.765, 0.0356);
     g.add(dialFace);
-    const knob = mesh(new T.CylinderGeometry(0.019, 0.021, 0.018, 28), std("#d9dcde", { metalness: 0.75, roughness: 0.32 }), 0.004, 0.765, 0.044);
+    // the knob turns: knob + pointer share a pivot at the dial centre
+    const dial = new T.Group();
+    dial.position.set(0.004, 0.765, 0.044);
+    g.add(dial);
+    const knob = mesh(new T.CylinderGeometry(0.019, 0.021, 0.018, 28), std("#d9dcde", { metalness: 0.75, roughness: 0.32 }), 0, 0, 0);
     knob.rotation.x = Math.PI / 2;
-    g.add(knob);
-    const pointer = mesh(new T.BoxGeometry(0.004, 0.016, 0.003), M.red, 0.004, 0.774, 0.0545);
-    g.add(pointer);
+    knob.userData.act = kind + "Dial";
+    dial.add(knob);
+    const pointer = mesh(new T.BoxGeometry(0.004, 0.016, 0.003), M.red, 0, 0.009, 0.0105);
+    pointer.userData.act = kind + "Dial";
+    dial.add(pointer);
     parts.knob = knob;
+    parts.dial = dial;
+    parts.dialLabels = labels;
 
     // panel seams, brushed top trim, kick plate with vent slots, rubber feet
     const groove = std("#b9b5ad", { roughness: 0.7 });
@@ -857,6 +865,9 @@
         c.fillRect(x, top, bw, bh);
         c.fillStyle = night ? "#0d1319" : "rgba(80,70,60,0.18)";
         c.fillRect(x, top, bw, 6);
+        // the shaded return wall gives each block volume (no rnd here: both layers must stay in step)
+        c.fillStyle = night ? "rgba(0,0,0,0.3)" : "rgba(70,62,52,0.16)";
+        c.fillRect(x + bw - 14, top, 14, bh);
         // rooftop
         c.fillStyle = night ? "#0f161c" : "#9c9483";
         c.fillRect(x + bw * 0.2, top - 22, 26, 22);
@@ -868,6 +879,11 @@
             const lit = rnd() < (night ? 0.38 : 0);
             c.fillStyle = night ? (lit ? (rnd() < 0.7 ? "rgba(255,198,122,0.85)" : "rgba(170,210,255,0.6)") : "rgba(32,44,56,0.95)") : "rgba(96,118,130,0.5)";
             c.fillRect(wx, y, 14, 16);
+            if (!night) {
+              // daylight glass catches the sky in its upper pane
+              c.fillStyle = "rgba(226,238,242,0.42)";
+              c.fillRect(wx, y, 14, 6);
+            }
             c.fillStyle = night ? "rgba(0,0,0,0.35)" : "rgba(255,255,255,0.5)";
             c.fillRect(wx - 2, y + 16, 18, 2);
             if (rnd() < 0.08) {
@@ -879,6 +895,14 @@
           }
         }
         x += bw + 6 + rnd() * 18;
+      }
+      // street haze settles between the flats and the shophouses by day
+      if (!night) {
+        const haze = c.createLinearGradient(0, h - 170, 0, h - 80);
+        haze.addColorStop(0, "rgba(242,240,232,0)");
+        haze.addColorStop(1, "rgba(242,240,232,0.45)");
+        c.fillStyle = haze;
+        c.fillRect(0, h - 170, w, 90);
       }
       // near shophouses with striped awnings
       for (let x = -30; x < w; ) {
