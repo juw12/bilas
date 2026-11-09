@@ -1,0 +1,51 @@
+{
+  "mode": "pair",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "judges": {
+    "Pega-Vision": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Version 2 retains all of Version 1’s claimed hard-gate passes while adding clearer progress labels, more explicit fold gestures, and better cloth/fold visual fidelity, which improves the rubric’s clarity, interaction, and visual-craft criteria.",
+        "Version 1 adds clearer state labels, more specific fold guidance, and cloth/silhouette fixes that improve clarity, interaction fidelity, and visual craft while still meeting the hard gates."
+      ]
+    },
+    "Pega-Thinking": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "VERSION 2 (r9) improves on VERSION 1 (r8) with clearer state communication ('This load' card now shows colored state words like 'dry' under each shirt), more descriptive fold hints ('tap or swipe it in'), and better visual fold feedback (T-shirt silhouette, turned-edge shading, visible fold lines on the white shirt). These changes meaningfully strengthen C3 (visual craft) and C4 (clarity/onboarding), while C1 and C2 see marginal gains from the extra sound id and gesture-named hints.",
+        "VERSION 1 (r9) adds meaningful improvements over VERSION 2 (r8): cloth reads as fabric with T-shirt silhouette and turned-edge fold shading (C3), 'This load' card shows explicit state words under each shirt with colored badges (C4), and fold hints name the gesture ('tap or swipe it in'). The screenshot confirms V1's shirt has visible fold detail while V2's appears flatter. These are real gains in visual craft and onboarding clarity, outweighing the negligible sound/key-count differences."
+      ]
+    },
+    "GLM-5.3-Flash": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Version 2 (r9) passes the same hard gates but adds targeted improvements the rubric rewards: folded shirts read as cloth with fold-edge shading and no z-fighting slivers (visible as a white artifact on the shirt in Version 1's own screenshot), plus clearer onboarding via per-shirt state words and gesture-naming fold hints, directly serving C3 and C4 while matching C1/C2.",
+        "Version 1 (r9) contains all of Version 2's improvements plus targeted fixes that score directly on the rubric: folded shirts read as cloth with no z-fighting slivers (C1/C3), the shirt has a real T-shirt silhouette, the 'This load' card adds state words so progress needs no icon decoding, and fold hints name the gesture (C4). Both claim identical hard-gate passes, so Version 1's clarity and craft gains win it."
+      ]
+    }
+  },
+  "votes": {
+    "A": 0,
+    "B": 3,
+    "tie": 0
+  },
+  "quorum": 3,
+  "b_wins": true,
+  "label": "council-judged (3 judges)"
+}
