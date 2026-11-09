@@ -294,6 +294,28 @@ input:focus-visible {
   transform-origin: bottom;
 }
 
+.load-list .ls {
+  display: block;
+  font-size: 9.5px;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.load-list li.st-wet .ls {
+  color: #3f7aa0;
+}
+
+.load-list li.st-dry .ls {
+  color: #a5612a;
+}
+
+.load-list li.st-folded .ls {
+  color: #3b8f5c;
+  font-weight: 600;
+}
+
 .tickets {
   display: flex;
   flex-direction: column;
@@ -824,6 +846,9 @@ html[data-theme="night"] .lens {
   .load-list li {
     width: 30px;
     font-size: 0;
+  }
+  .load-list .ls {
+    font-size: 8.5px;
   }
   .load-list svg {
     width: 26px;

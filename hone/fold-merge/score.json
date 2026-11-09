@@ -1,0 +1,143 @@
+{
+  "mode": "score",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "weights": {
+    "C1": 0.3,
+    "C2": 0.25,
+    "C3": 0.25,
+    "C4": 0.2
+  },
+  "judges": {
+    "Pega-Vision": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 8.0,
+        "C3": 7.0,
+        "C4": 8.0
+      },
+      "evidence": {
+        "C1": "\"hand-on-cotton sound tied to drag speed\" and \"rain/room-tone ambience\" suggest strong sensory payoff, but the screenshot still looks fairly static and clean rather than deeply tactile.",
+        "C2": "\"DRAG each coin into the slot\" and \"drag across it to smooth wrinkles\" show real gesture fidelity, though several steps remain taps like \"tap to scoop\" and \"tap to take them down\".",
+        "C3": "The screenshot shows a coherent but plain white shirt on a green mat; it is readable, not yet a distinctive designer-screenshot look.",
+        "C4": "\"Now the right side: tap or swipe it in.\" gives a clear next step, but the load card in the screenshot shows all shirts as \"dry\" without an obvious folded-progress cue."
+      },
+      "fixes": [
+        "Make the folded shirt and laundry states visually unmistakable: show folded count, completed stack, and current shirt highlight so progress is not ambiguous on phone.",
+        "Raise visual distinctiveness: add fabric texture, stitching, subtle wear, richer lighting, and more characterful props so the scene is not a clean generic 3D mockup.",
+        "Increase visible tactile feedback for every interaction: add cloth deformation, coin/spill particles, foam, lint bits, or stronger contact shadows so actions feel physically satisfying."
+      ],
+      "total": 7.75,
+      "seconds": 17.2
+    },
+    "Pega-Thinking": {
+      "scores": {
+        "C1": 7.0,
+        "C2": 8.0,
+        "C3": 7.0,
+        "C4": 8.0
+      },
+      "evidence": {
+        "C1": "Visible frame shows calm warm palette, soft lighting, and good material craft on the shirt and detergent bottle; description claims 29 sounds + loops + spatial placement, but only one mid-activity frame is provided so the full sensory payoff (rain, hum, tumbling) cannot be verified.",
+        "C2": "Description covers changer, coin slot drag, detergent drawer, lint trap peel, pegs, smoothing drag, and folding in thirds with gesture-named hints ('Now the right side: tap or swipe it in.'); each station has its own matched gesture.",
+        "C3": "Coherent art direction visible: green grid cutting mat, 'lavanda' detergent label, warm HUD with bilas logo, tiled floor, clearcoat machines; readable 3D objects and HUD matches the place, but the overall look reads as pleasant generic cozy-game rather than a distinctive designer-screenshot identity.",
+        "C4": "'This load' card shows per-shirt state words (dry/dry/dry/dry), bottom bar highlights Fold, hint names the gesture, and progress is always visible; one clear next-step at all times with obvious navigation."
+      },
+      "fixes": [
+        "Push the visual identity past 'cozy generic' — the green mat, detergent label and warm HUD are coherent but not distinctive; introduce a stronger signature (e.g., a more memorable material/lighting motif or a unique prop silhouette) so a designer would actually screenshot it.",
+        "Make the ASMR payoff legible in the idle/mid-activity frame — the current screenshot is calm but visually quiet; add a visible ambient cue (rain beads on glass, drum swirl, steam wisp, or a peg swinging) so the scene visibly invites lingering rather than reading as a static fold task.",
+        "Verify the ghost-fingertip drag cue actually fires for the fold gestures on phone — the description claims it demos smoothing and folds, but the screenshot only shows a text hint; ensure the in-scene gesture demo is visible and timed so first-time phone users can complete the fold without confusion."
+      ],
+      "total": 7.45,
+      "seconds": 19.4
+    },
+    "GLM-5.3-Flash": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Rich sensory claims: 'Each machine sound is placed in space', night 'beads slide down the glass leaving thin trails', dryer steam, shirts that 'billow with the breeze', Sit station with ambient machines. Screenshot confirms calm warm palette and gentle hint tone. Held below 9: payoff beyond the one fold-state frame is self-reported, and the frame's left edge shows the lavanda jug awkwardly clipped/tilted, a small jarring note.",
+        "C2": "Every anchor-10 element is present with matched gestures: 'DRAG each coin into the slot', 'pull the lint trap and drag across it to peel the felt off', 'Hold to pour' on the drawer, pegs, 'drag across it to smooth', 'fold left sleeve, right sleeve, bottom up', coin-by-coin receipt. Not 10: minor fidelity gaps (no dryer heat/cycle choice, changer gives no denomination detail).",
+        "C3": "Coherent direction in the screenshot: cream/wood/green cutting mat with 'cream thirds guides', clearcoat machines, gaskets, maker's plates, layered parallax window, tidy rounded HUD that matches the place. Held below 9: the shirt's sleeve reads as an angular cut plane (the hero object of the fold scene), and the phone frame devotes its lower half to blank tile floor.",
+        "C4": "Layered guidance: hint names the gesture ('Now the right side: tap or swipe it in.'), red underline on next station, 'This load' chips print state words ('dirty / wet / dry / folded, Indonesian kotor / basah / kering / lipat'), object-pinned labels, ghost-fingertip demo after 2.2s idle. Not 10: the fold hint's target (which flap/side) is only textual, no visual highlight of the exact region."
+      },
+      "fixes": [
+        "Refine the shirt silhouette on the table: sleeves are angular quadrilaterals with hard diagonal cuts; give them curved hems, slight thickness and a visible neckline so the fold scene's hero object reads as tailored cloth (C3, and it is the finale screen).",
+        "Recompose the phone fold view: ~40% of the 390px frame is empty tile floor and the lavanda jug is clipped/tilted at the left edge; lower the camera target or add floor/prop interest so the framing looks deliberate (C3/C1).",
+        "Add a visual target highlight for fold gestures (glint or outline on the exact sleeve/hem being folded) so 'tap or swipe it in' is unambiguous at a glance, pushing onboarding from hint-following to self-evident (C4/C1)."
+      ],
+      "total": 8.45,
+      "seconds": 180.2
+    }
+  },
+  "quorum": 3,
+  "criterion_median": {
+    "C1": 8.0,
+    "C2": 8.0,
+    "C3": 7.0,
+    "C4": 8.0
+  },
+  "criterion_spread": {
+    "C1": 1.0,
+    "C2": 1.0,
+    "C3": 1.0,
+    "C4": 1.0
+  },
+  "split_criteria": [],
+  "judge_total_range": [
+    7.45,
+    8.45
+  ],
+  "fixes": [
+    {
+      "judge": "Pega-Vision",
+      "fix": "Make the folded shirt and laundry states visually unmistakable: show folded count, completed stack, and current shirt highlight so progress is not ambiguous on phone."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Raise visual distinctiveness: add fabric texture, stitching, subtle wear, richer lighting, and more characterful props so the scene is not a clean generic 3D mockup."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Increase visible tactile feedback for every interaction: add cloth deformation, coin/spill particles, foam, lint bits, or stronger contact shadows so actions feel physically satisfying."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Push the visual identity past 'cozy generic' — the green mat, detergent label and warm HUD are coherent but not distinctive; introduce a stronger signature (e.g., a more memorable material/lighting motif or a unique prop silhouette) so a designer would actually screenshot it."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Make the ASMR payoff legible in the idle/mid-activity frame — the current screenshot is calm but visually quiet; add a visible ambient cue (rain beads on glass, drum swirl, steam wisp, or a peg swinging) so the scene visibly invites lingering rather than reading as a static fold task."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Verify the ghost-fingertip drag cue actually fires for the fold gestures on phone — the description claims it demos smoothing and folds, but the screenshot only shows a text hint; ensure the in-scene gesture demo is visible and timed so first-time phone users can complete the fold without confusion."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Refine the shirt silhouette on the table: sleeves are angular quadrilaterals with hard diagonal cuts; give them curved hems, slight thickness and a visible neckline so the fold scene's hero object reads as tailored cloth (C3, and it is the finale screen)."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Recompose the phone fold view: ~40% of the 390px frame is empty tile floor and the lavanda jug is clipped/tilted at the left edge; lower the camera target or add floor/prop interest so the framing looks deliberate (C3/C1)."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Add a visual target highlight for fold gestures (glint or outline on the exact sleeve/hem being folded) so 'tap or swipe it in' is unambiguous at a glance, pushing onboarding from hint-following to self-evident (C4/C1)."
+    }
+  ],
+  "label": "council-judged (3 judges), mean of 2 runs",
+  "council_score": 8.1,
+  "runs": 2,
+  "run_scores": [
+    8.45,
+    7.75
+  ],
+  "run_spread": 0.7
+}

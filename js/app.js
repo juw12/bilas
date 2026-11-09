@@ -948,6 +948,23 @@
       if (omega !== 0) {
         root.rotation.z += tb.spin * dt;
         root.rotation.x += tb.spin * dt * 0.4;
+        // the cloth itself moves: stretched while it falls, a squash on landing that relaxes,
+        // pressed flat against the drum in spin, and folds that keep drifting
+        let target = 0.12;
+        if (Math.abs(omega) > 7) {
+          target = 0.75;
+        } else if (tb.falling) {
+          target = -0.55;
+        }
+        if (tb.wasFalling && !tb.falling) {
+          tb.sq = 0.9;
+        }
+        tb.wasFalling = tb.falling;
+        tb.sq = (tb.sq || 0) + (target - (tb.sq || 0)) * Math.min(1, dt * 6);
+        tb.t = (tb.t || tb.k * 10 + 1) + dt * (0.7 + Math.min(Math.abs(omega), 12) * 0.08);
+        if (s.obj.flex) {
+          s.obj.flex(tb.t, tb.sq);
+        }
       }
       // the cloth streams behind its own motion: along the drum wall while carried, downward when it drops
       if (s.obj.setTumble) {
@@ -2947,10 +2964,13 @@
         badge = '<circle cx="11" cy="14" r="1.3" fill="#7a5a34"/><circle cx="14" cy="17" r="1" fill="#7a5a34"/>';
       } else if (s.state === "wet") {
         badge = '<path d="M19 13c0 0-2.6 3-2.6 4.6a2.6 2.6 0 0 0 5.2 0C21.6 16 19 13 19 13z" fill="#4f8fb8" stroke="#fff" stroke-width=".8"/>';
+      } else if (s.state === "dry") {
+        badge = '<path d="M16.4 18.6c1-.9 1.9.9 2.9 0s1.9.9 2.9 0M16.4 15.6c1-.9 1.9.9 2.9 0s1.9.9 2.9 0" fill="none" stroke="#c8752c" stroke-width="1.3" stroke-linecap="round"/>';
       } else if (s.state === "folded") {
         badge = '<path d="M15.5 17.5l2 2 4-4.5" fill="none" stroke="#3b8f5c" stroke-width="2" stroke-linecap="round"/>';
       }
-      return '<li class="st-' + s.state + just + '" title="' + t("state_" + s.state) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + TEE + '" fill="' + col + '" stroke="rgba(0,0,0,.35)" stroke-width=".8"/>' + badge + '</svg><span class="sr">' + t("state_" + s.state) + "</span></li>";
+      // a short printed word under each tee, so the state never depends on decoding a glyph
+      return '<li class="st-' + s.state + just + '" title="' + t("state_" + s.state) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + TEE + '" fill="' + col + '" stroke="rgba(0,0,0,.35)" stroke-width=".8"/>' + badge + '</svg><span class="ls" aria-hidden="true">' + t("ls_" + s.state) + '</span><span class="sr">' + t("state_" + s.state) + "</span></li>";
     }).join("");
     const counts = {};
     const order = [];

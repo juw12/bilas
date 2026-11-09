@@ -29,3 +29,13 @@ Next levers judges agree on: secondary props (bottle, mug, spray) are bare primi
 | 2026-11-09 10:58 | council score | 8.22 | split: - | Pega-Vision=8.2, Pega-Thinking=8.25, GLM-5.3-Flash=8.45 |
 | 2026-11-09 11:14 | council score | 8.46 | split: - | Pega-Vision=8.45, Pega-Thinking=8.45, GLM-5.3-Flash=8.45 |
 | 2026-11-09 16:41 | council score | 9.0 | split: - | Pega-Vision=9.7, Pega-Thinking=8.25, GLM-5.3-Flash=9.25 |
+| 2026-11-09 09:43 | council score (r7, other shot set) | 8.0 | split: - | Pega-Vision=8.25, Pega-Thinking=7.45, GLM-5.3-Flash=8.0 |
+| 2026-11-09 09:43 | council pair | B wins: True | votes A/B/tie 0/3/0 | council-judged (3 judges) |
+| 2026-11-09 10:55 | council score | 8.12 | split: - | Pega-Vision=8.0, Pega-Thinking=8.0, GLM-5.3-Flash=8.75 |
+| 2026-11-09 10:59 | council pair | B wins: True | votes A/B/tie 0/3/0 | council-judged (3 judges) |
+| fold-merge | 2026-11-09 | Parallel-session merge on top of r10: fold hinge shade + flap contact shadow + rolled hem, T-shirt silhouette with rolled edges and soft undulation, shirt lifted clear of the board (no torn edge/slivers), shadow normal bias; 'This load' state words (dirty/wet/dry/folded) + dry badge; gesture verbs in fold hints | flow fm_1280 + fm_390, foldframe fmff, gates (see PR) | 8.1 (8.45/7.75) on r9 base; pairwise vs r8 3-0 and vs r9 3-0 (both orders unanimous) | shipped on unanimous pair, score inside noise band |
+Note: the same r7 build scored 8.0 on one shot set and 8.45 on another, so the absolute council score moves by about 0.45 with screenshot choice; the pairwise vote is the steadier signal.
+| 2026-11-09 11:25 | council score | 8.1 | split: - | Pega-Vision=7.75, Pega-Thinking=7.45, GLM-5.3-Flash=8.45 |
+| 2026-11-09 11:31 | council pair | B wins: True | votes A/B/tie 0/3/0 | council-judged (3 judges) |
+| 2026-11-09 16:09 | council pair | B wins: True | votes A/B/tie 0/3/0 | council-judged (3 judges) |
+| drum-tumble | 2026-11-09 | Drum contents read as cloth: crumple bundles get smooth per-vertex normals (no faceted rock look), drifting folds + a wandering sleeve lobe, squash/stretch driven by the tumble (stretch falling, squash on landing, flatten against the wall in spin) | flow dt2_1280 + dt2_390 PASS (0 errors, 31 sounds), gates PASS (G4 no overflow, G6 136/136, contrast ok) | pairwise vs main 343ee29 3-0 (both orders unanimous) | shipped on unanimous pair |
