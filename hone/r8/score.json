@@ -1,0 +1,143 @@
+{
+  "mode": "score",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "weights": {
+    "C1": 0.3,
+    "C2": 0.25,
+    "C3": 0.25,
+    "C4": 0.2
+  },
+  "judges": {
+    "Pega-Vision": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "'29 one-shot sound ids fired in one run' and 'Watch the water, or sit for a while' show calm payoff, but the phone fold screenshot shows a mostly flat shirt with no visible hand or crease feedback.",
+        "C2": "'DRAG each coin into the slot' and 'drag across it to peel the felt off' match real gestures, though some steps remain tap-based like 'tap to scoop 4 coins'.",
+        "C3": "'coherent art direction' is visible in the mint tile and receipt, but the washer drum laundry looks like low-poly blobs and the window city backdrop is flat.",
+        "C4": "'Tap the green slot to feed in a note.' and 'Now fold the right side in.' give one clear next step, with 'This load' progress visible."
+      },
+      "fixes": [
+        "Make every touch visibly tactile in screenshots: add coin-drag trails, slot flashes, peg-press motion, hand-on-cloth cursor, and animated fold creases so ASMR payoff is obvious without audio.",
+        "Raise visual craft: replace flat city backdrop and low-poly laundry blobs with richer cloth shading and normal detail, and redesign HUD icons to feel like laundromat tokens rather than generic line icons.",
+        "Add a first-run guided overlay or ghost-shirt fold arrows on phone, plus clearer affordances for the detergent drawer and coin slot, so first-time users never have to infer a gesture."
+      ],
+      "total": 8.45,
+      "seconds": 39.2
+    },
+    "Pega-Thinking": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 7.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Calm mint/cream palette, visible feedback in every screenshot (water+foam in drum, felt on lint trap, drips on line shirts, wrinkles on fold table); 29 synthesized one-shots + loops + ambient reported. Day theme shown; rain/hum ambient not visible in screenshots.",
+        "C2": "Each station has a matched gesture: feed note + scoop coins, drag coin into slot, pour detergent, drag to peel lint, drag to smooth wrinkles, fold sleeves/bottom in thirds. Changer, coin slot, detergent drawer, lint trap, pegs all present and labeled.",
+        "C3": "Coherent art direction (mint tile, warm wood, red accents, 'bilas PRO 7 KG' plates, 'lavanda' label, torn-zigzag receipt). HUD matches the place. However, the line shirts read as flat cardboard cutouts with no visible drape or fabric dimension, and the overall look is pleasant-clean rather than distinctive.",
+        "C4": "Every screenshot shows a specific next-step hint ('Tap the green slot to feed a note', 'Drag over the lint screen to peel the felt off', 'Now fold the right side in'); THIS LOAD card tracks shirt states; red underline marks next station; both phone and desktop verified."
+      },
+      "fixes": [
+        "Line shirts look like flat 2D cutouts — add real drape, sag from pegs, and visible fabric folds so they read as wet cotton hanging, not cardboard silhouettes.",
+        "Washing machine drum interior is static-looking despite the rich sound design — show clothes tumbling/swirling with the water and foam so the cycle reads as alive on screen.",
+        "Overall visual style is coherent but generic-clean; push toward a more distinctive, lived-in laundromat character (worn enamel, scuffed floor, hand-written price tags, warmer lamp light) so a designer would actually screenshot it."
+      ],
+      "total": 8.2,
+      "seconds": 46.8
+    },
+    "GLM-5.3-Flash": {
+      "scores": {
+        "C1": 9.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 10.0
+      },
+      "evidence": {
+        "C1": "Rich sensory layering: '29 one-shot sound ids fired in one run... plus continuous wash loop, dry loop and rain/room-tone ambience', 'Steam: a soft puff of warm vapour rises from the dryer', 'drips slow as they dry', plus a 'Sit' station and softened palette ('brand red softened... film grain/vignette reduced'). Held from 10 because the fold-table wrinkles read as brown smudge/stain streaks in the screenshot, weakening the smoothing before/after payoff, and the shirt in the drum reads as a tan blob rather than cloth.",
+        "C2": "Every 10-anchor element present with matched gestures: 'DRAG each coin into the slot (2 coins)', 'pull the lint trap and drag across it to peel the felt off', 'pour detergent into the drawer', 'wooden pegs', 'fold left sleeve, right sleeve, bottom up' on a mat with 'cream thirds guides'. Held from 10 because note feeding is a plain tap ('Tap the green slot to feed in a note') and scooping is 'tap to scoop' — insert/swipe gestures would match the real actions better.",
+        "C3": "Cohesive, deliberate direction: mint tile + cream + softened red, 'brushed metal maker's plate (\"bilas PRO 7 KG\")', 'deep green cutting mat with a light grid', thermal-receipt end card with monospace type, HUD that matches the place. Held from 10: wrinkles render as dirt-like brown streaks on the cream shirt, the phone fold view shows a flat, paper-like white shirt, and the bottle on the washer is a simple two-tone bottle that doesn't match the described 'rounded lathe body... moulded handle' jug.",
+        "C4": "Always-on, layered guidance: 'a small label pins to the exact machine or item for the next step (\"Washer 2 · Open the door\")', 'the red underline marks only a real next task', one-line hints in every screenshot ('Drag over the lint screen to peel the felt off.'), and 'This load' card plus per-machine timers ('Washer 2 0:25 Washing') keep progress visible; G2 real-pointer flow passes at 1280x800 and 390x844."
+      },
+      "fixes": [
+        "Rebuild the fold-table wrinkle shading: the brown streaks read as dirt smudges on the cream shirt rather than crisp fold ribbons — use neutral shadow/light (lit ridge, dark valley) with no stain-like tint, which also sharpens the smoothing payoff.",
+        "Raise gesture fidelity on the money interactions: make note feeding an actual insert/drag into the slot and coin scooping a swipe across the tray, instead of taps on the slot and tray.",
+        "Improve cloth readability in flat views: the phone fold-view shirt reads as flat paper at grazing angles — add self-shadowing/AO and visible drape so sleeves and body read as fabric, and reconcile the on-washer detergent bottle with the described moulded-handle lathe jug."
+      ],
+      "total": 8.95,
+      "seconds": 78.7
+    }
+  },
+  "quorum": 3,
+  "criterion_median": {
+    "C1": 8.0,
+    "C2": 9.0,
+    "C3": 8.0,
+    "C4": 9.0
+  },
+  "criterion_spread": {
+    "C1": 1.0,
+    "C2": 0.0,
+    "C3": 1.0,
+    "C4": 1.0
+  },
+  "split_criteria": [],
+  "judge_total_range": [
+    8.2,
+    8.95
+  ],
+  "fixes": [
+    {
+      "judge": "Pega-Vision",
+      "fix": "Make every touch visibly tactile in screenshots: add coin-drag trails, slot flashes, peg-press motion, hand-on-cloth cursor, and animated fold creases so ASMR payoff is obvious without audio."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Raise visual craft: replace flat city backdrop and low-poly laundry blobs with richer cloth shading and normal detail, and redesign HUD icons to feel like laundromat tokens rather than generic line icons."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Add a first-run guided overlay or ghost-shirt fold arrows on phone, plus clearer affordances for the detergent drawer and coin slot, so first-time users never have to infer a gesture."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Line shirts look like flat 2D cutouts — add real drape, sag from pegs, and visible fabric folds so they read as wet cotton hanging, not cardboard silhouettes."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Washing machine drum interior is static-looking despite the rich sound design — show clothes tumbling/swirling with the water and foam so the cycle reads as alive on screen."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Overall visual style is coherent but generic-clean; push toward a more distinctive, lived-in laundromat character (worn enamel, scuffed floor, hand-written price tags, warmer lamp light) so a designer would actually screenshot it."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Rebuild the fold-table wrinkle shading: the brown streaks read as dirt smudges on the cream shirt rather than crisp fold ribbons — use neutral shadow/light (lit ridge, dark valley) with no stain-like tint, which also sharpens the smoothing payoff."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Raise gesture fidelity on the money interactions: make note feeding an actual insert/drag into the slot and coin scooping a swipe across the tray, instead of taps on the slot and tray."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Improve cloth readability in flat views: the phone fold-view shirt reads as flat paper at grazing angles — add self-shadowing/AO and visible drape so sleeves and body read as fabric, and reconcile the on-washer detergent bottle with the described moulded-handle lathe jug."
+    }
+  ],
+  "label": "council-judged (3 judges), mean of 2 runs",
+  "council_score": 8.35,
+  "runs": 2,
+  "run_scores": [
+    8.25,
+    8.45
+  ],
+  "run_spread": 0.2
+}

@@ -208,28 +208,28 @@
       }
       // valley: soft shade spread wider than the crease
       c.filter = "blur(" + (2.2 * WS).toFixed(1) + "px)";
-      c.fillStyle = "rgba(24,16,10," + (0.2 * depth).toFixed(3) + ")";
+      c.fillStyle = "rgba(22,26,34," + (0.15 * depth).toFixed(3) + ")";
       band(pts, widths.map(function (w) {
         return w * 1.6;
       }), 0.15);
       // crease core: narrow, darker, nearly sharp
       c.filter = "blur(" + (0.6 * WS).toFixed(1) + "px)";
-      c.fillStyle = "rgba(20,12,6," + (0.26 * depth).toFixed(3) + ")";
+      c.fillStyle = "rgba(16,19,26," + (0.17 * depth).toFixed(3) + ")";
       band(pts, widths.map(function (w) {
         return w * 0.42;
       }), 0.35);
       // lit ridge beside it, thin and quiet so dark shirts never look scribbled
       c.filter = "blur(" + (0.9 * WS).toFixed(1) + "px)";
-      c.fillStyle = "rgba(255,250,238," + (0.13 * depth).toFixed(3) + ")";
+      c.fillStyle = "rgba(255,252,244," + (0.2 * depth).toFixed(3) + ")";
       band(pts, widths.map(function (w) {
-        return w * 0.5;
-      }), -0.55);
+        return w * 0.6;
+      }), -0.6);
     }
     c.save();
     // broad rumple underneath, very low contrast
     c.filter = "blur(" + (14 * WS).toFixed(0) + "px)";
     for (let i = 0; i < 6; i++) {
-      c.fillStyle = r() < 0.5 ? "rgba(20,15,10,0.05)" : "rgba(255,255,255,0.05)";
+      c.fillStyle = r() < 0.5 ? "rgba(20,24,32,0.05)" : "rgba(255,255,255,0.05)";
       c.beginPath();
       c.ellipse(wx(-0.2 + r() * 0.4), wy(-0.26 + r() * 0.52), (14 + r() * 20) * WS, (7 + r() * 10) * WS, r() * Math.PI, 0, Math.PI * 2);
       c.fill();
@@ -595,11 +595,20 @@
     // drape presets: "line" billows and sags, "table" rumples with the wrinkles, "folded" lies flat
     shirt.setDrape = function (kind) {
       shirt.drapeKind = kind;
-      drape.uBillow.value = kind === "line" ? 0.03 : 0;
-      drape.uSag.value = kind === "line" ? 0.018 : 0;
+      drape.uBillow.value = kind === "line" ? 0.045 : 0;
+      drape.uSag.value = kind === "line" ? 0.026 : 0;
       drape.uRumple.value = kind === "line" ? 0.004 : kind === "table" ? 0.014 * shirt.wrinkles : 0;
       drape.uOnLine.value = kind === "line" ? 1 : 0;
       slab.visible = kind === "folded";
+    };
+
+    // wind on the line: gusts swell the belly; wet cotton is heavy, so it sags more and billows less
+    shirt.setGust = function (gust, wet) {
+      if (shirt.drapeKind !== "line") {
+        return;
+      }
+      drape.uBillow.value = 0.045 * (1 - wet * 0.45) * (0.75 + gust * 0.6);
+      drape.uSag.value = 0.026 * (1 + wet * 0.6);
     };
 
     shirt.setWrinkled = function () {

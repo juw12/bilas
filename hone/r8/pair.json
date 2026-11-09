@@ -1,0 +1,51 @@
+{
+  "mode": "pair",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "judges": {
+    "Pega-Vision": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Both versions pass the stated gates, but V2 improves the rubric-relevant experience: it fixes the phone fold depth glitch, makes wrinkles more tactile, adds footstep and state-change feedback, and clears HUD/wall-note overlap, giving better ASMR payoff, visual craft, and clarity.",
+        "Version 1 is the later iteration and fixes visible clipping/overlap and fold-view issues while adding clearer state feedback and richer wrinkle detail, improving C3/C4 without changing the already strong interaction flow. Version 2 is essentially the prior build with slightly less polished HUD/scene text and fold presentation."
+      ]
+    },
+    "Pega-Thinking": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "VERSION 2 (r8) makes targeted refinements over VERSION 1 (r7): fixed phone fold glitch, rebuilt wrinkles as detailed fold ribbons (visible improvement in C3), added footsteps and laundry chip pop animations (C1/C4 feedback), and repositioned wall notes to avoid HUD overlap (C4). The loss of one sound id (30→29) is negligible since both well exceed the G3 threshold of 16.",
+        "VERSION 1 (r8) builds on VERSION 2 (r7) with meaningful polish: footsteps shuffle when walking between stations, wrinkles rebuilt as real fold ribbons with shaded valleys and lit ridges, laundry chips that pop on state changes, phone fold glitch fix, and wall notes repositioned to avoid HUD overlap. These improvements primarily strengthen C1 (ASMR sensory payoff) and C3 (visual craft), with a small C4 (onboarding) gain from the wall-note fix, while C2 remains equivalent. The incremental gains are real but modest, consistent with a small but clear edge."
+      ]
+    },
+    "GLM-5.3-Flash": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Version 2 (r8) contains the full r7 experience plus targeted fixes that map directly to weighted soft criteria: cleaner fold-ribbon/wrinkle rendering with path-erasing smoothing (C1/C3), wall notes and poster text no longer overlapping the HUD card or clipping (C3/C4), shirt-state pop feedback with reduced-motion support (C1/C4), and a fixed phone fold depth glitch (C3), with no substantive regression — its 29 distinct sounds still far exceed the >=16 gate versus r7's 30/31. Screenshots corroborate the cleaner folds and unobstructed notes, so the marginal but broad improvement tips it past a tie.",
+        "Both versions claim identical passing gates, but Version 1 (r8) is a strict superset of Version 2 (r7) with targeted fixes that map directly to weighted criteria: the phone fold depth-glitch fix, higher-fidelity fold wrinkles (corroborated by its screenshots showing natural creases vs Version 2's scribbly marks), footstep audio, HUD state-change feedback, and poster text shrink-to-fit — improving C1/C3/C4 with no visible regressions. The 29-vs-30 sound count difference is negligible since both far exceed the G3 threshold."
+      ]
+    }
+  },
+  "votes": {
+    "A": 0,
+    "B": 3,
+    "tie": 0
+  },
+  "quorum": 3,
+  "b_wins": true,
+  "label": "council-judged (3 judges)"
+}

@@ -25,3 +25,5 @@ Next levers judges agree on: volumetric cloth (sag on the line, thickness), rich
 Plateau after 2 rounds under the +0.3 bar. Shipped r6 anyway: both signals agree in direction (two unanimous pairwise wins over r4, +0.2 score), all gates pass; rule-strict best r4 stays at tag-less commit a42e534 for rollback.
 Next levers judges agree on: secondary props (bottle, mug, spray) are bare primitives; wall notes blurry at desktop size; visible water slosh/foam through the door glass on phone; steam/rain ambient life; machines need more surface detail (seams, brand plates, drum texture); phone fold framing (shirt near top edge mid-fold).
 | 2026-11-09 08:46 | council score | 8.45 | split: - | Pega-Vision=8.2, Pega-Thinking=8.45, GLM-5.3-Flash=8.45 |
+| 2026-11-09 10:13 | council score | 8.35 | split: - | Pega-Vision=8.45, Pega-Thinking=8.2, GLM-5.3-Flash=8.95 |
+| 2026-11-09 10:58 | council score | 8.22 | split: - | Pega-Vision=8.2, Pega-Thinking=8.25, GLM-5.3-Flash=8.45 |

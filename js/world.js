@@ -769,11 +769,15 @@
     });
   }
 
-  function outsideTexture() {
+  function outsideTexture(layer) {
     // the street across: hazy far towers, mid-rise flats with rooftop tanks, near shophouses with
     // awnings, overhead cables and a street lamp. Seeded so day/night redraws keep the same skyline.
+    const far = layer === "far";
     return canvasTex(1024, 512, function (c, w, h) {
       const night = W.theme !== "day";
+      c.clearRect(0, 0, w, h);
+      // "near" skips drawing the far layer but still draws its random numbers, so both layers line up
+      const ink = far ? c : { fillRect: function () {}, beginPath: function () {}, ellipse: function () {}, fill: function () {} };
       let seed = 7;
       function rnd() {
         seed = (seed * 16807) % 2147483647;
@@ -789,34 +793,37 @@
         grd.addColorStop(0.65, "#e3ebe6");
         grd.addColorStop(1, "#f2efe6");
       }
-      c.fillStyle = grd;
-      c.fillRect(0, 0, w, h);
+      ink.fillStyle = grd;
+      ink.fillRect(0, 0, w, h);
       if (!night) {
-        c.fillStyle = "rgba(255,255,255,0.55)";
+        ink.fillStyle = "rgba(255,255,255,0.55)";
         for (let i = 0; i < 5; i++) {
           const cx = 90 + i * 210 + rnd() * 60;
           const cy = 50 + rnd() * 60;
           for (let k = 0; k < 4; k++) {
-            c.beginPath();
-            c.ellipse(cx + k * 28, cy + (k % 2) * 6, 46, 16, 0, 0, Math.PI * 2);
-            c.fill();
+            ink.beginPath();
+            ink.ellipse(cx + k * 28, cy + (k % 2) * 6, 46, 16, 0, 0, Math.PI * 2);
+            ink.fill();
           }
         }
       }
       // far towers in haze
-      c.fillStyle = night ? "#1c2836" : "#c3cfd3";
+      ink.fillStyle = night ? "#1c2836" : "#c3cfd3";
       for (let x = -20; x < w; ) {
         const bw = 50 + rnd() * 70;
         const bh = 190 + rnd() * 160;
-        c.fillRect(x, h - bh - 40, bw, bh);
+        ink.fillRect(x, h - bh - 40, bw, bh);
         if (night) {
-          c.fillStyle = "rgba(255,214,150,0.35)";
+          ink.fillStyle = "rgba(255,214,150,0.35)";
           for (let k = 0; k < 10; k++) {
-            c.fillRect(x + 6 + rnd() * (bw - 12), h - bh - 30 + rnd() * (bh - 40), 4, 5);
+            ink.fillRect(x + 6 + rnd() * (bw - 12), h - bh - 30 + rnd() * (bh - 40), 4, 5);
           }
-          c.fillStyle = "#1c2836";
+          ink.fillStyle = "#1c2836";
         }
         x += bw + 8 + rnd() * 30;
+      }
+      if (far) {
+        return;
       }
       // mid-rise flats with rooftop water tanks and AC boxes
       for (let x = -10; x < w; ) {
@@ -1143,8 +1150,18 @@
     const sill = mesh(new T.BoxGeometry(0.22, 0.03, 2.5), std("#d9d2c4"), -2.9, 0.885, 0);
     sill.receiveShadow = true;
     scene.add(sill);
-    const outside = mesh(new T.PlaneGeometry(6, 3.2), new T.MeshBasicMaterial({ map: outsideTexture() }), -4.4, 1.5, 0);
+    // two depth layers so the street slides against the skyline as you walk between stations
+    const skyline = mesh(new T.PlaneGeometry(9, 4.8), new T.MeshBasicMaterial({ map: outsideTexture("far") }), -6.4, 1.6, 0);
+    skyline.rotation.y = Math.PI / 2;
+    scene.add(skyline);
+    W.skyline = skyline;
+    const outside = mesh(
+      new T.PlaneGeometry(6, 3.2),
+      new T.MeshBasicMaterial({ map: outsideTexture("near"), transparent: true, depthWrite: false }),
+      -4.4, 1.5, 0
+    );
     outside.rotation.y = Math.PI / 2;
+    outside.renderOrder = 1;
     scene.add(outside);
     W.outside = outside;
     const rain = mesh(new T.PlaneGeometry(2.4, 1.4), rainMaterial(), -2.97, 1.6, 0);
@@ -1658,6 +1675,7 @@
       W.windowLight.patchMat.opacity = night ? 0.07 : 0.2;
     }
     redraw(W.outside.material.map);
+    redraw(W.skyline.material.map);
   };
 
   W.setLang = function () {

@@ -1,0 +1,143 @@
+{
+  "mode": "score",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "weights": {
+    "C1": 0.3,
+    "C2": 0.25,
+    "C3": 0.25,
+    "C4": 0.2
+  },
+  "judges": {
+    "Pega-Vision": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 7.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "29 one-shot sound ids fired in one run plus loops, but screenshots show some plain surfaces, like the flat changer panel, that mute the sensory payoff.",
+        "C2": "DRAG each coin into the slot and drag across it to smooth wrinkles; changer, detergent drawer, lint trap, pegs, and folding are all present.",
+        "C3": "The changer front reads as a large flat black panel and the window city is flat illustration, so the look is coherent but not distinctive.",
+        "C4": "Bottom station bar with a red underline on the next suggested step; one-line hint above it, plus This load card and ghost fingertip."
+      },
+      "fixes": [
+        "Elevate hero visual craft: replace flat changer/window/lint surfaces with richer materials, depth, and deliberate lighting so screenshots are distinctive.",
+        "Make ASMR feedback more visible in stills: stronger water/foam, lint peel, cloth deformation, coin/detergent particles, and tactile cues for every touch.",
+        "Tighten first-run gesture discoverability and phone HUD: show drag affordance before 2.2s idle, clarify fold marks, and prevent card overlap."
+      ],
+      "total": 8.2,
+      "seconds": 79.4
+    },
+    "Pega-Thinking": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 8.0
+      },
+      "evidence": {
+        "C1": "Calm mint/wood palette, visible feedback (foam in drum, lint felt texture, receipt printing), 29 synthesized sounds + ambient bed; however the line screenshot shows shirts hanging fairly stiff despite described billowing, and the drum view reads somewhat static.",
+        "C2": "All anchor-10 elements present: changer with note feed, coin slot drag, detergent drawer, lint trap with peel gesture, pegs, smoothing drag, folding in thirds on green mat; gestures matched to each action (drag coin, drag lint, drag shirt, fold sleeves/bottom).",
+        "C3": "Coherent warm laundromat art direction, deliberate materials (clearcoat enamel, glazed mug, glass spray bottle), contact shadows, film grain/vignette, torn-zigzag receipt; HUD station bar and load card match the place. Tiles and machine bodies still read a bit flat/simple vs. truly distinctive designer-screenshot craft.",
+        "C4": "Contextual one-line hints visible in every screenshot ('Tap the green slot to feed a note', 'Drag over the lint screen to peel the felt off', 'Now fold the right side in'), red underline on next station, timer + shirt-state chips always visible, ghost-fingertip demo after idle."
+      },
+      "fixes": [
+        "Make the described dynamic sensory elements actually read on screen: the line screenshot shows nearly static shirts despite the breeze/sag/billow claims, and the washer drum view looks static — push visible cloth motion, water swirl, and steam so the ASMR payoff lands without reading the changelog.",
+        "Elevate surface craft beyond 'coherent' to 'designer-screenshot': the tile walls, machine bodies, and floor still read as flat primitives in the screenshots — add grout variation, enamel micro-wear, and floor specular breakup so light and materials feel deliberate rather than default.",
+        "Audit the phone flow for parity: the 390px screenshots show the hint wrapping to two lines and the load card crowding the top — tighten mobile hint copy and HUD spacing so a first-time phone user finishes with the same zero-confusion clarity as desktop."
+      ],
+      "total": 8.25,
+      "seconds": 39.2
+    },
+    "GLM-5.3-Flash": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "'Drum agitates with shader water and foam', 'shirts billow with the breeze... drips slow as they dry', 29 one-shots plus 'rain/room-tone ambience' — strong payoff in wash/line/fold, but the idle changer screen (screenshot 1) is static and sparse, so not every touch and scene rewards attention yet.",
+        "C2": "'DRAG each coin into the slot', 'pull the lint trap and drag across it to peel the felt off', 'fold left sleeve, right sleeve, bottom up', 'Hold to pour' — every rubric-10 element (changer, coin slot, detergent drawer, lint trap, pegs, smoothing, thirds) has a matched gesture; only deeper sim layers (other customers, detergent dosing) are absent.",
+        "C3": "'clearcoat material', 'brushed metal maker's plate (bilas PRO 7 KG)', receipt with 'torn zigzag bottom' printing line by line — cohesive palette, props and matching HUD; but the 'two-layer parallax city' reads as flat pastel cutouts and the changer face is a plain dark panel, below the craft of the washer/fold close-ups.",
+        "C4": "'a small label pins to the exact machine or item for the next step', 'red underline marks only a real next task', ghost-fingertip demo after 2.2s idle, 'This load' chips ('2 dry · 2 wet') plus per-machine timers — one nit: hint says 'Tap the green slot' while the slot renders as a pink ring."
+      },
+      "fixes": [
+        "Bring the idle/front-of-house up to the wash/fold craft level: add material detail to the plain changer face and coin tray, and deepen the flat pastel parallax city (layered silhouettes, lit windows, lamp glow) — it is both the first screen and the view you linger on while hanging.",
+        "Close the remaining C1 sensory gaps: give the plain taps (coin scoop, peg on/off, station jump) visible tactile feedback and add sparse ambient life at the Sit station (other customers' machines starting/stopping, a distant door chime) so lingering always has something gentle to watch and hear.",
+        "Polish legibility and affordance mismatches: wall notes are too small and low-contrast to read in the changer shot, the lint-felt texture reads as noisy splotches, and the 'Tap the green slot' hint does not match the pink-ringed slot shown on screen."
+      ],
+      "total": 8.45,
+      "seconds": 448.3
+    }
+  },
+  "quorum": 3,
+  "criterion_median": {
+    "C1": 8.0,
+    "C2": 9.0,
+    "C3": 8.0,
+    "C4": 9.0
+  },
+  "criterion_spread": {
+    "C1": 0.0,
+    "C2": 0.0,
+    "C3": 1.0,
+    "C4": 1.0
+  },
+  "split_criteria": [],
+  "judge_total_range": [
+    8.2,
+    8.45
+  ],
+  "fixes": [
+    {
+      "judge": "Pega-Vision",
+      "fix": "Elevate hero visual craft: replace flat changer/window/lint surfaces with richer materials, depth, and deliberate lighting so screenshots are distinctive."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Make ASMR feedback more visible in stills: stronger water/foam, lint peel, cloth deformation, coin/detergent particles, and tactile cues for every touch."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Tighten first-run gesture discoverability and phone HUD: show drag affordance before 2.2s idle, clarify fold marks, and prevent card overlap."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Make the described dynamic sensory elements actually read on screen: the line screenshot shows nearly static shirts despite the breeze/sag/billow claims, and the washer drum view looks static — push visible cloth motion, water swirl, and steam so the ASMR payoff lands without reading the changelog."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Elevate surface craft beyond 'coherent' to 'designer-screenshot': the tile walls, machine bodies, and floor still read as flat primitives in the screenshots — add grout variation, enamel micro-wear, and floor specular breakup so light and materials feel deliberate rather than default."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Audit the phone flow for parity: the 390px screenshots show the hint wrapping to two lines and the load card crowding the top — tighten mobile hint copy and HUD spacing so a first-time phone user finishes with the same zero-confusion clarity as desktop."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Bring the idle/front-of-house up to the wash/fold craft level: add material detail to the plain changer face and coin tray, and deepen the flat pastel parallax city (layered silhouettes, lit windows, lamp glow) — it is both the first screen and the view you linger on while hanging."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Close the remaining C1 sensory gaps: give the plain taps (coin scoop, peg on/off, station jump) visible tactile feedback and add sparse ambient life at the Sit station (other customers' machines starting/stopping, a distant door chime) so lingering always has something gentle to watch and hear."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Polish legibility and affordance mismatches: wall notes are too small and low-contrast to read in the changer shot, the lint-felt texture reads as noisy splotches, and the 'Tap the green slot' hint does not match the pink-ringed slot shown on screen."
+    }
+  ],
+  "label": "council-judged (3 judges), mean of 2 runs",
+  "council_score": 8.22,
+  "runs": 2,
+  "run_scores": [
+    8.0,
+    8.45
+  ],
+  "run_spread": 0.45
+}

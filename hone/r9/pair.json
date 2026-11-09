@@ -1,0 +1,51 @@
+{
+  "mode": "pair",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "judges": {
+    "Pega-Vision": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Version 2 adds the same verified flow plus stronger onboarding via the ghost fingertip drag cue and richer sensory/visual detail through parallax city depth and billowing shirts, improving the weighted clarity, interaction, and ASMR criteria without introducing visible regressions.",
+        "Version 1 adds meaningful r9 improvements—parallax city depth, billowing shirts, clearer neutral wrinkles, and an in-scene drag cue—that strengthen ASMR payoff, visual craft, and onboarding while preserving the same passing hard gates."
+      ]
+    },
+    "Pega-Thinking": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "VERSION 2 (r9) adds meaningful polish across the soft criteria: a two-layer parallax city view and neutral grey wrinkles improve visual craft (C3), breeze-driven shirt billowing on the line adds sensory payoff (C1), and the ghost-fingertip drag cue after idle is a clear onboarding improvement (C4). The core interaction fidelity and ASMR coverage are equivalent, so the edge is modest but consistent.",
+        "VERSION 1 (r9) adds meaningful polish over VERSION 2 (r8): a two-layer parallax city view, breeze-driven shirt billowing with wet/dry differential, improved wrinkle rendering (cool grey with stronger fold relief), and a ghost-fingertip drag cue that directly improves onboarding. It also claims 31 synthesized sound ids vs 29. These improvements lift C1 (sensory payoff), C3 (visual craft), and C4 (onboarding) while C2 remains comparable, giving VERSION 1 a clear edge under the weighted rubric."
+      ]
+    },
+    "GLM-5.3-Flash": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Both versions pass all hard gates identically, but Version 2 (r9) is a strict superset of Version 1 with targeted soft-criterion gains: a ghost-fingertip drag demo strengthens onboarding (C4), cooler-grey wrinkle shading fixes the dirt-like crease look visible in V1's screenshots (C3), and billowing line shirts plus a parallax window add sensory/craft payoff (C1/C3) with no regressions.",
+        "Version 1 (r9) contains everything in Version 2 (r8) plus targeted improvements mapping to the soft criteria: a ghost-fingertip drag-gesture demo (C4 onboarding), cool-grey fold wrinkles that read as cloth shadow where V2's screenshots show brownish dirt-like smudges (C3 craft), a two-layer parallax window and breeze-synced shirt billow (C1 sensory payoff), with identical hard-gate results and no visible regression."
+      ]
+    }
+  },
+  "votes": {
+    "A": 0,
+    "B": 3,
+    "tie": 0
+  },
+  "quorum": 3,
+  "b_wins": true,
+  "label": "council-judged (3 judges)"
+}

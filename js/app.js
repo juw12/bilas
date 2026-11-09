@@ -1359,6 +1359,11 @@
       h.swing *= 1 - Math.min(1, dt * 1.5);
       if (h.pegs >= 2 && !s.flying) {
         h.pivot.rotation.z = Math.sin(now * 1.1 + h.phase) * amp + Math.sin(now * 0.37 + h.phase * 2) * amp * 0.6 + h.swing * Math.sin(now * 6);
+        // the same breeze swells the cloth itself, a beat behind the swing
+        const gust = 0.5 + 0.5 * Math.sin(now * 0.9 + h.phase - 0.6) * Math.sin(now * 0.37 + h.phase * 2);
+        if (s.obj.setGust) {
+          s.obj.setGust(day ? gust : gust * 0.6, wet);
+        }
       }
       h.markers.forEach(function (mk) {
         mk.scale.setScalar(1 + Math.sin(now * 4) * 0.12);
@@ -2503,10 +2508,81 @@
     callout.classList.add("on");
   }
 
+  /* Ghost fingertip: when a step needs a drag and the player has been idle, show the gesture on the object
+     itself (coin -> slot, across the felt, across the shirt, sleeve -> middle). Taps keep the marker. */
+  const cueEl = $("dragCue");
+  const cueV = new T.Vector3();
+
+  function dragCuePath() {
+    const st = S.station;
+    const s = S.table.shirt;
+    if (st === "fold" && s && !S.table.folding) {
+      const f = s.obj.flat;
+      const at = function (x, y) {
+        return f.localToWorld(new T.Vector3(x, y, 0.01));
+      };
+      if (S.table.step === "smooth") {
+        return [at(-0.14, 0.1), at(0.14, -0.08)];
+      }
+      if (S.table.step === "L") {
+        return [at(-0.24, 0.08), at(-0.04, 0.06)];
+      }
+      if (S.table.step === "R") {
+        return [at(0.24, 0.08), at(0.04, 0.06)];
+      }
+      if (S.table.step === "B") {
+        return [at(0, -0.24), at(0, -0.02)];
+      }
+      return null;
+    }
+    if (st === "dry" && S.lint.open && S.lint.amount > 0) {
+      LT.feltMesh.updateWorldMatrix(true, false);
+      return [LT.feltMesh.localToWorld(new T.Vector3(-0.1, 0.03, 0)), LT.feltMesh.localToWorld(new T.Vector3(0.1, -0.03, 0))];
+    }
+    if (st === "wash" || st === "dry") {
+      const m = st === "wash" ? MS.washer : MS.dryer;
+      const ready = m.phase === "idle" && m.items.length && !m.doorOpen && (st === "dry" || m.soap);
+      if (ready && m.coins < m.need && m.parts.coins.length) {
+        const coin = m.parts.coins[m.parts.coins.length - 1];
+        coin.updateWorldMatrix(true, false);
+        return [coin.getWorldPosition(new T.Vector3()), m.parts.slotWorld().clone()];
+      }
+    }
+    return null;
+  }
+
+  function stepDragCue(sinceInput) {
+    const path = !drag && sinceInput > (S.loadId <= 1 ? 2200 : 4200) ? dragCuePath() : null;
+    if (!path) {
+      if (cueEl.style.visibility !== "hidden") {
+        cueEl.style.opacity = "0";
+        cueEl.style.visibility = "hidden";
+      }
+      return;
+    }
+    // 1.9 s loop: press, glide, lift, pause
+    const k = (performance.now() % 1900) / 1900;
+    const glide = Math.min(1, Math.max(0, (k - 0.12) / 0.55));
+    const eased = glide < 0.5 ? 2 * glide * glide : 1 - Math.pow(-2 * glide + 2, 2) / 2;
+    cueV.copy(path[0]).lerp(path[1], eased);
+    const p = screenOf(cueV);
+    if (!p.onScreen) {
+      cueEl.style.opacity = "0";
+      cueEl.style.visibility = "hidden";
+      return;
+    }
+    cueEl.style.visibility = "visible";
+    const fade = k < 0.08 ? k / 0.08 : k > 0.78 ? Math.max(0, 1 - (k - 0.78) / 0.12) : 1;
+    cueEl.style.transform = "translate(" + p.x.toFixed(1) + "px," + p.y.toFixed(1) + "px) scale(" + (k > 0.1 && k < 0.7 ? 0.9 : 1) + ")";
+    cueEl.style.opacity = (0.9 * fade).toFixed(2);
+    cueEl.classList.toggle("press", k > 0.1 && k < 0.7);
+  }
+
   function stepGuide() {
     const mk = W.marker;
     const sinceInput = performance.now() - S.lastInput;
     const tgt = guideTarget();
+    stepDragCue(sinceInput);
     placeCallout(tgt, sinceInput > 650);
     const idle = sinceInput > (S.loadId <= 1 ? 1400 : 3500);
     if (!tgt || !idle) {
