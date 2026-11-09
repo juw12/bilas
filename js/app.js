@@ -898,6 +898,23 @@
       if (omega !== 0) {
         root.rotation.z += tb.spin * dt;
         root.rotation.x += tb.spin * dt * 0.4;
+        // the cloth itself moves: stretched while it falls, a squash on landing that relaxes,
+        // pressed flat against the drum in spin, and folds that keep drifting
+        let target = 0.12;
+        if (Math.abs(omega) > 7) {
+          target = 0.75;
+        } else if (tb.falling) {
+          target = -0.55;
+        }
+        if (tb.wasFalling && !tb.falling) {
+          tb.sq = 0.9;
+        }
+        tb.wasFalling = tb.falling;
+        tb.sq = (tb.sq || 0) + (target - (tb.sq || 0)) * Math.min(1, dt * 6);
+        tb.t = (tb.t || tb.k * 10 + 1) + dt * (0.7 + Math.min(Math.abs(omega), 12) * 0.08);
+        if (s.obj.flex) {
+          s.obj.flex(tb.t, tb.sq);
+        }
       }
     });
   }

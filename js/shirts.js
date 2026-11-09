@@ -524,22 +524,93 @@
     rightBottom: shapeFrom([[Q, -TOP], [HALF, -TOP], [HALF, 0], [Q, 0]])
   };
 
+  // the crumpled bundle: a lumpy ball with fabric ridges. The same displacement runs every frame
+  // while it tumbles (shirt.flex), so the folds drift, a sleeve lobe flops out and the bundle
+  // stretches as it falls and squashes when it lands, instead of one rigid ball spinning.
+  const CRUMPLE_SCALE = [1.3, 0.62, 1.05];
+
+  function crumpleShape(g, t, squash) {
+    const p = g.attributes.position;
+    const dirs = g.userData.dirs;
+    const seed = g.userData.seed;
+    const ph0 = seed * 1.3 + t * 0.9;
+    const ph1 = seed * 2.1 + t * 0.6;
+    const ph2 = seed * 0.7 - t * 0.7;
+    // sleeve lobe: a soft bulge whose direction wanders, so an arm seems to flop out and tuck back
+    let lx = Math.cos(t * 0.8 + seed);
+    let ly = Math.sin(t * 1.1 + seed * 0.5) * 0.6;
+    let lz = Math.sin(t * 0.6 + seed * 1.7);
+    const ll = Math.hypot(lx, ly, lz) || 1;
+    lx /= ll;
+    ly /= ll;
+    lz /= ll;
+    const lobeSize = t === 0 ? 0 : 0.2 + 0.08 * Math.sin(t * 1.7 + seed);
+    const sx = CRUMPLE_SCALE[0] * (1 + 0.18 * squash);
+    const sy = CRUMPLE_SCALE[1] * (1 - 0.34 * squash);
+    const sz = CRUMPLE_SCALE[2] * (1 + 0.12 * squash);
+    for (let i = 0; i < p.count; i++) {
+      const nx = dirs[i * 3];
+      const ny = dirs[i * 3 + 1];
+      const nz = dirs[i * 3 + 2];
+      const ridge = 1 - Math.abs(Math.sin(nx * 6.5 + nz * 4.2 + ph1));
+      const ridge2 = 1 - Math.abs(Math.sin(ny * 7.5 - nx * 3.1 + ph2));
+      const facing = Math.max(0, nx * lx + ny * ly + nz * lz);
+      const lobe = lobeSize * Math.pow(facing, 6);
+      const k = 1 + 0.16 * Math.sin(nx * 5 + ph0) * Math.cos(ny * 4 + ph1) + 0.1 * Math.sin(nz * 7 + ph2) + 0.07 * ridge * ridge + 0.05 * ridge2 * ridge2 + lobe;
+      p.setXYZ(i, nx * 0.1 * k * sx, ny * 0.1 * k * sy, nz * 0.1 * k * sz);
+    }
+    p.needsUpdate = true;
+    g.computeVertexNormals();
+    smoothNormals(g);
+  }
+
+  // the icosphere is non-indexed, so computeVertexNormals gives one normal per face and the bundle
+  // looks like a faceted rock. Average the normals of every copy of the same vertex so cotton reads soft.
+  function smoothNormals(g) {
+    const nrm = g.attributes.normal;
+    const groups = g.userData.groups;
+    for (let gi = 0; gi < groups.length; gi++) {
+      const members = groups[gi];
+      let x = 0;
+      let y = 0;
+      let z = 0;
+      for (let j = 0; j < members.length; j++) {
+        x += nrm.getX(members[j]);
+        y += nrm.getY(members[j]);
+        z += nrm.getZ(members[j]);
+      }
+      const len = Math.hypot(x, y, z) || 1;
+      for (let j = 0; j < members.length; j++) {
+        nrm.setXYZ(members[j], x / len, y / len, z / len);
+      }
+    }
+    nrm.needsUpdate = true;
+  }
+
   function crumpleGeo(seed) {
     const g = new T.IcosahedronGeometry(0.1, 5);
     const p = g.attributes.position;
+    const dirs = new Float32Array(p.count * 3);
     const v = new T.Vector3();
-    const ph = [seed * 1.3, seed * 2.1, seed * 0.7];
     for (let i = 0; i < p.count; i++) {
-      v.fromBufferAttribute(p, i);
-      const n = v.clone().normalize();
-      // big lumps + soft fabric ridges (abs of a sine gives a fold crest, not a facet)
-      const ridge = 1 - Math.abs(Math.sin(n.x * 6.5 + n.z * 4.2 + ph[1]));
-      const ridge2 = 1 - Math.abs(Math.sin(n.y * 7.5 - n.x * 3.1 + ph[2]));
-      const k = 1 + 0.16 * Math.sin(n.x * 5 + ph[0]) * Math.cos(n.y * 4 + ph[1]) + 0.1 * Math.sin(n.z * 7 + ph[2]) + 0.07 * ridge * ridge + 0.05 * ridge2 * ridge2;
-      v.copy(n).multiplyScalar(0.1 * k);
-      p.setXYZ(i, v.x * 1.3, v.y * 0.62, v.z * 1.05);
+      v.fromBufferAttribute(p, i).normalize();
+      dirs[i * 3] = v.x;
+      dirs[i * 3 + 1] = v.y;
+      dirs[i * 3 + 2] = v.z;
     }
-    g.computeVertexNormals();
+    // copies of the same corner share a direction; group them once for smooth shading
+    const byKey = new Map();
+    for (let i = 0; i < p.count; i++) {
+      const key = Math.round(dirs[i * 3] * 1e4) + "," + Math.round(dirs[i * 3 + 1] * 1e4) + "," + Math.round(dirs[i * 3 + 2] * 1e4);
+      if (!byKey.has(key)) {
+        byKey.set(key, []);
+      }
+      byKey.get(key).push(i);
+    }
+    g.userData.groups = Array.from(byKey.values());
+    g.userData.dirs = dirs;
+    g.userData.seed = seed;
+    crumpleShape(g, 0, 0);
     return g;
   }
 
@@ -741,6 +812,14 @@
     shirt.setWarm = function (k) {
       mat.emissive.set("#3a1a08").multiplyScalar(k);
       crumpleMat.emissive.copy(mat.emissive);
+    };
+
+    // live cloth in the drum: t drifts the folds, squash > 0 presses the bundle flat, < 0 stretches it
+    shirt.flex = function (t, squash) {
+      if (shirt.mode !== "crumple") {
+        return;
+      }
+      crumpleShape(crumple.geometry, t, squash);
     };
 
     shirt.setMode = function (mode) {
