@@ -36,3 +36,5 @@ Next levers judges agree on: secondary props (bottle, mug, spray) are bare primi
 Note: the same r7 build scored 8.0 on one shot set and 8.45 on another, so the absolute council score moves by about 0.45 with screenshot choice; the pairwise vote is the steadier signal.
 | 2026-11-09 11:25 | council score | 8.1 | split: - | Pega-Vision=7.75, Pega-Thinking=7.45, GLM-5.3-Flash=8.45 |
 | 2026-11-09 11:31 | council pair | B wins: True | votes A/B/tie 0/3/0 | council-judged (3 judges) |
+| 2026-11-09 16:09 | council pair | B wins: True | votes A/B/tie 0/3/0 | council-judged (3 judges) |
+| drum-tumble | 2026-11-09 | Drum contents read as cloth: crumple bundles get smooth per-vertex normals (no faceted rock look), drifting folds + a wandering sleeve lobe, squash/stretch driven by the tumble (stretch falling, squash on landing, flatten against the wall in spin) | flow dt2_1280 + dt2_390 PASS (0 errors, 31 sounds), gates PASS (G4 no overflow, G6 136/136, contrast ok) | pairwise vs main 343ee29 3-0 (both orders unanimous) | shipped on unanimous pair |

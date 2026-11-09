@@ -1,0 +1,1 @@
+Bilas candidate: same build, but clothes inside the drum are soft cloth bundles with smooth shading, folds and a sleeve lobe that deform as they tumble (stretch while falling, squash on landing and against the wall during spin).

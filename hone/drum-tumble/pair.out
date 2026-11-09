@@ -1,0 +1,51 @@
+{
+  "mode": "pair",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "judges": {
+    "Pega-Vision": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Version 2 significantly improves Visual Craft (C3) and ASMR payoff (C1) by replacing rigid clothing models with soft, deforming cloth bundles that squash and stretch, creating a more realistic and satisfying sensory experience.",
+        "Version 1 significantly outperforms Version 2 on Soft Criteria C1 (ASMR sensory payoff) and C3 (Visual craft) by implementing soft-body deformation for clothes during the wash cycle, whereas Version 2 uses rigid blobs that feel sterile and less faithful to reality."
+      ]
+    },
+    "Pega-Thinking": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "VERSION 2's soft cloth bundles with smooth shading, folds, and sleeve lobes that deform during tumbling provide significantly better ASMR sensory payoff (C1) and visual craft (C3) than VERSION 1's rigid crumpled blobs, which look like default primitives and would feel sterile to watch during the wash cycle.",
+        "VERSION 1's soft, deformable cloth bundles with folds and sleeve lobes that stretch, squash, and deform during tumbling provide stronger ASMR sensory payoff (C1) and more distinctive visual craft (C3) than VERSION 2's rigid crumpled blobs that simply rotate with the drum, which read as generic primitives."
+      ]
+    },
+    "GLM-5.3-Flash": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Both versions share the same build, gates, HUD, and flow, but Version 2's soft, deforming cloth bundles make the drum-tumbling view — a focal mid-activity state — visibly more tactile and pleasant to watch (C1) and look more crafted and less like rigid default primitives (C3), with no regressions elsewhere.",
+        "Both builds are functionally identical across the gates and all interaction steps, but Version 1's soft, deformable cloth bundles (squash-and-stretch tumbling, visible folds and sleeve) directly serve the rubric's highest-weighted criterion C1 — making the drum pleasant to watch and tactilely satisfying — and slightly lift C3's visual craft, whereas Version 2's rigid crumpled blobs read as stiffer and less inviting, with no offsetting advantage."
+      ]
+    }
+  },
+  "votes": {
+    "A": 0,
+    "B": 3,
+    "tie": 0
+  },
+  "quorum": 3,
+  "b_wins": true,
+  "label": "council-judged (3 judges)"
+}
