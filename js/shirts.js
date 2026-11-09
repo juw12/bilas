@@ -140,6 +140,72 @@
     c.beginPath();
     c.ellipse(px(0), py(0.34), 0.092 / BX * TEX, 0.056 / BY * TEX, 0, 0, Math.PI);
     c.stroke();
+    // rolled hems: a soft shade just inside the outline so every edge (and every folded edge
+    // later) reads as a few millimetres of cotton instead of a cut sheet of paper
+    c.save();
+    tracePath(c, OUTLINE);
+    c.clip();
+    c.filter = "blur(2.5px)";
+    c.strokeStyle = "rgba(40,28,16,0.24)";
+    c.lineWidth = 7;
+    tracePath(c, OUTLINE);
+    c.stroke();
+    c.restore();
+    // broad, low cotton undulation so a smoothed shirt still has body
+    c.save();
+    c.filter = "blur(14px)";
+    for (let i = 0; i < 9; i++) {
+      c.fillStyle = i % 2 ? "rgba(255,252,244,0.07)" : "rgba(30,20,10,0.05)";
+      c.beginPath();
+      c.ellipse(px(-0.22 + Math.random() * 0.44), py(-0.3 + Math.random() * 0.6), 18 + Math.random() * 20, 10 + Math.random() * 14, Math.random() * Math.PI, 0, Math.PI * 2);
+      c.fill();
+    }
+    c.restore();
+  }
+
+  function tracePath(c, pts) {
+    c.beginPath();
+    pts.forEach(function (p, i) {
+      if (i === 0) {
+        c.moveTo(px(p[0]), py(p[1]));
+      } else {
+        c.lineTo(px(p[0]), py(p[1]));
+      }
+    });
+    c.closePath();
+  }
+
+  // fold shading, drawn into the shirt's own texture coordinates once a fold lands:
+  // the turned edge rolls away from the light, and the flap's free edge lays a soft contact
+  // shadow on the layer underneath
+  function drawFoldShade(c, which) {
+    c.save();
+    if (which === "L" || which === "R") {
+      const s = which === "L" ? -1 : 1;
+      // turned edge on the flap, darkest right at the hinge line
+      const g = c.createLinearGradient(px(s * (Q + 0.03)), 0, px(s * Q), 0);
+      g.addColorStop(0, "rgba(40,28,16,0)");
+      g.addColorStop(0.7, "rgba(40,28,16,0.16)");
+      g.addColorStop(1, "rgba(40,28,16,0.34)");
+      c.fillStyle = g;
+      c.fillRect(Math.min(px(s * (Q + 0.03)), px(s * Q)), 0, Math.abs(px(s * Q) - px(s * (Q + 0.03))), TEX);
+      // contact shadow along the flap's free edge, mirrored onto the layer below
+      c.filter = "blur(2.5px)";
+      c.strokeStyle = "rgba(35,24,12,0.42)";
+      c.lineWidth = 5;
+      c.beginPath();
+      const edge = which === "L" ? [[0.006, -TOP], [0.006, 0.17]] : [[-0.244, -TOP], [-0.244, 0.17]];
+      c.moveTo(px(edge[0][0]), py(edge[0][1]));
+      c.lineTo(px(edge[1][0]), py(edge[1][1]));
+      c.stroke();
+    } else {
+      const g = c.createLinearGradient(0, py(-0.03), 0, py(0));
+      g.addColorStop(0, "rgba(40,28,16,0)");
+      g.addColorStop(1, "rgba(40,28,16,0.3)");
+      c.fillStyle = g;
+      c.fillRect(0, py(0), TEX, py(-0.03) - py(0));
+    }
+    c.restore();
   }
 
   function drawWrinkles(c, seed) {
@@ -445,6 +511,10 @@
     neck.push([0.088 * Math.cos(a), TOP - 0.052 * Math.sin(a)]);
   }
 
+  const OUTLINE = [[-HALF, -TOP], [HALF, -TOP], [HALF, 0.17], [0.36, 0.115], [0.43, 0.245], [HALF, 0.335], [Q, TOP]]
+    .concat(neck)
+    .concat([[-Q, TOP], [-HALF, 0.335], [-0.43, 0.245], [-0.36, 0.115], [-HALF, 0.17]]);
+
   const GEO = {
     centerTop: shapeFrom([[-Q, 0], [Q, 0], [Q, TOP]].concat(neck).concat([[-Q, TOP]])),
     centerBottom: shapeFrom([[-Q, -TOP], [Q, -TOP], [Q, 0], [-Q, 0]]),
@@ -489,6 +559,9 @@
     const wr = document.createElement("canvas");
     wr.width = WTEX;
     wr.height = WTEX;
+    const fl = document.createElement("canvas");
+    fl.width = TEX;
+    fl.height = TEX;
     const comp = document.createElement("canvas");
     comp.width = WTEX;
     comp.height = WTEX;
@@ -578,7 +651,8 @@
       wet: 0,
       wrinkles: 0,
       touched: new Set(),
-      cells: 0
+      cells: 0,
+      folds: {}
     };
 
     shirt.compose = function () {
@@ -588,6 +662,7 @@
       if (shirt.wrinkles > 0) {
         c.drawImage(wr, 0, 0);
       }
+      c.drawImage(fl, 0, 0, WTEX, WTEX);
       tex.needsUpdate = true;
       crumpleTex.needsUpdate = true;
     };
@@ -676,6 +751,9 @@
       flat.visible = mode !== "crumple";
       crumple.visible = mode === "crumple";
       if (mode === "flat" || mode === "crumple") {
+        fl.getContext("2d").clearRect(0, 0, TEX, TEX);
+        shirt.folds = {};
+        shirt.compose();
         pivots.lt.rotation.set(0, 0, 0);
         pivots.lb.rotation.set(0, 0, 0);
         pivots.rt.rotation.set(0, 0, 0);
@@ -695,6 +773,11 @@
         pivots.rb.rotation.y = -a;
       } else {
         pivots.b.rotation.x = -a;
+      }
+      if (k >= 1 && !shirt.folds[which]) {
+        shirt.folds[which] = true;
+        drawFoldShade(fl.getContext("2d"), which);
+        shirt.compose();
       }
     };
 

@@ -1,0 +1,51 @@
+{
+  "mode": "pair",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "judges": {
+    "Pega-Vision": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Version 2 better satisfies the rubric’s soft criteria: the fold scene reads more like real cloth with a clearer T-shirt silhouette, and the HUD plus gesture hint make progress and next actions easier to understand. Both versions claim the same hard gates, but Version 2’s added clarity and tactile visual payoff make it stronger overall.",
+        "Both versions claim the same hard gates, but VERSION 1 adds r10 improvements that make folded shirts read more like cloth, reduce fold glitches, and provide clearer state labels and gesture hints, improving visual craft and onboarding under the rubric."
+      ]
+    },
+    "Pega-Thinking": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "VERSION 2 (r10) builds on r9 with meaningful refinements: the T-shirt silhouette with turned-edge shading and contact shadows improves visual craft (C3), and the state-word labels under each shirt chip plus gesture-naming fold hints ('tap or swipe it in') materially improve clarity and onboarding (C4). The screenshot confirms a more dimensional cloth read and clearer HUD progress, giving V2 a slight edge on ASMR payoff (C1) while interaction fidelity (C2) is unchanged.",
+        "VERSION 1 (r10) is a strict improvement over VERSION 2 (r9) on the soft criteria: the folded shirt now reads as cloth with turned-edge shading, contact shadows, and a real T-shirt silhouette (C3 visual craft), and the HUD now shows explicit state words under each shirt plus more descriptive fold hints (C4 clarity/onboarding). The screenshots confirm the difference—VERSION 1's HUD clearly labels each shirt 'dry' while VERSION 2 shows only icons, and VERSION 1's hint names the gesture ('tap or swipe it in'). Hard gates are claimed identical, so the edge comes from C3 and C4."
+      ]
+    },
+    "GLM-5.3-Flash": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Version 2 (r10) is a strict superset of Version 1 with all hard gates passing equally, and its additions map directly to weighted criteria: HUD state words and gesture-named fold hints strengthen clarity/progress visibility (C4), while cloth-like folded shirts, a true T-shirt silhouette, and the mid-fold z-fighting fix improve visual craft (C3), with no regressions.",
+        "Version 1 (r10) is a strict superset of Version 2 (r9) with the same claimed gate passes, adding fixes and polish that map directly to the rubric: fold rendering that reads as cloth with z-fighting/sliver artifacts removed (C3), plus state-word labels on the load card and gesture-naming hints visible in its screenshot ('tap or swipe it in' vs the vaguer 'fold the right side in'), improving progress visibility (C4). C1/C2 are equivalent, so the weighted score favors Version 1."
+      ]
+    }
+  },
+  "votes": {
+    "A": 0,
+    "B": 3,
+    "tie": 0
+  },
+  "quorum": 3,
+  "b_wins": true,
+  "label": "council-judged (3 judges)"
+}

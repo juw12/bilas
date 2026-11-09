@@ -1119,6 +1119,8 @@
     sun.shadow.camera.top = 3;
     sun.shadow.camera.bottom = -3;
     sun.shadow.bias = -0.0008;
+    // flat cloth lying in layers on the table self-shadows into jagged acne without this
+    sun.shadow.normalBias = 0.02;
     scene.add(sun, sun.target);
     W.lights = { hemi: hemi, ceilA: ceilA, ceilB: ceilB, sun: sun };
 

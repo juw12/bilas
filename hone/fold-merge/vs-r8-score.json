@@ -1,0 +1,143 @@
+{
+  "mode": "score",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "weights": {
+    "C1": 0.3,
+    "C2": 0.25,
+    "C3": 0.25,
+    "C4": 0.2
+  },
+  "judges": {
+    "Pega-Vision": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 7.0,
+        "C4": 8.0
+      },
+      "evidence": {
+        "C1": "Artifact promises 'hand-on-cotton sound tied to drag speed' and 'rain/room-tone ambience', but the bright red fold marker in the screenshot is the most jarring UI element.",
+        "C2": "The flow includes 'DRAG each coin into the slot', 'drag across it to smooth wrinkles', lint trap peeling, pegs, and sleeve/bottom folds.",
+        "C3": "The green cutting mat and props are deliberate, but the phone screenshot still shows a flat white shirt and generic HUD icons.",
+        "C4": "The hint 'Now the right side: tap or swipe it in.' is clear, yet all four 'This load' chips read 'dry' during folding, so folded progress is not obvious."
+      },
+      "fixes": [
+        "Make the 'This load' card unambiguous during folding: show a folded count, update the active shirt state, and highlight the shirt being folded.",
+        "Soften and integrate the red next-step marker/HUD into the calm art direction so the ASMR payoff is not broken by bright UI accents.",
+        "Increase cloth realism in the fold view: add thickness, edge shading, ambient occlusion, and less paper-like white so the shirt reads as fabric on phone."
+      ],
+      "total": 8.0,
+      "seconds": 54.8
+    },
+    "Pega-Thinking": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 7.0,
+        "C4": 8.0
+      },
+      "evidence": {
+        "C1": "31 synthesized sound ids, ambient bed, rain/room-tone, cloth sounds tied to drag speed, steam puff, rain beads on window; screenshot shows calm warm palette at fold station with visible fold lines and detergent bottle",
+        "C2": "Changer feed+scoop, washer door/drawer/drag-coin, dryer lint trap peel gesture, pegs, smoothing drag, fold in thirds (left sleeve, right sleeve, bottom up); receipt lists every coin and station",
+        "C3": "Green cutting mat with grid and thirds guides is distinctive, 'lavanda' label on detergent bottle, warm film grain; however the shirt on the board in the screenshot reads fairly flat/paper-like despite description claims of 'broad soft undulation' and 'cloth not paper'",
+        "C4": "Object-pinned labels ('Washer 2 · Open the door'), one-line hint above station bar, 'This load' card with colored state words (dirty/wet/dry/folded), fold hints name the gesture ('Now the right side: tap or swipe it in.'), red underline only on real next task"
+      },
+      "fixes": [
+        "Make the flat shirt on the folding board visibly read as cloth in the mid-fold screenshot — add stronger undulation, fabric weave, and lifted-edge shading so the 'cloth not paper' claim is visible, not just described",
+        "Reduce the visual footprint of the bottom station bar on phone (390px) — it currently occupies a large band; consider icon-only collapsed state or smaller hit targets while keeping >=40px",
+        "Make the 'Sit' station visually inviting and distinct so the lingering/ambient payoff is discoverable — currently it is just another tab with no scene cue that it is the calm reward state"
+      ],
+      "total": 8.0,
+      "seconds": 39.7
+    },
+    "GLM-5.3-Flash": {
+      "scores": {
+        "C1": 9.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Paired tactile+sound payoff everywhere: 'hand-on-cotton sound tied to drag speed', 'pull the lint trap and drag across it to peel', 'coins cascade into the tray'; lingering hooks via 'Sit' station, rain beads with trails, 'drips slow as they dry', ambient bed; grain/vignette 'reduced by a third' and red softened — screenshot shows calm warm palette, nothing jarring; only residual flatness in even lighting keeps it from 10.",
+        "C2": "Full neighbourhood-laundry gesture set: 'DRAG each coin into the slot', 'Hold to pour' into the drawer, 'pull the lint trap and drag across it to peel', wooden pegs, 'fold left sleeve, right sleeve, bottom up', changer with note feed and scoop; only the hang step lacks a named distinct gesture ('go on a line... tap to take them down') versus the gesture-matched folds.",
+        "C3": "Deliberate materials: 'clearcoat material' enamel, 'deep grey rubber gasket', 'brushed metal maker's plate (\"bilas PRO 7 KG\")', lathe-built jug with 'lavanda' label, green cutting mat with 'cream thirds guides'; HUD (station bar, 'This load' card, coin purse) matches the place; screenshot is cohesive but wide-shot lighting is even/flat and floor/wall surfaces plain — short of 'a designer would screenshot'.",
+        "C4": "Gesture-naming hint always visible ('Now the right side: tap or swipe it in.'), object-pinned labels ('Washer 2 · Open the door') that 'stays inside the screen on phones', per-shirt state words 'dirty / wet / dry / folded' so 'progress never depends on decoding an icon'; gaps: pins appear only 'when you pause' and machine cycle timers live only on the in-scene LCD, hard to read on phone."
+      },
+      "fixes": [
+        "Give the hang station a named, tactile gesture (e.g., drag a wet shirt from basket to line, then press a peg) so every station matches the gesture fidelity of change/wash/dry/fold.",
+        "Surface machine cycle progress in the HUD (small washer/dryer timer chip in the 'This load' card) so waiting states are visible on phone without reading the tiny 3D LCD.",
+        "Push wide-shot visual craft: warmer light pools over machines and more variation in floor/wall materials so idle desktop views are as crafted as the fold close-up."
+      ],
+      "total": 8.75,
+      "seconds": 75.6
+    }
+  },
+  "quorum": 3,
+  "criterion_median": {
+    "C1": 8.0,
+    "C2": 9.0,
+    "C3": 7.0,
+    "C4": 8.0
+  },
+  "criterion_spread": {
+    "C1": 1.0,
+    "C2": 0.0,
+    "C3": 1.0,
+    "C4": 1.0
+  },
+  "split_criteria": [],
+  "judge_total_range": [
+    8.0,
+    8.75
+  ],
+  "fixes": [
+    {
+      "judge": "Pega-Vision",
+      "fix": "Make the 'This load' card unambiguous during folding: show a folded count, update the active shirt state, and highlight the shirt being folded."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Soften and integrate the red next-step marker/HUD into the calm art direction so the ASMR payoff is not broken by bright UI accents."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Increase cloth realism in the fold view: add thickness, edge shading, ambient occlusion, and less paper-like white so the shirt reads as fabric on phone."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Make the flat shirt on the folding board visibly read as cloth in the mid-fold screenshot — add stronger undulation, fabric weave, and lifted-edge shading so the 'cloth not paper' claim is visible, not just described"
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Reduce the visual footprint of the bottom station bar on phone (390px) — it currently occupies a large band; consider icon-only collapsed state or smaller hit targets while keeping >=40px"
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Make the 'Sit' station visually inviting and distinct so the lingering/ambient payoff is discoverable — currently it is just another tab with no scene cue that it is the calm reward state"
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Give the hang station a named, tactile gesture (e.g., drag a wet shirt from basket to line, then press a peg) so every station matches the gesture fidelity of change/wash/dry/fold."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Surface machine cycle progress in the HUD (small washer/dryer timer chip in the 'This load' card) so waiting states are visible on phone without reading the tiny 3D LCD."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Push wide-shot visual craft: warmer light pools over machines and more variation in floor/wall materials so idle desktop views are as crafted as the fold close-up."
+    }
+  ],
+  "label": "council-judged (3 judges), mean of 2 runs",
+  "council_score": 8.12,
+  "runs": 2,
+  "run_scores": [
+    8.25,
+    8.0
+  ],
+  "run_spread": 0.25
+}
