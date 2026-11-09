@@ -1,0 +1,51 @@
+{
+  "mode": "pair",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "judges": {
+    "Pega-Vision": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "Version 2 makes small but rubric-relevant improvements: a shorter phone HUD hint improves clarity and clipping safety, the earlier drag cue aids onboarding, and the wall-tile detail strengthens visual craft without changing the already passing gates.",
+        "Both versions satisfy the hard gates and core ASMR/interaction requirements, but VERSION 1 is a later iteration with clearer phone HUD text and richer tile/material detail, giving a slight edge on layout robustness and visual craft."
+      ]
+    },
+    "Pega-Thinking": {
+      "picks_AB_BA": [
+        "B",
+        "B"
+      ],
+      "vote": "B",
+      "reasons": [
+        "VERSION 2 (r10) adds small but real polish improvements over VERSION 1 (r9): glazed ceramic wall tiles with bevel, grime and chipped corners (C3 visual craft), a faster first-run drag cue at 1.5s (C4 onboarding), and a shorter phone HUD hint that fits on one line at 390px (C4 clarity). Core ASMR, interaction fidelity, and gate results are identical, so the edge is modest but consistent across weighted criteria.",
+        "VERSION 1 (r10) adds glazed ceramic wall tiles with bevels, chipped corners and grime (C3 visual craft), shortens the phone HUD hint to fit one line at 390px, and brings the first-run drag cue forward to 1.5s (C4 onboarding). These are incremental but real improvements over VERSION 2 (r9); interaction richness (C2) and ASMR coverage (C1) are essentially unchanged."
+      ]
+    },
+    "GLM-5.3-Flash": {
+      "picks_AB_BA": [
+        "tie",
+        "B"
+      ],
+      "vote": "tie",
+      "reasons": [
+        "Both versions claim identical gate passes and the same interaction flow; V2 only layers minor polish on top of V1 (subtler tile shading, a one-line phone hint, drag cue at 1.5s vs 2.2s) with no visible regressions in the screenshots. These marginal gains on C1/C3/C4 are well below a meaningful threshold, so the difference is negligible.",
+        "Both versions pass all hard gates and share the same interaction set, but Version 1 (r10) is a strict superset of Version 2 (r9) with visible polish gains: glazed-ceramic tile materials with grout/bevel/grime depth, a one-line phone hint where V2's wraps to two lines at 390px, and an earlier drag cue — improving C1, C3 and C4 with no apparent regressions."
+      ]
+    }
+  },
+  "votes": {
+    "A": 0,
+    "B": 2,
+    "tie": 1
+  },
+  "quorum": 3,
+  "b_wins": true,
+  "label": "council-judged (3 judges)"
+}

@@ -705,18 +705,41 @@
         c.fillStyle = "rgba(120,100,70," + (Math.random() * 0.03) + ")";
         c.fillRect(Math.random() * cw, Math.random() * tileTop, 2, 2);
       }
-      c.fillStyle = "#f7f6f1";
+      // grout: warm grey, greyer toward the floor where the mop water dries
+      const grout = c.createLinearGradient(0, tileTop, 0, ch);
+      grout.addColorStop(0, "#d9d6cc");
+      grout.addColorStop(1, "#b9b3a5");
+      c.fillStyle = grout;
       c.fillRect(0, tileTop, cw, ch - tileTop);
       const tw = 0.15 * pxm;
       const th = 0.075 * pxm;
       for (let row = 0; tileTop + row * th < ch; row++) {
         const off = row % 2 ? tw / 2 : 0;
         for (let x = -off; x < cw; x += tw) {
+          const y = tileTop + row * th;
           const shade = 210 + Math.floor(Math.random() * 10);
           c.fillStyle = "rgb(" + (shade - 38) + "," + (shade - 8) + "," + (shade - 22) + ")";
-          c.fillRect(x + 1.5, tileTop + row * th + 1.5, tw - 3, th - 3);
+          c.fillRect(x + 1.5, y + 1.5, tw - 3, th - 3);
+          // glazed bevel: lit top edge, shaded bottom edge
+          c.fillStyle = "rgba(255,255,250,0.35)";
+          c.fillRect(x + 2, y + 2, tw - 4, 1.5);
+          c.fillStyle = "rgba(60,70,62,0.16)";
+          c.fillRect(x + 2, y + th - 3.5, tw - 4, 1.5);
+          // an old chip here and there, showing the biscuit underneath
+          if (Math.random() < 0.012) {
+            c.fillStyle = "rgba(236,226,206,0.9)";
+            c.beginPath();
+            c.arc(x + (Math.random() < 0.5 ? 3 : tw - 3), y + (Math.random() < 0.5 ? 3 : th - 3), 2 + Math.random() * 2.5, 0, Math.PI * 2);
+            c.fill();
+          }
         }
       }
+      // grime settles in the bottom rows
+      const grime = c.createLinearGradient(0, ch - 0.35 * pxm, 0, ch);
+      grime.addColorStop(0, "rgba(90,80,60,0)");
+      grime.addColorStop(1, "rgba(90,80,60,0.14)");
+      c.fillStyle = grime;
+      c.fillRect(0, ch - 0.35 * pxm, cw, 0.35 * pxm);
       c.fillStyle = "#7c6a52";
       c.fillRect(0, tileTop - 10, cw, 12);
     });

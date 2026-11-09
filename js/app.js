@@ -2552,7 +2552,7 @@
   }
 
   function stepDragCue(sinceInput) {
-    const path = !drag && sinceInput > (S.loadId <= 1 ? 2200 : 4200) ? dragCuePath() : null;
+    const path = !drag && sinceInput > (S.loadId <= 1 ? 1500 : 4200) ? dragCuePath() : null;
     if (!path) {
       if (cueEl.style.visibility !== "hidden") {
         cueEl.style.opacity = "0";

@@ -1,0 +1,143 @@
+{
+  "mode": "score",
+  "models": [
+    "Pega-Vision",
+    "Pega-Thinking",
+    "GLM-5.3-Flash"
+  ],
+  "weights": {
+    "C1": 0.3,
+    "C2": 0.25,
+    "C3": 0.25,
+    "C4": 0.2
+  },
+  "judges": {
+    "Pega-Vision": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "\"smooth sound tied to drag speed\" and tumbling/water loops give strong payoffs, but the phone fold shirt looks flat and station buttons remain plain.",
+        "C2": "\"DRAG each coin into the slot\" and \"drag across it to peel the felt off\" show strong gesture fidelity, though some steps are still tap-driven.",
+        "C3": "Cohesive mint/cream palette and receipt detail, but tiles, machines, and HUD pills still read somewhat flat and generic.",
+        "C4": "\"Tap the green slot to feed in a note\" plus persistent \"This load\" states make next steps clear, though phone fold cues could be more visually obvious."
+      },
+      "fixes": [
+        "Make smoothing and folding visibly tactile on phone: stronger wrinkle contrast, fold progress, and cloth deformation at 390 px.",
+        "Deepen materials, lighting, and HUD art direction: less flat tiles/machines, more ambient occlusion/reflections, and HUD styled as laundromat signage rather than generic pills.",
+        "Convert remaining tap-only steps into physical gestures: drag shirts into drums, pull detergent drawer, turn knob, and animate coin insertion with matched feedback."
+      ],
+      "total": 8.45,
+      "seconds": 26.7
+    },
+    "Pega-Thinking": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Calm mint/cream palette, visible water and foam in washer drum, tumbling shirts in dryer, drips on line, steam from dryer, 29 synthesized sound ids + ambient bed, 'Sit' station for lingering. Tactile drag cues (smooth, peel lint, drag coin) described but visual payoff of smoothing/peel not fully visible in static screenshots.",
+        "C2": "Each station has its own gesture: changer note-feed + coin scoop, washer door/detergent drawer/coin drag/start, dryer coin ledge + lint trap peel, pegs on line, smoothing + sleeve/bottom folds. Receipt lists every coin and station. Matches a real neighbourhood laundry workflow.",
+        "C3": "Coherent art direction: glazed ceramic tiles with grout and chips, rounded machines with rubber gaskets and brushed maker plates, 'lavanda' detergent label, green cutting mat with thirds guides, torn-zigzag receipt, film grain/vignette. City view through window reads somewhat flat/illustrated vs the otherwise deliberate craft.",
+        "C4": "Always-visible one-line hint ('Tap the green slot to feed a note.', 'Drag over the lint screen to peel the felt off.', 'Now fold the right side in.'), red underline on next station, 'THIS LOAD' card tracks each shirt's state, in-scene object labels, ghost-fingertip drag cue. Phone hint shortened to one line at 390px."
+      },
+      "fixes": [
+        "Make the tumbling clothes inside the washer/dryer drums read as moving fabric (visible rotation, shifting folds, water sloshing) rather than near-static shapes — currently the drum contents look frozen in the screenshots.",
+        "Deepen the window city view: the parallax layers are described but the buildings read as flat cutouts; add window glow, lit interiors at night, or atmospheric haze so the view feels like a real neighbourhood rather than a poster.",
+        "Strengthen the visible feedback of the smoothing and lint-peel drags — show a clear trail of erased wrinkles or a peeling felt edge in real time so the tactile payoff of the gesture is obvious without relying on sound alone."
+      ],
+      "total": 8.45,
+      "seconds": 32.9
+    },
+    "GLM-5.3-Flash": {
+      "scores": {
+        "C1": 8.0,
+        "C2": 9.0,
+        "C3": 8.0,
+        "C4": 9.0
+      },
+      "evidence": {
+        "C1": "Rich sensory layer: '29 one-shot sound ids... Each machine sound is placed in space', 'drips slow as it dries', steam, billow, shader foam; but the lint-screen screenshot is a bare white-floor expanse and sound pacing/quality can't be verified from stills, so 'nothing jarring / invites lingering' isn't fully demonstrated.",
+        "C2": "Anchor-10 list fully covered: changer ('feed a note... coins cascade'), 'DRAG each coin into the slot', 'pour detergent into the drawer', 'pull the lint trap and drag across it to peel', pegs, smoothing, sleeve/bottom folds; held back by tap-to-load shirts and fixed machines (Washer 2, Dryer 3) rather than free machine choice.",
+        "C3": "Deliberate and cohesive: 'chipped corner showing the biscuit', clearcoat enamel, 'bilas PRO 7 KG' plates, warm mint/cream palette, matching HUD; but in the phone fold shot the shirt reads as a flat white cutout with faint wrinkles, and the lint-view floor/wall areas look washed-out and empty.",
+        "C4": "Persistent hint at every state ('Drag over the lint screen to peel the felt off.'), object-pinned labels ('Washer 2 · Open the door'), ghost drag cue after 1.5 s, This-load card + timers + red underline; the card shows state ('2 dry · 2 wet') but not each shirt's next destination, so next action relies on the single hint line."
+      },
+      "fixes": [
+        "Fill the sterile quiet states: the lint-screen view is mostly empty white floor and the wall right of the changer is blank — add grounded ambient detail (floor grime/reflection, a bin or bench edge, wall texture) so waiting moments stay warm, not sterile (C1, highest weight).",
+        "Fix phone craft drop-off: on the 390 px fold view the shirt reads as a flat white shape with barely visible fold relief — increase wrinkle contrast/shading at grazing angles so the 2x 'fold ribbons' read at phone distance (C3).",
+        "Deepen laundry fidelity: let shirts be dragged from basket into the drum instead of tap-loading, and let any free washer/dryer be used rather than scripted Washer 2 / Dryer 3, so gestures and choice match a real neighbourhood laundry (C2)."
+      ],
+      "total": 8.45,
+      "seconds": 66.6
+    }
+  },
+  "quorum": 3,
+  "criterion_median": {
+    "C1": 8.0,
+    "C2": 9.0,
+    "C3": 8.0,
+    "C4": 9.0
+  },
+  "criterion_spread": {
+    "C1": 0.0,
+    "C2": 0.0,
+    "C3": 0.0,
+    "C4": 0.0
+  },
+  "split_criteria": [],
+  "judge_total_range": [
+    8.45,
+    8.45
+  ],
+  "fixes": [
+    {
+      "judge": "Pega-Vision",
+      "fix": "Make smoothing and folding visibly tactile on phone: stronger wrinkle contrast, fold progress, and cloth deformation at 390 px."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Deepen materials, lighting, and HUD art direction: less flat tiles/machines, more ambient occlusion/reflections, and HUD styled as laundromat signage rather than generic pills."
+    },
+    {
+      "judge": "Pega-Vision",
+      "fix": "Convert remaining tap-only steps into physical gestures: drag shirts into drums, pull detergent drawer, turn knob, and animate coin insertion with matched feedback."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Make the tumbling clothes inside the washer/dryer drums read as moving fabric (visible rotation, shifting folds, water sloshing) rather than near-static shapes — currently the drum contents look frozen in the screenshots."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Deepen the window city view: the parallax layers are described but the buildings read as flat cutouts; add window glow, lit interiors at night, or atmospheric haze so the view feels like a real neighbourhood rather than a poster."
+    },
+    {
+      "judge": "Pega-Thinking",
+      "fix": "Strengthen the visible feedback of the smoothing and lint-peel drags — show a clear trail of erased wrinkles or a peeling felt edge in real time so the tactile payoff of the gesture is obvious without relying on sound alone."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Fill the sterile quiet states: the lint-screen view is mostly empty white floor and the wall right of the changer is blank — add grounded ambient detail (floor grime/reflection, a bin or bench edge, wall texture) so waiting moments stay warm, not sterile (C1, highest weight)."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Fix phone craft drop-off: on the 390 px fold view the shirt reads as a flat white shape with barely visible fold relief — increase wrinkle contrast/shading at grazing angles so the 2x 'fold ribbons' read at phone distance (C3)."
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "fix": "Deepen laundry fidelity: let shirts be dragged from basket into the drum instead of tap-loading, and let any free washer/dryer be used rather than scripted Washer 2 / Dryer 3, so gestures and choice match a real neighbourhood laundry (C2)."
+    }
+  ],
+  "label": "council-judged (3 judges), mean of 2 runs",
+  "council_score": 8.46,
+  "runs": 2,
+  "run_scores": [
+    8.47,
+    8.45
+  ],
+  "run_spread": 0.02
+}
