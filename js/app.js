@@ -2872,6 +2872,14 @@
       }
       return t("h_go", { st: t("st_" + next) });
     };
+    // while this station only waits, point at the job the red underline marks;
+    // the timer itself lives on the ticket, so the hint does not repeat it
+    const whileWaiting = function (line) {
+      if (next && next !== "sit" && next !== st) {
+        return line + " " + t("h_meanwhile", { st: t("st_" + next) });
+      }
+      return line;
+    };
     if (allDone()) {
       return t("h_all_done");
     }
@@ -2895,7 +2903,7 @@
     }
     if (st === "wash") {
       if (w.phase === "run") {
-        return t("h_washing", { phase: t("ph_" + w.ph), time: fmtTime(w.dur - w.t) });
+        return whileWaiting(t("h_washing", { phase: t("ph_" + w.ph) }));
       }
       if (w.phase === "done") {
         return w.doorOpen ? t("h_unload", { n: w.items.length }) : t("h_wash_done");
@@ -2928,7 +2936,7 @@
         return t("h_lint_peel");
       }
       if (d.phase === "run") {
-        return t("h_drying", { phase: t("ph_" + d.ph), time: fmtTime(d.dur - d.t) });
+        return whileWaiting(t("h_drying", { phase: t("ph_" + d.ph) }));
       }
       if (d.phase === "done") {
         return d.doorOpen ? t("h_unload", { n: d.items.length }) : t("h_dry_done");
@@ -2966,14 +2974,10 @@
       })) {
         return t("h_hang_take");
       }
-      const drying = S.line.filter(function (s) {
+      if (S.line.some(function (s) {
         return s && s.state === "wet";
-      });
-      if (drying.length) {
-        const left = Math.max.apply(null, drying.map(function (s) {
-          return (1 - s.hang.dry) * S.cycle * 0.9;
-        }));
-        return t("h_hang_drying", { time: fmtTime(left) });
+      })) {
+        return whileWaiting(t("h_hang_drying"));
       }
       return goNext();
     }

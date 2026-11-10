@@ -70,8 +70,9 @@ def gestures(r):
         k = i / 18
         pg.mouse.move(s["x"] + (t["x"] - s["x"]) * k, s["y"] + (t["y"] - s["y"]) * k)
         pg.wait_for_timeout(20)
-    pg.wait_for_timeout(500)
-    r.shot("g2-pouring")
+    # release as soon as the cup has started filling: a fixed delay (or a slow WebGL screenshot here)
+    # can start the pour late or let the 2 s pour finish before the "early" release
+    r.until("(" + B + "MS.washer.soapFill || 0) > 0.1", 6)
     pg.mouse.up()
     pg.wait_for_timeout(1200)
     part = r.js(B + "MS.washer.soapFill || 0")
@@ -85,6 +86,9 @@ def gestures(r):
         k = i / 18
         pg.mouse.move(s["x"] + (t["x"] - s["x"]) * k, s["y"] + (t["y"] - s["y"]) * k)
         pg.wait_for_timeout(20)
+    # mid-pour shot on the full pour, where running to a full cup is the intended outcome
+    r.until("(" + B + "MS.washer.soapFill || 0) > " + str(round(part + 0.1, 2)), 6)
+    r.shot("g2-pouring")
     r.until(B + "MS.washer.soap === true", 8)
     pg.mouse.up()
     F.expect(r.js(B + "MS.washer.soap") is True, "detergent poured by holding the bottle over the drawer")
