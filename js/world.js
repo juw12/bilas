@@ -334,6 +334,7 @@
     parts.display = disp;
     const plate = mesh(new T.BoxGeometry(0.062, 0.09, 0.008), M.chrome, 0.085, 0.765, 0.038);
     g.add(plate);
+    parts.slotPlate = plate;
     const slot = mesh(new T.BoxGeometry(0.0055, 0.036, 0.004), M.black, 0.085, 0.765, 0.0425);
     g.add(slot);
     const slotHit = mesh(new T.PlaneGeometry(0.07, 0.1), M.hit, 0.085, 0.765, 0.046);
@@ -767,6 +768,34 @@
           const tone = Math.random() * 0.08 - 0.04;
           c.fillStyle = tone > 0 ? "rgba(255,255,255," + tone + ")" : "rgba(40,40,30," + -tone + ")";
           c.fillRect(i * s, j * s, s, s);
+          // the odd tile replaced after a dropped bottle: a near-match from a later batch
+          if (Math.random() < 0.035) {
+            c.fillStyle = (i + j) % 2 ? "rgba(214,196,160,0.55)" : "rgba(150,178,170,0.55)";
+            c.fillRect(i * s + 2, j * s + 2, s - 4, s - 4);
+          }
+          // glaze sheen: each tile catches the ceiling light on a slightly different diagonal
+          const sheen = c.createLinearGradient(i * s, j * s, i * s + s, j * s + s);
+          const sa = 0.03 + Math.random() * 0.05;
+          sheen.addColorStop(0, "rgba(255,255,250," + sa + ")");
+          sheen.addColorStop(0.5, "rgba(255,255,250,0)");
+          sheen.addColorStop(1, "rgba(60,55,45," + sa * 0.8 + ")");
+          c.fillStyle = sheen;
+          c.fillRect(i * s, j * s, s, s);
+          // a hairline crack running corner-ish to edge
+          if (Math.random() < 0.05) {
+            c.strokeStyle = "rgba(70,64,54,0.35)";
+            c.lineWidth = 1;
+            c.beginPath();
+            let cx = i * s + Math.random() * s * 0.3;
+            let cy = j * s + Math.random() * s;
+            c.moveTo(cx, cy);
+            for (let k = 0; k < 5; k++) {
+              cx += s * (0.12 + Math.random() * 0.1);
+              cy += (Math.random() - 0.5) * s * 0.25;
+              c.lineTo(Math.min(cx, i * s + s - 1), Math.max(j * s + 1, Math.min(cy, j * s + s - 1)));
+            }
+            c.stroke();
+          }
         }
       }
       // scuffs where people stand and drag baskets
@@ -787,6 +816,13 @@
         c.fillStyle = Math.random() < 0.5 ? "rgba(60,60,55,0.18)" : "rgba(255,255,255,0.25)";
         c.fillRect(Math.random() * w, Math.random() * w, 2, 2);
       }
+      // grout darkens along the walking path between the machines and the door
+      const path = c.createLinearGradient(0, 0, w, 0);
+      path.addColorStop(0, "rgba(70,62,50,0)");
+      path.addColorStop(0.5, "rgba(70,62,50,0.07)");
+      path.addColorStop(1, "rgba(70,62,50,0)");
+      c.fillStyle = path;
+      c.fillRect(0, 0, w, w);
       c.strokeStyle = "rgba(80,80,70,0.35)";
       c.lineWidth = 2;
       for (let i = 0; i <= n; i++) {
@@ -1108,6 +1144,8 @@
     });
     const m = new T.Mesh(new T.PlaneGeometry(w, h), new T.MeshStandardMaterial({ map: t, roughness: 0.8 }));
     m.userData.tex = t;
+    m.userData.lines = lines;
+    m.userData.paper = opts.bg;
     return m;
   }
 
@@ -1340,6 +1378,10 @@
     note3.rotation.z = -0.07;
     scene.add(note3);
     W.posters = [price, note, note2, note3];
+    W.posters.forEach(function (p, i) {
+      p.userData.act = "note" + i;
+      p.userData.home = { x: p.position.x, y: p.position.y };
+    });
 
     // wall clock with real time
     const clockTex = canvasTex(256, 256, function (c, s) {
@@ -1746,6 +1788,28 @@
     }
     redraw(W.outside.material.map);
     redraw(W.skyline.material.map);
+  };
+
+  // Phone portrait: the wall between the window and the changer is a narrow strip, so the notes
+  // regroup into one column there and grow, instead of hanging half off the left edge.
+  const COMPACT_NOTES = [
+    { x: 1.335, y: 1.37, s: 0.8 },
+    { x: 1.33, y: 1.12, s: 1.3 },
+    { x: 1.345, y: 0.9, s: 1.4 },
+    { x: 1.33, y: 0.71, s: 1.4 }
+  ];
+  W.setCompact = function (on) {
+    if (!W.posters || W.compact === on) {
+      return;
+    }
+    W.compact = on;
+    W.posters.forEach(function (p, i) {
+      const c = COMPACT_NOTES[i];
+      const home = p.userData.home;
+      p.position.x = on ? c.x : home.x;
+      p.position.y = on ? c.y : home.y;
+      p.scale.setScalar(on ? c.s : 1);
+    });
   };
 
   W.setLang = function () {
