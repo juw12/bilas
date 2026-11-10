@@ -476,7 +476,17 @@
         coin.position.lerpVectors(start, rest, k);
       }, function () {
         A.play("coinDrop");
-        coin.rotation.set(0, rand(0, 3), 0);
+        jiggleTray(0.03);
+        // one small hop and a settling wobble before it lies flat
+        const tilt = rand(0.15, 0.3);
+        const spin = rand(0, 3);
+        tween(0.22, function (k) {
+          coin.position.y = rest.y + 0.007 * Math.sin(k * Math.PI) * (1 - k);
+          coin.rotation.set(tilt * Math.exp(-5 * k) * Math.cos(k * 18), spin, 0);
+        }, function () {
+          coin.position.y = rest.y;
+          coin.rotation.set(0, spin, 0);
+        });
       }, function (k) {
         return k * k;
       });
@@ -491,14 +501,23 @@
       return;
     }
     A.play("coinScoop");
+    jiggleTray(0.05);
     const coins = C.coins.splice(0);
-    coins.forEach(function (c) {
+    coins.forEach(function (c, i) {
       const p0 = c.position.clone();
-      tween(0.45, function (k) {
-        c.position.set(p0.x * (1 - k), p0.y + 0.08 * k, p0.z + 0.25 * k);
-        c.scale.setScalar(1 - k * 0.8);
-      }, function () {
-        C.tray.remove(c);
+      // fingers rake the coins over the floor to the front lip, then lift them out
+      const lip = new T.Vector3(p0.x * 0.5, p0.y, 0.095);
+      later(i * 0.025, function () {
+        tween(0.16, function (k) {
+          c.position.lerpVectors(p0, lip, k);
+        }, function () {
+          tween(0.32, function (k) {
+            c.position.set(lip.x * (1 - k), lip.y + 0.08 * k, lip.z + 0.2 * k);
+            c.scale.setScalar(1 - k * 0.8);
+          }, function () {
+            C.tray.remove(c);
+          });
+        });
       });
     });
     S.purse += S.trayCoins;
@@ -856,15 +875,48 @@
         W.scene.remove(coin);
       });
       A.play("coinSlot");
+      pushPlate(m.parts.slotPlate);
       updateHUD();
+    });
+  }
+
+  // the chrome coin plate is sprung: it gives a millimetre as a coin drops through
+  function pushPlate(plate) {
+    if (!plate) {
+      return;
+    }
+    const z0 = plate.userData.z0 === undefined ? (plate.userData.z0 = plate.position.z) : plate.userData.z0;
+    tween(0.22, function (k) {
+      plate.position.z = z0 - 0.0016 * Math.exp(-5 * k) * Math.cos(k * 12);
+    }, function () {
+      plate.position.z = z0;
+    });
+  }
+
+  // the steel tray rocks on its rivets when coins land in it or are scooped out
+  function jiggleTray(amount) {
+    const tray = C.tray;
+    tween(0.4, function (k) {
+      tray.rotation.x = amount * Math.exp(-6 * k) * Math.sin(k * 34);
+    }, function () {
+      tray.rotation.x = 0;
     });
   }
 
   function pressStart(m) {
     const st = m.parts.start;
     A.play("button");
-    tween(0.18, function (k) {
-      st.position.z = 0.044 - 0.005 * Math.sin(k * Math.PI);
+    // the cap bottoms out fast, then springs back past rest and settles (about 9 mm of travel)
+    tween(0.07, function (k) {
+      st.position.z = 0.044 - 0.009 * k;
+    }, function () {
+      tween(0.26, function (k) {
+        st.position.z = 0.035 + 0.009 * (1 - Math.exp(-6 * k) * Math.cos(k * 14));
+      }, function () {
+        st.position.z = 0.044;
+      });
+    }, function (k) {
+      return k * k;
     });
     if (m.phase === "run") {
       return;
@@ -1816,6 +1868,7 @@
     const aspect = w / h;
     cam.fov = aspect < 0.75 ? 64 : aspect < 1.2 ? 56 : 50;
     cam.factor = aspect < 0.75 ? 1.3 : aspect < 1.2 ? 1.12 : 1;
+    W.setCompact(aspect < 0.75);
     const bottom = document.querySelector(".bottom").offsetHeight || 120;
     const p = Math.max(0, Math.round((bottom - 70) / 2));
     W.camera.fov = cam.fov;
@@ -1981,6 +2034,12 @@
     switch (act) {
       case "bill":
         feedNote();
+        break;
+      case "note0":
+      case "note1":
+      case "note2":
+      case "note3":
+        readNote(Number(act.slice(4)));
         break;
       case "tray":
         collectCoins();
@@ -2206,6 +2265,11 @@
     if (beat) {
       // a tap during the opening line just skips it
       endBeat();
+      return;
+    }
+    if (noteOpen()) {
+      // a tap puts the note back on the wall
+      closeNote();
       return;
     }
     if (S.station === "sit") {
@@ -3247,6 +3311,10 @@
       endBeat();
       return;
     }
+    if (noteOpen() && (e.key === "Escape" || e.key === "Enter" || e.key === " ")) {
+      closeNote();
+      return;
+    }
     if (e.key === "Escape") {
       $("settings").hidden = true;
       if (S.station === "sit") {
@@ -3279,6 +3347,39 @@
   function clearBeat() {
     beat = null;
     $("beat").hidden = true;
+  }
+
+  // wall notes are small in the room, so a tap lifts one off the wall into a readable card
+  let noteSeq = 0;
+
+  function readNote(i) {
+    const p = W.posters[i];
+    if (!p) {
+      return;
+    }
+    const lines = p.userData.lines();
+    const card = $("notecard");
+    card.querySelector(".nc-t").textContent = lines[0];
+    card.querySelector(".nc-b").textContent = lines.slice(1).join("\n");
+    card.style.setProperty("--paper", p.userData.paper || "#fffdf7");
+    card.dataset.note = String(i);
+    card.hidden = false;
+    A.play("flap", 0.5);
+    const seq = ++noteSeq;
+    later(7, function () {
+      if (seq === noteSeq) {
+        closeNote();
+      }
+    });
+  }
+
+  function closeNote() {
+    noteSeq++;
+    $("notecard").hidden = true;
+  }
+
+  function noteOpen() {
+    return !$("notecard").hidden;
   }
 
   function endBeat() {

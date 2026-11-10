@@ -226,6 +226,9 @@ def phase_wash(r):
     r.until(B + "MS.washer.soap === true", 60)
     r.wait_idle()
     expect(r.js(B + "MS.washer.soap") is True, "detergent added")
+    plate_rest = r.js("window.BilasWorld.washer.slotPlate.position.z")
+    r.js("(function(){const p=window.BilasWorld.washer.slotPlate;window.__plateMin=p.position.z;"
+         "(function t(){window.__plateMin=Math.min(window.__plateMin,p.position.z);requestAnimationFrame(t);})();})()")
     for i in range(2):
         r.wait_idle()
         coin = r.pos("washerCoin")
@@ -234,6 +237,8 @@ def phase_wash(r):
             r.drag(coin, slot)
         r.until(B + f"MS.washer.coins === {i + 1}")
     expect(r.js(B + "MS.washer.coins") == 2, "2 coins dragged into washer slot")
+    give = plate_rest - r.js("window.__plateMin")
+    expect(give > 0.0008, f"coin plate gives {1000 * give:.1f} mm as coins drop through")
     r.wait_idle()
     r.tap("washerStart")
     expect(r.js(B + "MS.washer.phase") == "run", "washer running")

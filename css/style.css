@@ -1194,3 +1194,63 @@ html[data-theme="day"] {
   background: var(--enamel);
   color: var(--enamel-ink);
 }
+
+/* a wall note lifted into the hand: same paper colour, big enough to read on a phone */
+.notecard {
+  position: fixed;
+  left: 50%;
+  top: 30%;
+  z-index: 30;
+  width: min(78vw, 340px);
+  padding: 22px 22px 14px;
+  background: var(--paper, #fffdf7);
+  color: #2b3236;
+  border-radius: 3px;
+  box-shadow: 0 18px 40px rgba(20, 24, 26, 0.35), 0 2px 6px rgba(20, 24, 26, 0.25);
+  transform: translate(-50%, 0) rotate(-1.2deg);
+  animation: note-lift 0.28s ease-out;
+  pointer-events: none;
+}
+.notecard::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -9px;
+  width: 84px;
+  height: 20px;
+  margin-left: -42px;
+  background: rgba(240, 225, 170, 0.85);
+  transform: rotate(2deg);
+}
+.notecard[hidden] {
+  display: none;
+}
+.notecard .nc-t {
+  margin: 0 0 8px;
+  font: 700 22px/1.2 var(--font-display, system-ui, sans-serif);
+}
+.notecard .nc-b {
+  margin: 0;
+  white-space: pre-line;
+  font: 500 18px/1.45 var(--font-display, system-ui, sans-serif);
+}
+.notecard .nc-x {
+  margin: 14px 0 0;
+  font-size: 12px;
+  opacity: 0.6;
+}
+@keyframes note-lift {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 24px) rotate(-4deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) rotate(-1.2deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .notecard {
+    animation: none;
+  }
+}
