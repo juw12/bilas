@@ -127,6 +127,9 @@
     doneShown: false
   };
 
+  // first-run opening line (a later() tween while it shows, else null)
+  let beat = null;
+
   function makeMachineState(key, parts, need) {
     return {
       key: key,
@@ -1848,6 +1851,9 @@
     if (!S.started) {
       return;
     }
+    if (beat) {
+      clearBeat();
+    }
     if (S.station === "sit" && st !== "sit") {
       document.body.classList.remove("sitting");
       $("btnStand").hidden = true;
@@ -2197,6 +2203,21 @@
       return;
     }
     S.lastInput = performance.now();
+    if (beat) {
+      // a tap during the opening line just skips it
+      endBeat();
+      return;
+    }
+    if (S.station === "sit") {
+      // sitting is a rest: taps never reach machines or shirts, they only nudge "Stand up"
+      down = null;
+      drag = null;
+      const sb = $("btnStand");
+      sb.classList.remove("nudge");
+      void sb.offsetWidth;
+      sb.classList.add("nudge");
+      return;
+    }
     try {
       canvas.setPointerCapture(e.pointerId);
     } catch (err) {
@@ -3151,6 +3172,15 @@
     });
   }
 
+  // film grain over the room: on by default, the vignette stays either way
+  function setGrain(g) {
+    store.set("grain", g);
+    document.documentElement.dataset.grain = g;
+    document.querySelectorAll("[data-grain]").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.getAttribute("data-grain") === g));
+    });
+  }
+
   let savedVol = Number(store.get("vol"));
   if (!(savedVol >= 0 && savedVol <= 1) || store.get("vol") === null) {
     savedVol = 0.8;
@@ -3194,6 +3224,10 @@
     if (cb) {
       setCycle(Number(cb.getAttribute("data-cycle")));
     }
+    const gb = e.target.closest("[data-grain]");
+    if (gb) {
+      setGrain(gb.getAttribute("data-grain"));
+    }
     const sb = e.target.closest("[data-st]");
     if (sb) {
       go(sb.getAttribute("data-st"));
@@ -3207,6 +3241,10 @@
 
   document.addEventListener("keydown", function (e) {
     if (!S.started) {
+      return;
+    }
+    if (beat) {
+      endBeat();
       return;
     }
     if (e.key === "Escape") {
@@ -3231,6 +3269,33 @@
     go("sit");
   });
 
+  /* ---------- first-run beat: one quiet line over the room before the first task ---------- */
+  function enterChange() {
+    if (S.station === "overview") {
+      go("change");
+    }
+  }
+
+  function clearBeat() {
+    beat = null;
+    $("beat").hidden = true;
+  }
+
+  function endBeat() {
+    if (!beat) {
+      return;
+    }
+    clearBeat();
+    enterChange();
+  }
+
+  function startBeat() {
+    const el = $("beat");
+    el.textContent = t(theme === "day" ? "beat_day" : "beat_night");
+    el.hidden = false;
+    beat = later(3.4, endBeat);
+  }
+
   $("btnStart").addEventListener("click", function () {
     A.init();
     A.setVolume(A.getVolume());
@@ -3239,11 +3304,12 @@
     S.started = true;
     S.lastInput = performance.now();
     updateHUD();
-    later(1.0, function () {
-      if (S.station === "overview") {
-        go("change");
-      }
-    });
+    if (store.get("beat") !== "1") {
+      store.set("beat", "1");
+      startBeat();
+    } else {
+      later(1.0, enterChange);
+    }
   });
 
   /* ---------- main loop ---------- */
@@ -3311,6 +3377,7 @@
   window.addEventListener("resize", resize);
   setTheme(theme);
   setCycle(S.cycle);
+  setGrain(store.get("grain") === "off" ? "off" : "on");
   applyI18n();
   newLoad();
   const startView = targetOf("overview");
