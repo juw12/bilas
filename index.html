@@ -56,6 +56,9 @@
     <div class="row"><span data-i18n="cycle">Cycle length</span>
       <div class="seg" role="group"><button type="button" data-cycle="45" data-i18n="cycle_short">45 s</button><button type="button" data-cycle="180" data-i18n="cycle_long">3 min</button></div>
     </div>
+    <div class="row"><span data-i18n="grain">Film grain</span>
+      <div class="seg" role="group"><button type="button" data-grain="on" data-i18n="grain_on">On</button><button type="button" data-grain="off" data-i18n="grain_off">Off</button></div>
+    </div>
     <div class="row"><span data-i18n="language">Language</span>
       <div class="seg" role="group"><button type="button" data-lang="en">English</button><button type="button" data-lang="id">Indonesia</button></div>
     </div>
@@ -84,6 +87,8 @@
   </div>
 
   <button class="stand ticket" id="btnStand" type="button" hidden data-i18n="stand">Stand up</button>
+
+  <p class="beat" id="beat" hidden aria-live="polite"></p>
 
   <div class="overlay" id="intro">
     <div class="card ticket">
