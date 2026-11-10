@@ -61,22 +61,46 @@ def gestures(r):
     r.wait_idle()
     r.tap("washerDoor")
     r.until("!" + B + "MS.washer.doorOpen && !" + B + "MS.washer.busy")
+    # closing the door swings the camera to the soap view; grab the bottle once it has settled
+    r.wait_idle()
     # pour: carry the bottle over the drawer and hold, release early once, then finish
     s = r.pos("soap")
     t = r.pos("pourTarget")
+    # release as soon as the cup has started filling. The release is fired from inside the page on the
+    # first frame past 10 %: on a loaded machine each scripted mouse move is a slow round trip, and a
+    # release sent from here can arrive after the whole 2 s pour has already finished.
+    r.js("""(function () {
+        const canvas = document.getElementById('scene');
+        window.__earlyRelease = null;
+        (function watch() {
+            const fill = window.__bilas.MS.washer.soapFill || 0;
+            if (fill > 0.1) {
+                canvas.dispatchEvent(new PointerEvent('pointerup', {
+                    bubbles: true, pointerId: 1, pointerType: 'mouse', isPrimary: true,
+                    clientX: %f, clientY: %f
+                }));
+                window.__earlyRelease = fill;
+                return;
+            }
+            if (!window.__bilas.MS.washer.soap) {
+                requestAnimationFrame(watch);
+            }
+        })();
+        return true;
+    })()""" % (t["x"], t["y"]))
     pg.mouse.move(s["x"], s["y"])
     pg.mouse.down()
     for i in range(1, 19):
         k = i / 18
         pg.mouse.move(s["x"] + (t["x"] - s["x"]) * k, s["y"] + (t["y"] - s["y"]) * k)
         pg.wait_for_timeout(20)
-    # release as soon as the cup has started filling: a fixed delay (or a slow WebGL screenshot here)
-    # can start the pour late or let the 2 s pour finish before the "early" release
-    r.until("(" + B + "MS.washer.soapFill || 0) > 0.1", 6)
+    r.until("window.__earlyRelease !== null", 12)
     pg.mouse.up()
     pg.wait_for_timeout(1200)
     part = r.js(B + "MS.washer.soapFill || 0")
-    F.expect(0 < part < 1 and r.js(B + "MS.washer.soap") is False, f"early release keeps a partial cup ({part:.2f})")
+    released = r.js("window.__earlyRelease")
+    soap_now = r.js(B + "MS.washer.soap")
+    F.expect(0 < part < 1 and soap_now is False, f"early release keeps a partial cup ({part:.2f}, released at {released}, soap {soap_now})")
     r.wait_idle()
     s = r.pos("soap")
     t = r.pos("pourTarget")
