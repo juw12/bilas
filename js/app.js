@@ -477,6 +477,7 @@
       }, function () {
         A.play("coinDrop");
         jiggleTray(0.03);
+        clink(coin.getWorldPosition(new T.Vector3()), 0.55);
         // one small hop and a settling wobble before it lies flat
         const tilt = rand(0.15, 0.3);
         const spin = rand(0, 3);
@@ -653,11 +654,72 @@
   }
 
   // detergent
-  const stream = new T.Mesh(new T.CylinderGeometry(0.004, 0.003, 0.06, 6), new T.MeshStandardMaterial({ color: "#7fc0b3", transparent: true, opacity: 0.8 }));
-  stream.position.set(-0.17, 0.69, 0.1);
+  // the pour: a glossy tapered column that runs from the bottle mouth down into the drawer cup,
+  // a few drops breaking off it and a ring where it lands
+  const liquidMat = new T.MeshStandardMaterial({ color: "#86cdbf", emissive: "#1d4a43", roughness: 0.12, metalness: 0.05, transparent: true, opacity: 0.88 });
+  const streamGeo = new T.CylinderGeometry(0.0062, 0.0036, 1, 10, 1, true);
+  streamGeo.translate(0, -0.5, 0);
+  const stream = new T.Mesh(streamGeo, liquidMat);
   stream.visible = false;
   stream.userData.pass = true;
   W.washer.group.add(stream);
+  const streamDrops = [];
+  for (let i = 0; i < 4; i++) {
+    const drop = new T.Mesh(new T.SphereGeometry(0.0042, 8, 6), liquidMat);
+    drop.visible = false;
+    drop.userData.pass = true;
+    W.washer.group.add(drop);
+    streamDrops.push(drop);
+  }
+  const splashRing = new T.Mesh(
+    new T.RingGeometry(0.006, 0.0095, 20),
+    new T.MeshBasicMaterial({ color: "#e9fbf6", transparent: true, opacity: 0, depthWrite: false, side: T.DoubleSide })
+  );
+  splashRing.rotation.x = -Math.PI / 2;
+  splashRing.visible = false;
+  splashRing.userData.pass = true;
+  W.washer.group.add(splashRing);
+  const MOUTH = new T.Vector3(0, 0.172, 0);
+  const pourFx = { on: false, t: 0, len: 0, top: new T.Vector3(), cupY: 0 };
+  W.pourFx = pourFx;
+
+  function stepStream(dt) {
+    const show = pourFx.on;
+    stream.visible = show;
+    splashRing.visible = show;
+    streamDrops.forEach(function (d) {
+      d.visible = show;
+    });
+    if (!show) {
+      pourFx.t = 0;
+      return;
+    }
+    pourFx.t += dt;
+    const b = MS.washer.parts.bottle;
+    const d = MS.washer.parts.drawer;
+    const g = W.washer.group;
+    b.updateWorldMatrix(true, false);
+    const top = g.worldToLocal(b.localToWorld(MOUTH.clone()));
+    const cupY = d.position.y + 0.027;
+    const len = Math.max(0.008, top.y - cupY);
+    // the column wobbles and necks a little, like a real pour
+    const wob = 1 + 0.18 * Math.sin(pourFx.t * 38) + 0.08 * Math.sin(pourFx.t * 91);
+    stream.position.copy(top);
+    stream.scale.set(wob, len, wob);
+    stream.rotation.z = 0.04 * Math.sin(pourFx.t * 7);
+    streamDrops.forEach(function (drop, i) {
+      const ph = (pourFx.t * 2.6 + i / streamDrops.length) % 1;
+      drop.position.set(top.x + 0.006 * Math.sin(i * 2.1 + pourFx.t * 9), top.y - len * ph * ph, top.z + 0.004 * Math.cos(i * 1.7));
+      drop.scale.setScalar(0.6 + 0.5 * ph);
+    });
+    const rp = (pourFx.t * 3.2) % 1;
+    splashRing.position.set(top.x, cupY + 0.0015, top.z);
+    splashRing.scale.setScalar(0.7 + rp * 1.6);
+    splashRing.material.opacity = 0.75 * (1 - rp);
+    pourFx.top.copy(top);
+    pourFx.cupY = cupY;
+    pourFx.len = len;
+  }
 
   function addSoap() {
     const m = MS.washer;
@@ -679,11 +741,9 @@
       b.rotation.z = 1.9 * k;
     }, function () {
       A.play("pour");
-      stream.visible = true;
-      tween(1.3, function (k) {
-        stream.scale.set(1, 0.6 + 0.4 * Math.sin(k * 40), 1);
-      }, function () {
-        stream.visible = false;
+      pourFx.on = true;
+      later(1.3, function () {
+        pourFx.on = false;
         tween(0.6, function (k) {
           b.position.lerpVectors(pour, home, k);
           b.rotation.z = 1.9 * (1 - k);
@@ -758,10 +818,9 @@
     const target = near ? 1.9 : 0.25;
     b.rotation.z += (target - b.rotation.z) * Math.min(1, dt * 9);
     const pouring = near && b.rotation.z > 1.45;
-    stream.visible = pouring;
+    pourFx.on = pouring;
     if (pouring) {
       m.soapFill = Math.min(1, m.soapFill + dt / POUR_TIME);
-      stream.scale.set(1, 0.6 + 0.4 * Math.sin(performance.now() / 25), 1);
       const now = performance.now() / 1000;
       if (now - dg.lastSound > 1.2) {
         dg.lastSound = now;
@@ -783,7 +842,7 @@
     const home = m.parts.bottleHome.clone();
     const p0 = b.position.clone();
     const r0 = b.rotation.z;
-    stream.visible = false;
+    pourFx.on = false;
     tween(0.5, function (k) {
       b.position.lerpVectors(p0, home, k);
       b.rotation.z = r0 * (1 - k);
@@ -876,6 +935,7 @@
       });
       A.play("coinSlot");
       pushPlate(m.parts.slotPlate);
+      clink(m.parts.slotWorld(), 1);
       updateHUD();
     });
   }
@@ -1017,6 +1077,9 @@
           if (Math.abs(tb.phi) < 0.3) {
             tb.falling = false;
             tb.k = rand(-0.3, 0.4);
+            if (m.key === "washer" && m.parts.water.visible) {
+              splashWater(m, root.position.x / R);
+            }
             if (m.key === "dryer" && m.phase === "run" && near > 0.5) {
               const now = performance.now();
               if (now - m.lastThump > 140) {
@@ -1067,6 +1130,83 @@
         s.obj.setTumble(tb.flow, tumbleDir, performance.now() / 1000 + tb.k * 7);
       }
     });
+  }
+
+  // a shirt dropping back into the water heaves the surface and throws a few drops
+  function splashWater(m, x) {
+    const wu = m.parts.water.material.uniforms;
+    const now = performance.now();
+    if (now - (m.lastSplash || 0) < 220) {
+      return;
+    }
+    m.lastSplash = now;
+    wu.uSplash.value = Math.min(1, wu.uSplash.value * 0.35 + 0.8);
+    wu.uSplashX.value = Math.max(-0.8, Math.min(0.8, x));
+    wu.uSplashT.value = 0;
+    m.splashes = (m.splashes || 0) + 1;
+  }
+
+  // coin clink: one shared light (made once, so no shader rebuilds) flashes where the coin hit,
+  // a star glint pops on the metal and the view gives the smallest jolt
+  const glint = new T.PointLight("#fff1cf", 0, 0.45, 2);
+  W.scene.add(glint);
+  const glintTex = W.canvasTex(64, 64, function (c, w, h) {
+    const gr = c.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
+    gr.addColorStop(0, "rgba(255,255,255,1)");
+    gr.addColorStop(0.25, "rgba(255,244,214,0.55)");
+    gr.addColorStop(1, "rgba(255,244,214,0)");
+    c.fillStyle = gr;
+    c.fillRect(0, 0, w, h);
+    c.fillStyle = "rgba(255,255,255,0.9)";
+    c.fillRect(w / 2 - 1, 4, 2, h - 8);
+    c.fillRect(4, h / 2 - 1, w - 8, 2);
+  });
+  const glintSprite = new T.Sprite(new T.SpriteMaterial({ map: glintTex, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending }));
+  glintSprite.visible = false;
+  glintSprite.userData.pass = true;
+  W.scene.add(glintSprite);
+  const clinkFx = { t: 9, strength: 0, count: 0, peak: 0 };
+  W.clinkFx = clinkFx;
+  const REDUCED_MOTION = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function clink(pos, strength) {
+    const camPos = W.camera.position;
+    // nudge the light and glint a few cm toward the viewer so they read on the metal
+    const toCam = camPos.clone().sub(pos).normalize();
+    glint.position.copy(pos).addScaledVector(toCam, 0.05);
+    glintSprite.position.copy(pos).addScaledVector(toCam, 0.012);
+    clinkFx.t = 0;
+    clinkFx.strength = strength;
+    clinkFx.count += 1;
+  }
+
+  function stepClink(dt) {
+    clinkFx.t += dt;
+    const k = clinkFx.t / 0.28;
+    if (k >= 1) {
+      glint.intensity = 0;
+      glintSprite.visible = false;
+      return;
+    }
+    const env = Math.exp(-k * 4) * (1 - k);
+    glint.intensity = 0.05 * clinkFx.strength * env;
+    clinkFx.peak = Math.max(clinkFx.peak, glint.intensity);
+    glintSprite.visible = true;
+    glintSprite.material.opacity = env;
+    glintSprite.material.rotation = k * 0.8;
+    glintSprite.scale.setScalar(0.018 + 0.03 * clinkFx.strength * Math.sin(Math.min(1, k * 3) * Math.PI * 0.5));
+  }
+
+  // decaying jolt added after the camera settles; skipped with reduced motion
+  function clinkKick(cm) {
+    if (REDUCED_MOTION || clinkFx.t > 0.3) {
+      return;
+    }
+    const k = clinkFx.t;
+    const amp = 0.0035 * clinkFx.strength * Math.exp(-k * 16);
+    clinkFx.kickMax = Math.max(clinkFx.kickMax || 0, Math.abs(amp * Math.sin(k * 70)));
+    cm.position.y += amp * Math.sin(k * 70);
+    cm.position.x += amp * 0.4 * Math.sin(k * 53 + 1);
   }
 
   function nearness(st) {
@@ -1125,6 +1265,12 @@
     setDrumAngle(P, m.ang);
     tumble(m, dt, m.vel, nearness("wash"));
     const wu = P.water.material.uniforms;
+    // the load displaces water: a full drum stands visibly higher than an empty one
+    if (level > -1.0) {
+      level += Math.min(0.14, m.items.length * 0.028);
+    }
+    wu.uSplash.value *= Math.exp(-dt * 2.4);
+    wu.uSplashT.value += dt;
     wu.uLevel.value += (level - wu.uLevel.value) * Math.min(1, dt * 3);
     wu.uFoam.value += (foam - wu.uFoam.value) * Math.min(1, dt * 2);
     wu.uSlosh.value = -m.vel * 0.045;
@@ -1787,6 +1933,8 @@
     change: [[1.85, 0.98, 0.0], [1.85, 0.78, -1.6]],
     wash: [[-0.75, 0.98, -0.3], [-0.75, 0.5, -1.36]],
     washPanel: [[-0.66, 1.0, -0.86], [-0.66, 0.79, -1.36]],
+    // loaded and shut but no soap yet: lift the view so the jug, the drawer and the pour all show
+    washSoap: [[-0.78, 1.16, -0.36], [-0.78, 0.66, -1.36]],
     dry: [[0.6, 0.98, -0.28], [0.6, 0.45, -1.36]],
     dryPanel: [[0.72, 1.0, -0.86], [0.72, 0.79, -1.36]],
     lint: [[0.6, 0.66, -0.8], [0.6, 0.11, -1.22]],
@@ -1802,7 +1950,12 @@
   function viewKey() {
     const st = S.station;
     if (st === "wash") {
-      return panelMode(MS.washer) ? "washPanel" : "wash";
+      if (panelMode(MS.washer)) {
+        return "washPanel";
+      }
+      const w = MS.washer;
+      const needsSoap = w.phase === "idle" && !w.doorOpen && w.items.length > 0 && !w.soap;
+      return needsSoap || (drag && drag.kind === "pour") ? "washSoap" : "wash";
     }
     if (st === "dry") {
       if (S.lint.open) {
@@ -1858,6 +2011,7 @@
       cm.position.y += Math.sin(tt * 0.5) * 0.008;
       cm.position.x += Math.sin(tt * 0.21) * 0.01;
     }
+    clinkKick(cm);
     cm.lookAt(cam.look);
   }
 
@@ -2832,7 +2986,7 @@
   }
 
   function stepDragCue(sinceInput) {
-    const path = !drag && sinceInput > (S.loadId <= 1 ? 1500 : 4200) ? dragCuePath() : null;
+    const path = !drag && sinceInput > (S.loadId <= 1 ? 6000 : 9000) ? dragCuePath() : null;
     if (!path) {
       if (cueEl.style.visibility !== "hidden") {
         cueEl.style.opacity = "0";
@@ -3434,6 +3588,8 @@
     }
     stepTweens(dt);
     stepPour(dt);
+    stepStream(dt);
+    stepClink(dt);
     stepSim(dt);
     stepBackground(dt);
     stepDrips(dt);
@@ -3517,6 +3673,13 @@
     S: S,
     MS: MS,
     go: go,
+    dragInfo: function () {
+      return {
+        kind: drag ? drag.kind : null,
+        started: !!(drag && drag.started),
+        moved: down ? Math.round(down.moved) : null
+      };
+    },
     idle: function () {
       return !cam.moving && !tweens.some(function (tw) {
         return tw.dur > 0 && tw.t < tw.dur;

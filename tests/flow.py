@@ -72,8 +72,13 @@ def serve():
         def log_message(self, *args):
             pass
 
+    class Server(socketserver.ThreadingTCPServer):
+        # the default backlog of 5 refused Chromium's parallel module requests on a loaded machine,
+        # so app.js sometimes never arrived and #btnStart timed out
+        request_queue_size = 128
+
     handler = functools.partial(Quiet, directory=str(ROOT))
-    server = socketserver.ThreadingTCPServer(("127.0.0.1", 0), handler)
+    server = Server(("127.0.0.1", 0), handler)
     server.daemon_threads = True
     threading.Thread(target=server.serve_forever, daemon=True).start()
     return server.server_address[1]
@@ -222,6 +227,7 @@ def phase_wash(r):
     r.shot("03-washer-loaded")
     r.tap("washerDoor")
     r.until("!" + B + "MS.washer.doorOpen && !" + B + "MS.washer.busy")
+    r.wait_idle()
     r.tap("soap", settle=False)
     r.until(B + "MS.washer.soap === true", 60)
     r.wait_idle()
@@ -406,8 +412,15 @@ def main():
             flow(r)
         except Exception as e:  # noqa: BLE001
             FAILS.append("EXCEPTION " + repr(e)[:300])
-            r.shot("zz-exception")
-        fired = page.evaluate("window.__bilas.fired ? window.__bilas.fired() : []")
+            print("EXCEPTION", repr(e)[:600], flush=True)
+            try:
+                r.shot("zz-exception")
+            except Exception as shot_exc:  # noqa: BLE001
+                print("no exception shot:", type(shot_exc).__name__, flush=True)
+        try:
+            fired = page.evaluate("window.__bilas.fired ? window.__bilas.fired() : []")
+        except Exception:  # noqa: BLE001
+            fired = []
         result = {
             "size": f"{WIDTH}x{HEIGHT}",
             "fails": FAILS,
@@ -417,7 +430,10 @@ def main():
             "soundCount": len([s for s in fired if s != "ambient"]),
             "ambient": "ambient" in fired,
         }
-        browser.close()
+        try:
+            browser.close()
+        except Exception:  # noqa: BLE001
+            pass
     print("RESULT " + json.dumps(result), flush=True)
     os._exit(0)
 

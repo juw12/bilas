@@ -194,6 +194,484 @@
     return new T.Mesh(new T.CircleGeometry(size, 32), new T.MeshStandardMaterial({ map: t, roughness: 0.5 }));
   }
 
+
+  /* ---------- machine character: brand plates, wear, taped cues ---------- */
+  // four second-hand machines from four suppliers; names are invented, local-sounding
+  const BRANDS = {
+    1: { name: "SAMUDRA", model: "S-70 · 7 KG", style: "wave", metal: 0.65, rough: 0.35 },
+    2: { name: "TIRTA", model: "PRO 7 KG", style: "enamel", metal: 0.15, rough: 0.3 },
+    3: { name: "SURYA", model: "HEAT 8 KG", style: "sun", metal: 0.6, rough: 0.38 },
+    4: { name: "BARA", model: "GAS 8", style: "ember", metal: 0.3, rough: 0.45 }
+  };
+  W.BRANDS = BRANDS;
+
+  function seeded(seed) {
+    let s = seed % 2147483647;
+    if (s <= 0) {
+      s += 2147483646;
+    }
+    return function () {
+      s = (s * 16807) % 2147483647;
+      return (s - 1) / 2147483646;
+    };
+  }
+
+  function brushed(c, pw, ph, a, b) {
+    const gr = c.createLinearGradient(0, 0, pw, 0);
+    gr.addColorStop(0, a);
+    gr.addColorStop(0.5, b);
+    gr.addColorStop(1, a);
+    c.fillStyle = gr;
+    c.fillRect(0, 0, pw, ph);
+    for (let y = 0; y < ph; y += 2) {
+      c.fillStyle = "rgba(0,0,0," + (0.02 + ((y * 37) % 7) / 200).toFixed(3) + ")";
+      c.fillRect(0, y, pw, 1);
+    }
+  }
+
+  function rivets(c, pw, ph, col) {
+    c.fillStyle = col;
+    [[8, ph / 2], [pw - 8, ph / 2]].forEach(function (p) {
+      c.beginPath();
+      c.arc(p[0], p[1], 3.2, 0, Math.PI * 2);
+      c.fill();
+    });
+  }
+
+  function drawBrandPlate(c, pw, ph, brand) {
+    c.clearRect(0, 0, pw, ph);
+    c.textBaseline = "alphabetic";
+    if (brand.style === "wave") {
+      // stamped steel with a blue wave stripe
+      brushed(c, pw, ph, "#c5cacd", "#eef0f1");
+      c.fillStyle = "#2c5d86";
+      c.beginPath();
+      c.moveTo(0, ph);
+      for (let x = 0; x <= pw; x += 8) {
+        c.lineTo(x, ph - 12 + Math.sin(x / 14) * 3);
+      }
+      c.lineTo(pw, ph);
+      c.fill();
+      c.fillStyle = "#1f3f5c";
+      c.font = "bold 25px " + FONT_DISPLAY;
+      c.textAlign = "left";
+      c.fillText(brand.name, 18, 36);
+      c.font = "600 13px " + FONT_DISPLAY;
+      c.textAlign = "right";
+      c.fillText(brand.model, pw - 16, 34);
+      rivets(c, pw, ph - 10, "rgba(60,66,70,0.6)");
+    } else if (brand.style === "enamel") {
+      // vitreous enamel badge: deep teal oval on a cream ground, a little crazed
+      c.fillStyle = "#ece6d6";
+      c.beginPath();
+      c.roundRect(1, 1, pw - 2, ph - 2, 14);
+      c.fill();
+      c.fillStyle = "#1d5f63";
+      c.beginPath();
+      c.ellipse(pw * 0.36, ph / 2, pw * 0.3, ph * 0.38, 0, 0, Math.PI * 2);
+      c.fill();
+      c.strokeStyle = "#c79a3b";
+      c.lineWidth = 3;
+      c.stroke();
+      c.fillStyle = "#f6efdc";
+      c.font = "bold 27px " + FONT_DISPLAY;
+      c.textAlign = "center";
+      c.fillText(brand.name, pw * 0.36, ph / 2 + 10);
+      c.fillStyle = "#1d5f63";
+      c.font = "700 14px " + FONT_DISPLAY;
+      c.textAlign = "right";
+      c.fillText(brand.model, pw - 12, ph / 2 + 5);
+      c.strokeStyle = "rgba(90,80,60,0.18)";
+      c.lineWidth = 1;
+      for (let i = 0; i < 6; i++) {
+        c.beginPath();
+        c.moveTo(20 + i * 37, 4);
+        c.lineTo(34 + i * 31, ph - 6);
+        c.stroke();
+      }
+    } else if (brand.style === "sun") {
+      // brass-toned plate with a rising sun
+      brushed(c, pw, ph, "#b99a5c", "#e3cf98");
+      c.fillStyle = "#b8461f";
+      c.beginPath();
+      c.arc(30, ph - 10, 20, Math.PI, 0);
+      c.fill();
+      c.strokeStyle = "#b8461f";
+      c.lineWidth = 3;
+      for (let i = 0; i < 7; i++) {
+        const a = Math.PI + (i + 0.5) * (Math.PI / 7);
+        c.beginPath();
+        c.moveTo(30 + Math.cos(a) * 24, ph - 10 + Math.sin(a) * 24);
+        c.lineTo(30 + Math.cos(a) * 31, ph - 10 + Math.sin(a) * 31);
+        c.stroke();
+      }
+      c.fillStyle = "#4a3418";
+      c.font = "bold 26px " + FONT_DISPLAY;
+      c.textAlign = "left";
+      c.fillText(brand.name, 64, 38);
+      c.font = "600 13px " + FONT_DISPLAY;
+      c.textAlign = "right";
+      c.fillText(brand.model, pw - 12, 38);
+    } else {
+      // black anodised plate, ember-orange lettering, two screws
+      c.fillStyle = "#1e2124";
+      c.beginPath();
+      c.roundRect(1, 1, pw - 2, ph - 2, 6);
+      c.fill();
+      c.fillStyle = "#e0702a";
+      c.font = "italic bold 30px " + FONT_DISPLAY;
+      c.textAlign = "left";
+      c.fillText(brand.name, 22, 42);
+      c.fillStyle = "#e0702a";
+      c.fillRect(22, 48, 92, 3);
+      c.fillStyle = "#9aa1a6";
+      c.font = "600 13px " + FONT_DISPLAY;
+      c.textAlign = "right";
+      c.fillText(brand.model, pw - 18, 40);
+      rivets(c, pw, ph, "#6b7176");
+    }
+  }
+
+  // a transparent decal on a machine face; clicks pass through it
+  function decal(parent, w, h, x, y, z, draw, cw, ch) {
+    const pxW = cw || 256;
+    const pxH = ch || Math.round((pxW * h) / w);
+    const tex = canvasTex(pxW, pxH, draw, true);
+    const mat = new T.MeshStandardMaterial({
+      map: tex,
+      transparent: true,
+      depthWrite: false,
+      roughness: 0.7,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -4
+    });
+    const d = mesh(new T.PlaneGeometry(w, h), mat, x, y, z);
+    d.userData.pass = true;
+    d.renderOrder = 1;
+    parent.add(d);
+    return d;
+  }
+
+  // one enamel chip: bare dark steel, a rusty halo, a bright broken rim
+  function chip(c, x, y, r, rnd) {
+    const n = 7;
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2 + rnd() * 0.5;
+      const rr = r * (0.55 + rnd() * 0.6);
+      pts.push([x + Math.cos(a) * rr, y + Math.sin(a) * rr * (0.7 + rnd() * 0.4)]);
+    }
+    function path(scale) {
+      c.beginPath();
+      pts.forEach(function (p, i) {
+        const px = x + (p[0] - x) * scale;
+        const py = y + (p[1] - y) * scale;
+        if (i === 0) {
+          c.moveTo(px, py);
+        } else {
+          c.lineTo(px, py);
+        }
+      });
+      c.closePath();
+    }
+    c.fillStyle = "rgba(146,92,52,0.42)";
+    path(1.45);
+    c.fill();
+    c.fillStyle = "#3a3f43";
+    path(1);
+    c.fill();
+    c.strokeStyle = "rgba(255,255,255,0.5)";
+    c.lineWidth = 1.2;
+    path(1.08);
+    c.stroke();
+  }
+
+  function drawHandleWear(c, cw, ch, rnd) {
+    const hx = cw * 0.25;
+    const hy = ch * 0.5;
+    // grey halo where hands have rubbed the enamel for years
+    c.save();
+    c.translate(hx + cw * 0.12, hy);
+    c.scale(1, 1.6);
+    const halo = c.createRadialGradient(0, 0, 4, 0, 0, cw * 0.42);
+    halo.addColorStop(0, "rgba(78,80,82,0.24)");
+    halo.addColorStop(0.6, "rgba(90,92,94,0.09)");
+    halo.addColorStop(1, "rgba(90,92,94,0)");
+    c.fillStyle = halo;
+    c.beginPath();
+    c.arc(0, 0, cw * 0.42, 0, Math.PI * 2);
+    c.fill();
+    c.restore();
+    // finger smudges right of the handle, where the grip lands
+    for (let i = 0; i < 14; i++) {
+      c.fillStyle = "rgba(60,62,64," + (0.04 + rnd() * 0.06).toFixed(3) + ")";
+      c.beginPath();
+      c.ellipse(hx + cw * (0.12 + rnd() * 0.3), hy + ch * (rnd() - 0.5) * 0.36, 6 + rnd() * 8, 3 + rnd() * 4, rnd() * 3, 0, Math.PI * 2);
+      c.fill();
+    }
+    // a few chips knocked out by rings, keys and buckles
+    for (let i = 0; i < 6; i++) {
+      chip(c, hx + cw * (0.1 + rnd() * 0.45), hy + ch * (rnd() - 0.5) * 0.5, 2.5 + rnd() * 5, rnd);
+    }
+  }
+
+  function drawCornerChips(c, cw, ch, rnd, side) {
+    const outer = side < 0 ? 0 : cw;
+    const inward = side < 0 ? 1 : -1;
+    // shoe scuffs along the bottom
+    for (let i = 0; i < 9; i++) {
+      c.strokeStyle = "rgba(40,40,42," + (0.06 + rnd() * 0.1).toFixed(3) + ")";
+      c.lineWidth = 2 + rnd() * 3;
+      const sx = outer + inward * rnd() * cw * 0.9;
+      const sy = ch * (0.72 + rnd() * 0.25);
+      c.beginPath();
+      c.moveTo(sx, sy);
+      c.lineTo(sx + inward * (12 + rnd() * 24), sy - rnd() * 6);
+      c.stroke();
+    }
+    // chips stay on the outer edge so the brand plate and number sticker keep clean
+    for (let i = 0; i < 5; i++) {
+      chip(c, outer + inward * (4 + rnd() * cw * 0.28), ch * (0.15 + rnd() * 0.8), 3 + rnd() * 6, rnd);
+    }
+  }
+
+  function drawSlotScuffs(c, cw, ch, rnd) {
+    // bright scratches round the coin plate from missed coins
+    const cx = cw / 2;
+    const cy = ch / 2;
+    for (let i = 0; i < 22; i++) {
+      const a = rnd() * Math.PI * 2;
+      const r0 = cw * (0.33 + rnd() * 0.1);
+      const len = 6 + rnd() * 16;
+      c.strokeStyle = "rgba(225,228,230," + (0.18 + rnd() * 0.22).toFixed(3) + ")";
+      c.lineWidth = 1 + rnd();
+      c.beginPath();
+      c.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0 * 1.1);
+      c.lineTo(cx + Math.cos(a + 0.08) * (r0 + len), cy + Math.sin(a + 0.08) * (r0 + len) * 1.1);
+      c.stroke();
+    }
+  }
+
+  // worn yellow sticker between slot and start: arrow back to the slot, a coin, "then press"
+  function drawCoinArrow(c, cw, ch) {
+    const rnd = seeded(4242);
+    c.clearRect(0, 0, cw, ch);
+    c.fillStyle = "#f2c230";
+    c.beginPath();
+    c.roundRect(10, 10, cw - 20, ch - 20, 34);
+    c.fill();
+    c.fillStyle = "#1c1d1f";
+    // arrow pointing left to the slot
+    c.beginPath();
+    c.moveTo(34, ch / 2);
+    c.lineTo(150, ch / 2 - 96);
+    c.lineTo(150, ch / 2 - 40);
+    c.lineTo(250, ch / 2 - 40);
+    c.lineTo(250, ch / 2 + 40);
+    c.lineTo(150, ch / 2 + 40);
+    c.lineTo(150, ch / 2 + 96);
+    c.closePath();
+    c.fill();
+    // coin
+    c.lineWidth = 16;
+    c.strokeStyle = "#1c1d1f";
+    c.beginPath();
+    c.arc(370, ch / 2, 86, 0, Math.PI * 2);
+    c.stroke();
+    c.beginPath();
+    c.arc(370, ch / 2, 56, 0, Math.PI * 2);
+    c.lineWidth = 6;
+    c.stroke();
+    c.fillRect(361, ch / 2 - 34, 18, 68);
+    // wear: rubbed patches and a lifted corner
+    c.globalCompositeOperation = "destination-out";
+    for (let i = 0; i < 70; i++) {
+      const edge = rnd() < 0.5;
+      const x = edge ? (rnd() < 0.5 ? 12 + rnd() * 30 : cw - 12 - rnd() * 30) : 20 + rnd() * (cw - 40);
+      const y = edge ? 20 + rnd() * (ch - 40) : (rnd() < 0.5 ? 12 + rnd() * 26 : ch - 12 - rnd() * 26);
+      c.globalAlpha = 0.35 + rnd() * 0.6;
+      c.beginPath();
+      c.arc(x, y, 2 + rnd() * 7, 0, Math.PI * 2);
+      c.fill();
+    }
+    c.globalAlpha = 1;
+    c.beginPath();
+    c.moveTo(cw - 10, ch - 70);
+    c.lineTo(cw - 10, ch - 10);
+    c.lineTo(cw - 70, ch - 10);
+    c.closePath();
+    c.fill();
+    c.globalCompositeOperation = "source-over";
+    c.fillStyle = "rgba(255,246,214,0.95)";
+    c.beginPath();
+    c.moveTo(cw - 12, ch - 68);
+    c.lineTo(cw - 68, ch - 12);
+    c.lineTo(cw - 50, ch - 50);
+    c.closePath();
+    c.fill();
+    c.fillStyle = "rgba(120,90,20,0.18)";
+    c.fillRect(10, ch - 24, cw - 90, 10);
+  }
+
+  function tape(c, x, y, w, h, angle) {
+    c.save();
+    c.translate(x, y);
+    c.rotate(angle);
+    c.fillStyle = "rgba(236,226,196,0.82)";
+    c.fillRect(-w / 2, -h / 2, w, h);
+    c.fillStyle = "rgba(255,255,255,0.25)";
+    c.fillRect(-w / 2, -h / 2, w, h * 0.3);
+    c.restore();
+  }
+
+  // swipe-the-felt pictogram, taped to the dryer
+  function drawLintNote(c, cw, ch) {
+    c.clearRect(0, 0, cw, ch);
+    c.fillStyle = "#f7f3e8";
+    c.fillRect(20, 26, cw - 40, ch - 46);
+    // mesh tray
+    c.strokeStyle = "#7b8288";
+    c.lineWidth = 3;
+    c.strokeRect(44, 92, cw - 88, 92);
+    c.lineWidth = 1;
+    for (let x = 52; x < cw - 44; x += 9) {
+      c.beginPath();
+      c.moveTo(x, 94);
+      c.lineTo(x, 182);
+      c.stroke();
+    }
+    // fluff being pushed off
+    c.fillStyle = "#b9bec2";
+    c.beginPath();
+    c.ellipse(cw - 66, 138, 22, 15, 0.3, 0, Math.PI * 2);
+    c.fill();
+    // swipe arrow
+    c.strokeStyle = "#c2412f";
+    c.lineWidth = 9;
+    c.lineCap = "round";
+    c.beginPath();
+    c.moveTo(62, 70);
+    c.quadraticCurveTo(cw / 2, 46, cw - 82, 70);
+    c.stroke();
+    c.fillStyle = "#c2412f";
+    c.beginPath();
+    c.moveTo(cw - 62, 72);
+    c.lineTo(cw - 92, 52);
+    c.lineTo(cw - 88, 88);
+    c.closePath();
+    c.fill();
+    c.fillStyle = "#2b3236";
+    c.font = "bold 30px " + FONT_DISPLAY;
+    c.textAlign = "center";
+    c.fillText("LINT", cw / 2, ch - 34);
+    tape(c, cw / 2, 30, 110, 26, -0.05);
+  }
+
+  // the three folds as a taped card: smooth, sleeve, sleeve, bottom up
+  function drawFoldCard(c, cw, ch) {
+    c.clearRect(0, 0, cw, ch);
+    c.fillStyle = "#fbf7ec";
+    c.fillRect(16, 22, cw - 32, ch - 40);
+    c.fillStyle = "rgba(120,100,60,0.08)";
+    c.fillRect(16, ch - 30, cw - 32, 12);
+    const cellW = (cw - 32) / 4;
+    const top = 40;
+    const cellH = ch - 80;
+    function shirtShape(x, y, s, leftIn, rightIn, bottomUp) {
+      // a T-shirt outline centred at x,y; folded parts drawn as darker overlaps
+      const bw = 40 * s;
+      const bh = (bottomUp ? 34 : 64) * s;
+      c.fillStyle = "#7a93b8";
+      c.beginPath();
+      c.rect(x - bw / 2, y - 30 * s, bw, bh);
+      c.fill();
+      if (!leftIn) {
+        c.beginPath();
+        c.moveTo(x - bw / 2, y - 30 * s);
+        c.lineTo(x - bw / 2 - 22 * s, y - 14 * s);
+        c.lineTo(x - bw / 2 - 12 * s, y);
+        c.lineTo(x - bw / 2, y - 10 * s);
+        c.fill();
+      } else {
+        c.fillStyle = "#5c7599";
+        c.fillRect(x - bw / 2, y - 30 * s, bw * 0.33, bh);
+        c.fillStyle = "#7a93b8";
+      }
+      if (!rightIn) {
+        c.beginPath();
+        c.moveTo(x + bw / 2, y - 30 * s);
+        c.lineTo(x + bw / 2 + 22 * s, y - 14 * s);
+        c.lineTo(x + bw / 2 + 12 * s, y);
+        c.lineTo(x + bw / 2, y - 10 * s);
+        c.fill();
+      } else {
+        c.fillStyle = "#5c7599";
+        c.fillRect(x + bw / 2 - bw * 0.33, y - 30 * s, bw * 0.33, bh);
+      }
+      if (bottomUp) {
+        c.fillStyle = "#4e6688";
+        c.fillRect(x - bw / 2, y - 30 * s + bh * 0.45, bw, bh * 0.55);
+      }
+    }
+    function arrow(x0, y0, x1, y1) {
+      c.strokeStyle = "#c2412f";
+      c.fillStyle = "#c2412f";
+      c.lineWidth = 5;
+      c.lineCap = "round";
+      c.beginPath();
+      c.moveTo(x0, y0);
+      c.lineTo(x1, y1);
+      c.stroke();
+      const a = Math.atan2(y1 - y0, x1 - x0);
+      c.beginPath();
+      c.moveTo(x1 + Math.cos(a) * 6, y1 + Math.sin(a) * 6);
+      c.lineTo(x1 + Math.cos(a + 2.5) * 13, y1 + Math.sin(a + 2.5) * 13);
+      c.lineTo(x1 + Math.cos(a - 2.5) * 13, y1 + Math.sin(a - 2.5) * 13);
+      c.closePath();
+      c.fill();
+    }
+    for (let i = 0; i < 4; i++) {
+      const x = 16 + cellW * (i + 0.5);
+      const y = top + cellH * 0.52;
+      if (i > 0) {
+        c.strokeStyle = "rgba(60,60,60,0.18)";
+        c.lineWidth = 2;
+        c.beginPath();
+        c.moveTo(16 + cellW * i, top + 6);
+        c.lineTo(16 + cellW * i, top + cellH - 6);
+        c.stroke();
+      }
+      c.fillStyle = "#2b3236";
+      c.font = "bold 22px " + FONT_DISPLAY;
+      c.textAlign = "left";
+      c.fillText(String(i + 1), 16 + cellW * i + 8, top + 18);
+      if (i === 0) {
+        shirtShape(x, y, 1, false, false, false);
+        c.strokeStyle = "rgba(255,255,255,0.85)";
+        c.lineWidth = 3;
+        for (let k = 0; k < 3; k++) {
+          c.beginPath();
+          c.moveTo(x - 16, y - 16 + k * 14);
+          c.lineTo(x + 16, y - 16 + k * 14);
+          c.stroke();
+        }
+      } else if (i === 1) {
+        shirtShape(x, y, 1, true, false, false);
+        arrow(x - 40, y - 34, x - 14, y - 34);
+      } else if (i === 2) {
+        shirtShape(x, y, 1, true, true, false);
+        arrow(x + 40, y - 34, x + 14, y - 34);
+      } else {
+        shirtShape(x, y - 8, 1, true, true, true);
+        arrow(x, y + 46, x, y + 18);
+      }
+    }
+    tape(c, 34, 24, 62, 20, -0.5);
+    tape(c, cw - 34, 24, 62, 20, 0.45);
+  }
+  W.drawFoldCard = drawFoldCard;
+
   /* ---------- washer / dryer ---------- */
   function makeMachine(kind, number, opts) {
     opts = opts || {};
@@ -249,16 +727,37 @@
             uLevel: { value: -1.2 },
             uTime: { value: 0 },
             uSlosh: { value: 0 },
-            uFoam: { value: 0 }
+            uFoam: { value: 0 },
+            uSplash: { value: 0 },
+            uSplashX: { value: 0 },
+            uSplashT: { value: 9 }
           },
           vertexShader: "uniform float uR; varying vec2 vP; void main(){ vP = position.xy / uR; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
           fragmentShader: [
-            "uniform float uLevel; uniform float uTime; uniform float uSlosh; uniform float uFoam; varying vec2 vP;",
+            "uniform float uLevel; uniform float uTime; uniform float uSlosh; uniform float uFoam;",
+            "uniform float uSplash; uniform float uSplashX; uniform float uSplashT; varying vec2 vP;",
             "float h(vec2 p){ return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453); }",
             "void main(){",
             "  float wave = 0.035*sin(vP.x*7.0 + uTime*2.6) + 0.02*sin(vP.x*13.0 - uTime*4.1) + uSlosh*vP.x;",
+            // a shirt landing in the water: a heave under it and rings running outwards
+            "  float sdx = vP.x - uSplashX;",
+            "  wave += uSplash * (0.11*exp(-sdx*sdx*20.0) * cos(uSplashT*9.0) + 0.045*sin(abs(sdx)*24.0 - uSplashT*15.0) * exp(-abs(sdx)*2.5));",
             "  float surf = uLevel + wave;",
-            "  if (vP.y > surf) discard;",
+            // thrown drops above the surface for the first moment of the splash
+            "  float drops = 0.0;",
+            "  for (int i = 0; i < 4; i++) {",
+            "    float fi = float(i);",
+            "    float vx = (fi - 1.5) * 0.55;",
+            "    float vy = 1.2 + 0.35*mod(fi*1.7, 1.0);",
+            "    vec2 dp = vec2(uSplashX + vx*uSplashT, uLevel + vy*uSplashT - 5.0*uSplashT*uSplashT);",
+            "    drops += smoothstep(0.045, 0.02, length(vP - dp));",
+            "  }",
+            "  drops *= uSplash * step(uSplashT, 0.42);",
+            "  if (vP.y > surf) {",
+            "    if (drops < 0.05) discard;",
+            "    gl_FragColor = vec4(0.93, 0.98, 1.0, drops * 0.85);",
+            "    return;",
+            "  }",
             "  float depth = clamp(surf - vP.y, 0.0, 1.0);",
             "  vec3 col = mix(vec3(0.74,0.88,0.92), vec3(0.24,0.45,0.55), depth);",
             // slow swirl streaks under the surface
@@ -441,28 +940,43 @@
     });
     // deep rubber gasket inside the porthole
     g.add(mesh(new T.TorusGeometry(R + 0.002, 0.016, 12, 56), M.rubber, 0, cy, -0.022));
-    // brushed maker's plate
+    // maker's plate: each machine came from a different supplier, so each badge is its own
+    const brand = BRANDS[number] || BRANDS[kind === "washer" ? 2 : 3];
     const plateTex = canvasTex(256, 64, function (c, pw, ph) {
-      const gr = c.createLinearGradient(0, 0, pw, 0);
-      gr.addColorStop(0, "#c9cdd0");
-      gr.addColorStop(0.5, "#eef0f1");
-      gr.addColorStop(1, "#c3c7ca");
-      c.fillStyle = gr;
-      c.fillRect(0, 0, pw, ph);
-      for (let y = 0; y < ph; y += 2) {
-        c.fillStyle = "rgba(0,0,0," + (0.02 + Math.random() * 0.03).toFixed(3) + ")";
-        c.fillRect(0, y, pw, 1);
-      }
-      c.fillStyle = "#3a4044";
-      c.font = "bold 26px " + FONT_DISPLAY;
-      c.textAlign = "left";
-      c.fillText("bilas", 14, 40);
-      c.font = "600 15px " + FONT_DISPLAY;
-      c.textAlign = "right";
-      c.fillText(kind === "washer" ? "PRO 7 KG" : "HEAT 8 KG", pw - 14, 39);
+      drawBrandPlate(c, pw, ph, brand);
     }, true);
-    const makerPlate = mesh(new T.PlaneGeometry(0.11, 0.0275), new T.MeshStandardMaterial({ map: plateTex, metalness: 0.65, roughness: 0.35 }), -0.2, 0.095, 0.002);
+    const makerPlate = mesh(
+      new T.PlaneGeometry(0.11, 0.0275),
+      new T.MeshStandardMaterial({ map: plateTex, metalness: brand.metal, roughness: brand.rough, transparent: true }),
+      -0.2,
+      0.095,
+      0.002
+    );
+    makerPlate.userData.pass = true;
     g.add(makerPlate);
+    parts.brand = brand.name;
+
+    // years of use: worn enamel round the door handle, chipped lower corners, coin scuffs by the slot
+    const wear = [];
+    const rnd = seeded(number * 977 + 13);
+    const handleX = R + 0.035;
+    wear.push(decal(g, 0.12, 0.17, handleX + 0.03, cy, 0.0012, function (c, s, t) {
+      drawHandleWear(c, s, t, rnd);
+    }));
+    [-1, 1].forEach(function (sx) {
+      wear.push(decal(g, 0.1, 0.07, sx * (w / 2 - 0.05), 0.085, 0.0012, function (c, s, t) {
+        drawCornerChips(c, s, t, rnd, sx);
+      }));
+    });
+    wear.push(decal(g, 0.1, 0.11, 0.085, 0.765, 0.0351, function (c, s, t) {
+      drawSlotScuffs(c, s, t, rnd);
+    }));
+    parts.wear = wear;
+
+    // worn yellow sticker between slot and start: "coin goes here" without a word of UI
+    const coinArrow = decal(g, 0.05, 0.034, 0.144, 0.765, 0.0356, drawCoinArrow, 512, 348);
+    coinArrow.material.opacity = 0.96;
+    parts.coinArrow = coinArrow;
 
     if (kind === "washer") {
       const drawer = new T.Group();
@@ -529,6 +1043,10 @@
       parts.bottle = bottle;
       parts.bottleHome = bottle.position.clone();
     } else {
+      // taped pictogram: swipe the felt before you dry
+      const lintNote = decal(g, 0.075, 0.075, 0.235, 0.205, 0.0013, drawLintNote, 256, 256);
+      lintNote.rotation.z = -0.06;
+      parts.lintNote = lintNote;
       // lint trap slot under the porthole
       const lintSlot = mesh(new T.BoxGeometry(0.3, 0.022, 0.006), M.black, 0, 0.115, 0.003);
       g.add(lintSlot);
@@ -1554,6 +2072,13 @@
     board.receiveShadow = true;
     board.userData.pass = true;
     scene.add(board);
+
+    // taped how-to card on the board's far corner: the folds in four pictures
+    const foldCard = decal(scene, 0.26, 0.105, W.tableSpot.x - 0.2, 0.8512, W.tableSpot.z - 0.255, drawFoldCard, 640, 258);
+    foldCard.rotation.x = -Math.PI / 2;
+    foldCard.rotation.z = 0.035;
+    foldCard.receiveShadow = true;
+    W.foldCard = foldCard;
 
     // table props along the back edge (decor only, clicks pass through)
     const decor = [];
