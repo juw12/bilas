@@ -318,6 +318,11 @@ def phase_hang(r):
     expect(sorted(pegs) == [2, 2], f"2 shirts pegged ({pegs})")
     page.wait_for_timeout(2500)
     r.shot("08-hanging")
+    # while the line only dries, the hint names the station the red underline marks, and no timer is repeated
+    hint_text = r.js("document.getElementById('hint').textContent")
+    marked = r.js("(document.querySelector('#stations button.next') || {}).textContent || ''").strip()
+    expect(not marked or marked.lower() in hint_text.lower(), f"hint names the underlined station '{marked}' ({hint_text})")
+    expect(":" not in hint_text.split(".")[0], f"waiting hint leaves the timer to the ticket ({hint_text})")
     r.js(B + "ff(200)")
     page.wait_for_timeout(800)
     for i in range(2):
