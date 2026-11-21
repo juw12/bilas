@@ -11,7 +11,9 @@ A calm, first-person 3D coin laundromat. Sibling of [Jeda](https://github.com/ju
 | ![Hanging shirts](docs/hang.jpg) | <img src="docs/phone-fold.jpg" width="220" alt="Folding on a phone"> |
 
 ## Get it on your device
-- **Desktop (Windows / macOS / Linux):** open the link in Chrome or Edge and click the install icon in the address bar (or menu → *Install Bilas*). It runs in its own window and works offline. You can also download the repo and double-click `index.html`.
+- **Windows:** download [`Bilas-Windows-Setup.exe`](https://github.com/juw12/bilas/releases/download/desktop/Bilas-Windows-Setup.exe) and open it (no admin needed; if Windows says it protected your PC, choose *More info → Run anyway*). Without installing: [`Bilas-Windows-Portable.zip`](https://github.com/juw12/bilas/releases/download/desktop/Bilas-Windows-Portable.zip).
+- **Mac:** download [`Bilas-macOS-AppleSilicon.dmg`](https://github.com/juw12/bilas/releases/download/desktop/Bilas-macOS-AppleSilicon.dmg) (M1 and newer) or [`Bilas-macOS-Intel.dmg`](https://github.com/juw12/bilas/releases/download/desktop/Bilas-macOS-Intel.dmg), open it and drag Bilas to Applications. The first time, macOS blocks it because it is not notarized: **System Settings → Privacy & Security → Open Anyway**.
+- **Any computer, no download:** open the link in Chrome or Edge and click the install icon in the address bar (or menu → *Install Bilas*). It runs in its own window and works offline. You can also download the repo and double-click `index.html`.
 - **iPhone / iPad:** open the link in **Safari** → Share → **Add to Home Screen**. It opens full screen and works offline. Prefer a native app? Sideload `Bilas-unsigned.ipa` from the [ios release](https://github.com/juw12/bilas/releases/tag/ios) with AltStore or Sideloadly (they sign it with your own Apple ID). Not on the App Store.
 - **Android:** download `Bilas-android.apk` from the [android release](https://github.com/juw12/bilas/releases/tag/android) and allow your browser to install it, or open the link in Chrome → menu → **Add to Home screen**.
 
@@ -28,7 +30,7 @@ Turn the sound on — everything you hear is synthesized live.
 ## Details
 - three.js (bundled locally), Web Audio: about 30 synthesized sounds plus machine loops and room tone, placed in space. No audio files, no network calls.
 - English / Bahasa Indonesia, night (rain) and morning themes, cycle length 45 s to 3 min.
-- Installable PWA (manifest + service worker, offline). The Android APK and iOS app are Capacitor wrappers of the same files, built by GitHub Actions (`mobile/`, `.github/workflows/android.yml`, `.github/workflows/ios.yml`) and checked on an Android emulator and the iOS Simulator.
+- Installable PWA (manifest + service worker, offline). The Windows and Mac apps are a window around the live page ([`desktop/`](desktop/README.md), built and opened on each system by `.github/workflows/desktop.yml`). The Android APK and iOS app are Capacitor wrappers of the same files, built by GitHub Actions (`mobile/`, `.github/workflows/android.yml`, `.github/workflows/ios.yml`) and checked on an Android emulator and the iOS Simulator.
 - Works on phones (tested at 320-1440 px wide). Shows a friendly message if WebGL is unavailable.
 
 ## Tests
